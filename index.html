@@ -22,7 +22,6 @@
         .btn-header.import-btn { border-color: var(--accent); color: var(--accent); }
         .btn-header.import-btn:hover { background: var(--accent); color: var(--dark); }
         
-        /* Status Indicadores */
         .save-status, .conn-status { font-size: 12px; color: rgba(255,255,255,0.9); display: flex; align-items: center; gap: 5px; }
         .status-dot { width: 10px; height: 10px; border-radius: 50%; background: #aaa; }
         .status-dot.saving { background: var(--accent); animation: pulse 1s infinite; }
@@ -57,14 +56,13 @@
         .timeline-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .timeline { position: relative; padding-left: 30px; }
         .timeline::before { content: ''; position: absolute; left: 7px; top: 0; bottom: 0; width: 2px; background: var(--secondary); }
-        .timeline-item { position: relative; margin-bottom: 15px; background: var(--white); padding: 12px; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-left: 4px solid var(--accent); transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s; }
+        .timeline-item { position: relative; margin-bottom: 15px; background: var(--white); padding: 12px; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-left: 4px solid var(--accent); }
         .timeline-item::before { content: ''; position: absolute; left: -27px; top: 15px; width: 12px; height: 12px; background: var(--secondary); border-radius: 50%; border: 2px solid var(--white); }
         .timeline-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .timeline-form { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 8px; border-top: 1px solid #eee; padding-top: 8px; }
         .timeline-item.dragging { opacity: 0.35; transform: scale(0.98); }
         .timeline-item.drag-over-top { border-top: 3px solid var(--secondary); margin-top: -3px; }
         .timeline-item.drag-over-bottom { border-bottom: 3px solid var(--secondary); margin-bottom: -3px; }
-        .timeline-item[draggable="true"] { cursor: grab; }
         .drag-handle { display: flex; flex-direction: column; gap: 1px; margin-right: 6px; cursor: grab; color: #aaa; font-size: 16px; line-height: 1; user-select: none; padding: 0 4px; }
         .drag-handle-dots { letter-spacing: 1px; font-size: 11px; line-height: 0.9; }
         .move-btns { display: flex; flex-direction: column; gap: 2px; margin-left: 4px; }
@@ -91,7 +89,6 @@
         .mat-comp-box { background: var(--light); padding: 8px; border-radius: 4px; margin-top: 5px; border: 1px solid #ddd; }
         .comp-item { display: flex; justify-content: space-between; font-size: 11px; padding: 2px 0; border-bottom: 1px dashed #ccc; }
         .comp-form-grid { display: grid; grid-template-columns: 1fr 50px auto; gap: 5px; align-items: flex-end; }
-        .reorder-hint { font-size: 11px; color: #999; font-style: italic; margin-left: 10px; font-weight: normal; }
         #loadingScreen { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; z-index: 9999; }
     </style>
 </head>
@@ -151,18 +148,52 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Monitor de Conexão em Tempo Real
+    // Monitor de Conexão
     db.ref('.info/connected').on('value', snap => {
         const connDot = document.getElementById('connDot');
         const connText = document.getElementById('connText');
-        if (snap.val() === true) {
-            connDot.className = 'status-dot online';
-            connText.innerText = 'Online no Banco';
-        } else {
-            connDot.className = 'status-dot offline';
-            connText.innerText = 'Offline do Banco';
-        }
+        if (snap.val() === true) { connDot.className = 'status-dot online'; connText.innerText = 'Online'; } 
+        else { connDot.className = 'status-dot offline'; connText.innerText = 'Offline'; }
     });
+
+    // TRADUTOR COMPLETO DE CARACTERES PROIBIDOS DO FIREBASE ( . $ # [ ] / )
+    function sanitizeFirebaseKeys(obj) {
+        if (obj === null || typeof obj !== 'object') return obj;
+        if (Array.isArray(obj)) return obj.map(sanitizeFirebaseKeys);
+        const result = {};
+        for (const key in obj) {
+            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                const safeKey = key
+                    .replace(/\./g, '__PNT__')
+                    .replace(/\$/g, '__DSR__')
+                    .replace(/#/g, '__HSH__')
+                    .replace(/\[/g, '__BKT__')
+                    .replace(/\]/g, '__BKS__')
+                    .replace(/\//g, '__BRR__');
+                result[safeKey] = sanitizeFirebaseKeys(obj[key]);
+            }
+        }
+        return result;
+    }
+
+    function desanitizeFirebaseKeys(obj) {
+        if (obj === null || typeof obj !== 'object') return obj;
+        if (Array.isArray(obj)) return obj.map(desanitizeFirebaseKeys);
+        const result = {};
+        for (const key in obj) {
+            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                const originalKey = key
+                    .replace(/__PNT__/g, '.')
+                    .replace(/__DSR__/g, '$')
+                    .replace(/__HSH__/g, '#')
+                    .replace(/__BKT__/g, '[')
+                    .replace(/__BKS__/g, ']')
+                    .replace(/__BRR__/g, '/');
+                result[originalKey] = desanitizeFirebaseKeys(obj[key]);
+            }
+        }
+        return result;
+    }
 
     const defaultDatabaseState = {
       "medicos": [ "Dr. Thomas San Giovannni", "Dr. Panos Symeonides", "Dr. David kay", "Dr. Henyik Liska", "Dr. Alexandre Leme Godoy dos Santos", "Dr. José Antônio Veiga Sanhudo", "Dr. Bernard Fábio Meyer", "Dr. Orides Rinaldi Merino", "Dr. João Luiz Vieira da Silva", "Dr. Bruno A. B. Moura", "Dr. Luiz Fernando Bonaroski", "Dra. Amanda Damazio de Oliveira", "Dra. Barbara Heloisa Breidenbach Pupim", "Dr. Daniel Kyubin Cho", "Dr. José Tarcio de Campos Filho", "Dr. Alexandre Antonio de Camargo", "Dr. Jamil Faissal Soni" ],
@@ -194,19 +225,36 @@
     function loadDataFromCloud() {
         db.ref('eventData').once('value').then(snapshot => {
             const data = snapshot.val();
-            if (data) { medicos = data.medicos || []; materiais = data.materiais || {}; instrumentadores = data.instrumentadores || []; neoorthos = data.neoorthos || []; scheduleData = data.scheduleData || {}; }
-            else { medicos = [...defaultDatabaseState.medicos]; materiais = JSON.parse(JSON.stringify(defaultDatabaseState.materiais)); instrumentadores = [...defaultDatabaseState.instrumentadores]; neoorthos = [...defaultDatabaseState.neoorthos]; scheduleData = JSON.parse(JSON.stringify(defaultDatabaseState.scheduleData)); }
+            if (data) {
+                const originalData = desanitizeFirebaseKeys(data);
+                medicos = originalData.medicos || [];
+                materiais = originalData.materiais || {};
+                instrumentadores = originalData.instrumentadores || [];
+                neoorthos = originalData.neoorthos || [];
+                scheduleData = originalData.scheduleData || {};
+            } else {
+                medicos = [...defaultDatabaseState.medicos];
+                materiais = JSON.parse(JSON.stringify(defaultDatabaseState.materiais));
+                instrumentadores = [...defaultDatabaseState.instrumentadores];
+                neoorthos = [...defaultDatabaseState.neoorthos];
+                scheduleData = JSON.parse(JSON.stringify(defaultDatabaseState.scheduleData));
+            }
             ["CHC_08", "CHC_09", "CHR_08", "CHR_09"].forEach(tab => { if (!scheduleData[tab]) scheduleData[tab] = {}; salas.forEach(sala => { if (!scheduleData[tab][sala]) scheduleData[tab][sala] = {}; times.forEach(time => { if (!scheduleData[tab][sala][time]) scheduleData[tab][sala][time] = { medico: "", material: "", paciente: "", instrumentador: "", motor: false, neoortho: "" }; }); }); });
             document.getElementById('loadingScreen').style.display = 'none';
             updateSaveStatus('salvo');
             initUI();
         }).catch(error => { 
             console.error("Erro CRÍTICO ao carregar:", error); 
-            document.getElementById('loadingScreen').innerHTML = "<h2>Erro ao conectar ao Banco de Dados</h2><p>Verifique se o domínio planprogram.github.io está autorizado no Firebase e se as regras estão abertas.</p>"; 
+            document.getElementById('loadingScreen').innerHTML = "<h2>Erro ao conectar ao Banco de Dados</h2><p>Verifique as regras e domínios no Firebase.</p>"; 
         });
     }
 
-    function saveDataToCloud() { updateSaveStatus('salvando'); const dataToSave = { medicos, materiais, instrumentadores, neoorthos, scheduleData }; db.ref('eventData').set(dataToSave).then(() => { updateSaveStatus('salvo'); }).catch(error => { updateSaveStatus('erro'); console.error("Erro Firebase:", error); }); }
+    function saveDataToCloud() { 
+        updateSaveStatus('salvando'); 
+        const dataToSave = { medicos, materiais, instrumentadores, neoorthos, scheduleData }; 
+        const safeData = sanitizeFirebaseKeys(dataToSave);
+        db.ref('eventData').set(safeData).then(() => { updateSaveStatus('salvo'); }).catch(error => { updateSaveStatus('erro'); console.error("Erro Firebase:", error); }); 
+    }
     function forceSave() { clearTimeout(autoSaveTimer); saveDataToCloud(); }
     function initUI() { renderCadastros(); renderMateriais(); showTab('EVENT_05'); }
     function exportData() { const data = { medicos, materiais, instrumentadores, neoorthos, scheduleData }; const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2)); const dlAnchorElem = document.createElement('a'); dlAnchorElem.setAttribute("href", dataStr); dlAnchorElem.setAttribute("download", "steps2walk_backup.json"); dlAnchorElem.click(); }
@@ -232,7 +280,7 @@
 
     function renderCirurgias(tabKey) { const container = document.getElementById('scheduleContainer'); const [hospital, date] = tabKey.split('_'); const hKey = hospital.toLowerCase(); const matOptions = Object.keys(materiais).filter(m => materiais[m][hKey] > 0); const medFilter = medicos.filter(m => { if (regrasMedicos[m] && regrasMedicos[m] !== hospital) return false; return true; }).sort(); let html = `<table><thead><tr><th>Horário</th>${salas.map(s => `<th>${s}</th>`).join('')}</tr></thead><tbody>`; times.forEach((time, timeIdx) => { const separatorClass = timeIdx < times.length - 1 ? 'time-separator' : ''; html += `<tr><td class="time-col ${separatorClass}">${time}</td>`; salas.forEach(sala => { const slot = scheduleData[tabKey][sala][time]; const usedSameTime = getUsedResourcesSameHospitalTime(hospital, date, time, sala); let medOpt = `<option value="">Selecione...</option>`; medFilter.forEach(m => { if (usedSameTime.medicos.includes(m) && slot.medico !== m) return; if (isUsedInOtherHospitalDay('medico', m, hospital, date) && slot.medico !== m) return; medOpt += `<option value="${m}" ${slot.medico === m ? 'selected' : ''}>${m}</option>`; }); let matOpt = `<option value="">Selecione...</option>`; matOptions.forEach(m => { let usedQty = 0; Object.keys(scheduleData).filter(t => t.startsWith(hospital)).forEach(tk => { salas.forEach(s => times.forEach(t => { if(scheduleData[tk][s][t].material === m) usedQty++; })); }); const restante = materiais[m][hKey] - usedQty; if (restante <= 0 && slot.material !== m) return; matOpt += `<option value="${m}" ${slot.material === m ? 'selected' : ''}>${m} (Disp: ${restante})</option>`; }); let instOpt = `<option value="">Selecione...</option>`; instrumentadores.forEach(i => { if (usedSameTime.instrumentadores.includes(i) && slot.instrumentador !== i) return; instOpt += `<option value="${i}" ${slot.instrumentador === i ? 'selected' : ''}>${i}</option>`; }); let neoOpt = `<option value="">Selecione...</option>`; neoorthos.forEach(n => { if (isUsedInOtherHospitalDay('neoortho', n, hospital, date) && slot.neoortho !== n) return; neoOpt += `<option value="${n}" ${slot.neoortho === n ? 'selected' : ''}>${n}</option>`; }); const motorDisabled = (usedSameTime.motores >= maxMotorsPerHospital && !slot.motor) ? 'disabled' : ''; const motorAlert = (motorDisabled === 'disabled') ? `<span class="alert">Esgotado</span>` : ''; html += `<td class="${separatorClass}"><div style="margin-bottom:3px;"><b>Médico:</b><select onchange="updateSlot('${tabKey}','${sala}','${time}','medico',this.value)">${medOpt}</select></div><div style="margin-bottom:3px;"><b>Paciente:</b><input type="text" value="${slot.paciente}" onchange="updateSlot('${tabKey}','${sala}','${time}','paciente',this.value)"></div><div style="margin-bottom:3px;"><b>Material:</b><select onchange="updateSlot('${tabKey}','${sala}','${time}','material',this.value)">${matOpt}</select></div><div style="margin-bottom:3px;"><b>Instrumentador:</b><select onchange="updateSlot('${tabKey}','${sala}','${time}','instrumentador',this.value)">${instOpt}</select></div><div class="checkbox-label" style="margin-bottom:3px;"><b>Motor:</b><input type="checkbox" ${slot.motor ? 'checked' : ''} ${motorDisabled} onchange="updateSlot('${tabKey}','${sala}','${time}','motor',this.checked)"> ${motorAlert}</div><div><b>Neoortho:</b><select onchange="updateSlot('${tabKey}','${sala}','${time}','neoortho',this.value)">${neoOpt}</select></div></td>`; }); html += `</tr>`; }); html += `</tbody></table>`; container.innerHTML = html; }
 
-    function updateSlot(tabKey, sala, time, field, value) { const [hospital, date] = tabKey.split('_'); if (field === "medico" || field === "instrumentador") { const usedSameTime = getUsedResourcesSameHospitalTime(hospital, date, time, sala); const listType = field === "medico" ? "medicos" : "instrumentadores"; if (value && usedSameTime[listType].includes(value)) { alert(`Conflito! ${value} já alocado neste horário no ${hospital}.`); showTab(tabKey); return; } } if (field === "medico" && value) { if (isUsedInOtherHospitalDay('medico', value, hospital, date)) { alert(`Conflito! ${value} já alocado no outro hospital.`); showTab(tabKey); return; } } if (field === "neoortho" && value) { if (isUsedInOtherHospitalDay('neoortho', value, hospital, date)) { alert(`Conflito! ${value} já alocado no outro hospital.`); showTab(tabKey); return; } } if (field === "motor" && value === true) { const usedSameTime = getUsedResourcesSameHospitalTime(hospital, date, time, sala); if (usedSameTime.motores >= maxMotorsPerHospital) { alert(`Limite atingido!`); showTab(tabKey); return; } } scheduleData[tabKey][sala][time][field] = value; triggerAutoSave(); showTab(tabKey); }
+    function updateSlot(tabKey, sala, time, field, value) { const [hospital, date] = tabKey.split('_'); if (field === "medico" || field === "instrumentador") { const usedSameTime = getUsedResourcesSameHospitalTime(hospital, date, time, sala); const listType = field === "medico" ? "medicos" : "instrumentadores"; if (value && usedSameTime[listType].includes(value)) { alert(`Conflito! ${value} já alocado.`); showTab(tabKey); return; } } if (field === "medico" && value) { if (isUsedInOtherHospitalDay('medico', value, hospital, date)) { alert(`Conflito! ${value} já alocado.`); showTab(tabKey); return; } } if (field === "neoortho" && value) { if (isUsedInOtherHospitalDay('neoortho', value, hospital, date)) { alert(`Conflito! ${value} já alocado.`); showTab(tabKey); return; } } if (field === "motor" && value === true) { const usedSameTime = getUsedResourcesSameHospitalTime(hospital, date, time, sala); if (usedSameTime.motores >= maxMotorsPerHospital) { alert(`Limite atingido!`); showTab(tabKey); return; } } scheduleData[tabKey][sala][time][field] = value; triggerAutoSave(); showTab(tabKey); }
 
     function toggleMaterialDetails(m) { expandedMaterials[m] = !expandedMaterials[m]; renderMateriais(); }
     function addComponent(matName) { const nameInput = document.getElementById(`comp-name-${matName}`); const qtyInput = document.getElementById(`comp-qty-${matName}`); const compName = nameInput.value.trim(); const compQty = parseInt(qtyInput.value) || 1; if(compName) { if (!materiais[matName].components) materiais[matName].components = {}; materiais[matName].components[compName] = compQty; nameInput.value = ''; qtyInput.value = '1'; renderMateriais(); triggerAutoSave(); } }
