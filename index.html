@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STEPS2WALK Curitiba 2026 - Neoortho</title>
+    
+    <style>
+        :root {
+            --primary: #004d40; --primary-light: #e0f2f1; --secondary: #1a237e; --accent: #c5a003;
+            --success: #2e7d32; --danger: #c62828; --light: #f5f5f5; --dark: #212121; --white: #ffffff;
+            --border-dark: #455a64;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: var(--light); color: var(--dark); }
+        .header { background: var(--primary); color: var(--white); padding: 20px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-bottom: 4px solid var(--accent); }
+        .header h1 { margin: 0; font-size: 24px; text-transform: uppercase; letter-spacing: 2px; }
+        .header p { margin: 5px 0 0 0; opacity: 0.9; font-size: 14px; }
+        .header-actions { margin-top: 15px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .btn-header { padding: 8px 15px; border: 2px solid var(--white); background: transparent; color: var(--white); cursor: pointer; border-radius: 4px; font-weight: bold; transition: 0.3s; font-size: 12px; }
+        .btn-header:hover { background: var(--white); color: var(--primary); }
+        .btn-header.save-btn { border-color: var(--success); color: var(--success); background: rgba(255,255,255,0.1); }
+        .btn-header.save-btn:hover { background: var(--success); color: var(--white); }
+        .btn-header.import-btn { border-color: var(--accent); color: var(--accent); }
+        .btn-header.import-btn:hover { background: var(--accent); color: var(--dark); }
+        .container { display: flex; height: calc(100vh - 140px); } 
+        .sidebar { width: 340px; background: var(--white); padding: 15px; box-shadow: 2px 0 5px rgba(0,0,0,0.05); overflow-y: auto; border-right: 1px solid #ddd; }
+        .section-box { margin-bottom: 20px; }
+        .section-title { font-size: 13px; font-weight: bold; color: var(--primary); text-transform: uppercase; border-bottom: 2px solid var(--primary-light); padding-bottom: 5px; margin-bottom: 10px; }
+        .main { flex: 1; padding: 20px; overflow-y: auto; background: #eceff1; }
+        .tabs { display: flex; gap: 5px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab-btn { padding: 10px 15px; border: 2px solid var(--primary); background: transparent; color: var(--primary); cursor: pointer; border-radius: 4px; font-weight: bold; transition: 0.3s; font-size: 12px; }
+        .tab-btn:hover { background: var(--primary-light); }
+        .tab-btn.active { background: var(--primary); color: var(--white); }
+        .tab-btn.event-tab.active { background: var(--secondary); border-color: var(--secondary); }
+        .tab-btn.event-tab { border-color: var(--secondary); color: var(--secondary); }
+        .tab-btn.report-tab.active { background: var(--accent); border-color: var(--accent); color: var(--dark); }
+        .tab-btn.report-tab { border-color: var(--accent); color: var(--accent); }
+        table { width: 100%; border-collapse: collapse; background: var(--white); box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+        th { background: var(--primary); color: var(--white); font-size: 13px; border-color: rgba(255,255,255,0.2); }
+        .time-col { background: var(--primary-light); font-weight: bold; width: 80px; color: var(--primary); font-size: 12px;}
+        .left-text { text-align: left; }
+        .time-separator { border-bottom: 3px solid var(--border-dark) !important; }
+        .time-separator.time-col { border-bottom: 3px solid var(--border-dark) !important; }
+        select, input[type="text"], input[type="number"] { width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 12px; }
+        textarea { width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 12px; resize: vertical; min-height: 40px; }
+        .timeline-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .timeline { position: relative; padding-left: 30px; }
+        .timeline::before { content: ''; position: absolute; left: 7px; top: 0; bottom: 0; width: 2px; background: var(--secondary); }
+        .timeline-item { position: relative; margin-bottom: 15px; background: var(--white); padding: 12px; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-left: 4px solid var(--accent); transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s; }
+        .timeline-item::before { content: ''; position: absolute; left: -27px; top: 15px; width: 12px; height: 12px; background: var(--secondary); border-radius: 50%; border: 2px solid var(--white); }
+        .timeline-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .timeline-form { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 8px; border-top: 1px solid #eee; padding-top: 8px; }
+        .timeline-item.dragging { opacity: 0.35; transform: scale(0.98); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+        .timeline-item.drag-over-top { border-top: 3px solid var(--secondary); margin-top: -3px; }
+        .timeline-item.drag-over-bottom { border-bottom: 3px solid var(--secondary); margin-bottom: -3px; }
+        .timeline-item[draggable="true"] { cursor: grab; }
+        .timeline-item[draggable="true"]:active { cursor: grabbing; }
+        .drag-handle { display: flex; flex-direction: column; gap: 1px; margin-right: 6px; cursor: grab; color: #aaa; font-size: 16px; line-height: 1; user-select: none; padding: 0 4px; transition: color 0.2s; }
+        .drag-handle:hover { color: var(--secondary); }
+        .drag-handle-dots { letter-spacing: 1px; font-size: 11px; line-height: 0.9; }
+        .move-btns { display: flex; flex-direction: column; gap: 2px; margin-left: 4px; }
+        .move-btn { width: 22px; height: 16px; border: 1px solid #bbb; background: var(--light); color: #555; border-radius: 3px; cursor: pointer; font-size: 9px; display: flex; align-items: center; justify-content: center; transition: 0.2s; padding: 0; line-height: 1; }
+        .move-btn:hover { background: var(--secondary); color: var(--white); border-color: var(--secondary); }
+        .move-btn:disabled { opacity: 0.3; cursor: not-allowed; background: #eee; color: #aaa; border-color: #ddd; }
+        .summary-box { background: var(--white); border: 2px solid var(--accent); border-radius: 8px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(197, 160, 3, 0.15); }
+        .summary-title { font-weight: bold; color: var(--secondary); font-size: 16px; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;}
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+        .sponsor-card { background: var(--light); padding: 10px; border-radius: 4px; border-left: 3px solid var(--secondary); }
+        .sponsor-name { font-weight: bold; font-size: 13px; }
+        .sponsor-value { font-size: 16px; color: var(--primary); font-weight: bold; margin-top: 5px; }
+        .total-geral { text-align: right; font-size: 18px; color: var(--danger); font-weight: bold; margin-top: 10px; border-top: 2px solid #ddd; padding-top: 10px; }
+        .inline-form { display: flex; gap: 5px; margin-bottom: 8px; align-items: flex-end; }
+        .btn { padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s; height: 30px; }
+        .btn-add { background: var(--success); color: var(--white); }
+        .btn-remove { background: var(--danger); color: var(--white); font-size: 10px; padding: 3px 6px; height: auto; }
+        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); font-size: 10px; padding: 3px 6px; cursor: pointer; border-radius: 4px;}
+        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid #eee; font-size: 12px; }
+        .estoque-input { width: 40px; padding: 2px; text-align: center; }
+        .alert { color: var(--danger); font-size: 11px; font-weight: bold; }
+        .checkbox-label { display: flex; align-items: center; gap: 5px; font-size: 12px; justify-content: center; }
+        label { font-size: 10px; color: #777; display: block; margin-bottom: 2px; }
+        .mat-comp-box { background: var(--light); padding: 8px; border-radius: 4px; margin-top: 5px; border: 1px solid #ddd; }
+        .comp-item { display: flex; justify-content: space-between; font-size: 11px; padding: 2px 0; border-bottom: 1px dashed #ccc; }
+        .comp-form-grid { display: grid; grid-template-columns: 1fr 50px auto; gap: 5px; align-items: flex-end; }
+        .comp-form-grid label { font-size: 9px; }
+        .reorder-hint { font-size: 11px; color: #999; font-style: italic; margin-left: 10px; font-weight: normal; }
+        #loadingScreen { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; z-index: 9999; }
+    </style>
+</head>
+<body>
+
+<div id="loadingScreen">Carregando dados da nuvem...</div>
+
+<div class="header">
+    <h1>STEPS2WALK® CURITIBA 2026</h1>
+    <p>De 05 à 09 de outubro de 2026 | Foot and Ankle Training & Surgery</p>
+    <div class="header-actions">
+        <button class="btn-header save-btn" onclick="saveDataToCloud()">☁️ Salvar na Nuvem</button>
+        <button class="btn-header" onclick="exportData()">💾 Exportar Dados (Backup)</button>
+        <button class="btn-header import-btn" onclick="document.getElementById('importFile').click()">📂 Importar Dados</button>
+        <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+    </div>
+</div>
+
+<div class="container">
+    <div class="sidebar">
+        <div class="section-box">
+            <div class="section-title">Médicos</div>
+            <div class="inline-form">
+                <input type="text" id="newMedico" placeholder="Nome do Médico">
+                <button class="btn btn-add" onclick="addMedico()">+</button>
+            </div>
+            <div id="listaMedicos" style="max-height: 120px; overflow-y: auto;"></div>
+        </div>
+
+        <div class="section-box">
+            <div class="section-title">Instrumentadores</div>
+            <div class="inline-form">
+                <input type="text" id="newInstrumentador" placeholder="Nome">
+                <button class="btn btn-add" onclick="addCad('instrumentadores', 'newInstrumentador')">+</button>
+            </div>
+            <div id="listaInstrumentadores" style="max-height: 80px; overflow-y: auto;"></div>
+        </div>
+
+        <div class="section-box">
+            <div class="section-title">Resp. Neoortho</div>
+            <div class="inline-form">
+                <input type="text" id="newNeoortho" placeholder="Nome">
+                <button class="btn btn-add" onclick="addCad('neoorthos', 'newNeoortho')">+</button>
+            </div>
+            <div id="listaNeoorthos" style="max-height: 80px; overflow-y: auto;"></div>
+        </div>
+
+        <div class="section-box">
+            <div class="section-title">Estoque e Composição</div>
+            <div style="display: grid; grid-template-columns: 1fr 35px 125px auto auto; gap: 4px; font-size: 10px; font-weight: bold; margin-bottom: 5px; color:#555;">
+                <span>Material</span><span>CHC</span><span>CHR</span><span></span><span></span>
+            </div>
+            <div id="listaMateriais" style="max-height: 350px; overflow-y: auto;"></div>
+            <div class="inline-form" style="margin-top: 10px;">
+                <input type="text" id="newMatNome" placeholder="Novo Material">
+                <button class="btn btn-add" onclick="addMaterial()">+</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="tabs">
+            <button class="tab-btn event-tab" onclick="showTab('EVENT_05')">05 Out - UFPR/Fáb</button>
+            <button class="tab-btn event-tab" onclick="showTab('EVENT_06')">06 Out - Cadaver</button>
+            <button class="tab-btn event-tab" onclick="showTab('EVENT_07')">07 Out - CHR</button>
+            <button class="tab-btn" onclick="showTab('CHC_08')">08 Out - CHC-UFPR</button>
+            <button class="tab-btn" onclick="showTab('CHR_08')">08 Out - CHR</button>
+            <button class="tab-btn" onclick="showTab('CHC_09')">09 Out - CHC-UFPR</button>
+            <button class="tab-btn" onclick="showTab('CHR_09')">09 Out - CHR</button>
+            <button class="tab-btn report-tab" onclick="showTab('REPORT')">📊 Relatório</button>
+        </div>
+        <div id="scheduleContainer"></div>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+<script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD5_-AlE4zSXR0XHZBsyHKXG55x8QodRMs",
+      authDomain: "steps2walk-5d8b0.firebaseapp.com",
+      databaseURL: "https://steps2walk-5d8b0-default-rtdb.firebaseio.com",
+      projectId: "steps2walk-5d8b0",
+      storageBucket: "steps2walk-5d8b0.firebasestorage.app",
+      messagingSenderId: "914390869101",
+      appId: "1:914390869101:web:c2a8bcddce04a839480b64"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // =========================================================
+    //  DADOS PADRÃO (JSON FORNECIDO POR VOCÊ)
+    // =========================================================
+    const defaultDatabaseState = {
+      "medicos": [
+        "Dr. Thomas San Giovannni", "Dr. Panos Symeonides", "Dr. David kay", "Dr. Henyik Liska",
+        "Dr. Alexandre Leme Godoy dos Santos", "Dr. José Antônio Veiga Sanhudo", "Dr. Bernard Fábio Meyer",
+        "Dr. Orides Rinaldi Merino", "Dr. João Luiz Vieira da Silva", "Dr. Bruno A. B. Moura",
+        "Dr. Luiz Fernando Bonaroski", "Dra. Amanda Damazio de Oliveira", "Dra. Barbara Heloisa Breidenbach Pupim",
+        "Dr. Daniel Kyubin Cho", "Dr. José Tarcio de Campos Filho", "Dr. Alexandre Antonio de Camargo", "Dr. Jamil Faissal Soni"
+      ],
+      "materiais": {
+        "TTL": { "chc": 4, "chr": 3, "components": {} },
+        "TTCL": { "chc": 0, "chr": 3, "components": {} },
+        "FlexaFt": { "chc": 21, "chr": 0, "components": {} },
+        "Placa Retas": { "chc": 6, "chr": 2, "components": {} },
+        "Placa em T": { "chc": 8, "chr": 2, "components": {} },
+        "Pudu": { "chc": 5, "chr": 0, "components": {} },
+        "Osteotomia Calcâneo": { "chc": 3, "chr": 2, "components": {} },
+        "Parafuso 7mm": { "chc": 100, "chr": 0, "components": {} },
+        "Parafuso 4.5mm": { "chc": 8, "chr": 0, "components": {} },
+        "MTF": { "chc": 2, "chr": 4, "components": {} },
+        "Herbert": { "chc": 0, "chr": 10, "components": {} },
+        "Parafusos Canulados": { "chc": 0, "chr": 40, "components": {} }
+      },
+      "instrumentadores": [],
+      "neoorthos": [ "Vladimir", "Natacha", "Gustavo", "Maycon" ],
+      "scheduleData": {
+        "CHC_08": {
+          "Sala 1": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } },
+          "Sala 2": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } },
+          "Sala 3": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } },
+          "Sala 4": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } },
+          "Sala 5": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }
+        },
+        "CHC_09": {
+          "Sala 1": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } },
+          "Sala 2": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } },
+          "Sala 3": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } },
+          "Sala 4": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } },
+          "Sala 5": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }
+        },
+        "CHR_08": {
+          "Sala 1": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } },
+          "Sala 2": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } },
+          "Sala 3": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } },
+          "Sala 4": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" } },
+          "Sala 5": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" } }
+        },
+        "CHR_09": {
+          "Sala 1": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } },
+          "Sala 2": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "Vladimir" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } },
+          "Sala 3": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } },
+          "Sala 4": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } },
+          "Sala 5": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }
+        },
+        "EVENT_05": [
+          { "time": "7:00", "title": "Fotografos e Equipe", "desc": "", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 10000, "comments": "" },
+          { "time": "7:00", "title": "Entrega dos Crachás", "desc": "", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 2000, "comments": "Crachás divididos em cores diferentes:\nProfessores (25 Unid.);\nStaffs  (25 Unid.);\nInscritos  (40 Unid.);\nObservadores (40 Unid.):" },
+          { "time": "07:30", "title": "Boas-vindas e entrega de materiais", "desc": "Auditório Setor Ciências da Saúde UFPR", "resp": "Dr. João Luiz", "sponsor": "Steps2Walk", "price": 1, "comments": "" },
+          { "time": "08:00", "title": "Abertura", "desc": "", "resp": "Felipe", "sponsor": "NeoOrtho", "price": 0, "comments": "Empréstimo da Neoortho de um Projetor" },
+          { "time": "08:30 - 09:20", "title": "Aula", "desc": "", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 10000, "comments": "Materiais de apoio (Canetas, Bloco e Banner com BackDrop - 2,70 x 2m)" },
+          { "time": "09:20 - 10:30", "title": "Apresentação e discussão de casos", "desc": "CHC-UFPR", "resp": "", "sponsor": "", "price": 0, "comments": "" },
+          { "time": "10:30 - 10:50", "title": "Coffee Break", "desc": "", "resp": "", "sponsor": "", "price": 0, "comments": "" },
+          { "time": "10:50 - 11:10", "title": "Aula", "desc": "", "resp": "", "sponsor": "", "price": 0, "comments": "" },
+          { "time": "11:10 - 12:30", "title": "Apresentação e discussão de casos", "desc": "CHC-UFPR", "resp": "", "sponsor": "", "price": 0, "comments": "" },
+          { "time": "12:30 - 13:00", "title": "Brunch / Almoço", "desc": "", "resp": "", "sponsor": "", "price": 0, "comments": "" },
+          { "time": "13:00 - 13:20", "title": "Aula", "desc": "", "resp": "", "sponsor": "", "price": 0, "comments": "" },
+          { "time": "13:20 - 16:00", "title": "Apresentação e discussão de casos", "desc": "CHC-UFPR", "resp": "", "sponsor": "", "price": 0, "comments": "" },
+          { "time": "16:00 - 16:20", "title": "Coffee Break", "desc": "", "resp": "", "sponsor": "", "price": 0, "comments": "" },
+          { "time": "16:20 - 16:40", "title": "Aula", "desc": "", "resp": "", "sponsor": "", "price": 0, "comments": "" },
+          { "time": "16:40 - 18:20", "title": "Apresentação e discussão de casos", "desc": "CHC-UFPR", "resp": "", "sponsor": "", "price": 0, "comments": "" },
+          { "time": "18:30", "title": "Saída para visita à fábrica da Neoortho", "desc": "Transfer", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 7200, "comments": "Transfer da UFPR para a Neoortho 60 pessoas (Duas Vans) " },
+          { "time": "19:30", "title": "Apresentação Institucional e Visita à fábrica", "desc": "", "resp": "Felipe/Douglas", "sponsor": "NeoOrtho", "price": 6000, "comments": "Aluguel de audio e video e técnico" },
+          { "time": "20:15", "title": "Coquetel", "desc": "", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 21000, "comments": "Servir coquetel para 60 pessoas - Menu - TBD" },
+          { "time": "21:00", "title": "Transfer retorno hotel", "desc": "", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 7200, "comments": "Transfer da Neoortho para o NH Hotel / Novo Hotel - (Sugerido como hotel indicação do evento)" }
+        ],
+        "EVENT_06": [
+          { "time": "07:30 - 08:00", "title": "Entrega de Scrubs e paramentação", "desc": "Marc Institute® – Univ. Positivo", "resp": "Heloise", "sponsor": "NeoOrtho", "price": 141000, "comments": "Aluguel da sala, Arco em C." },
+          { "time": "08:00 - 10:00", "title": "Cadaver Lab", "desc": "", "resp": "Felipe", "sponsor": "NeoOrtho", "price": 130000, "comments": "Motores e Implantes e Instrumentais" },
+          { "time": "10:00 - 10:30", "title": "Coffee Break", "desc": "", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 3000, "comments": "Menu - TBD" },
+          { "time": "10:30 - 12:00", "title": "Cadaver Lab", "desc": "", "resp": "Felipe", "sponsor": "NeoOrtho", "price": 1800, "comments": "Instrumentadores Free Lance" },
+          { "time": "12:00 - 13:00", "title": "Brunch - Lunch Box", "desc": "", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 3000, "comments": "Menu - TBD" },
+          { "time": "13:00 - 16:00", "title": "Cadaver Lab", "desc": "", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 4000, "comments": "Touca Cirurgica" },
+          { "time": "16:00 - 16:30", "title": "Coffee Break", "desc": "", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 3000, "comments": "" },
+          { "time": "16:30 - 19:00", "title": "Cadaver Lab", "desc": "", "resp": "", "sponsor": "", "price": 0, "comments": "" }
+        ],
+        "EVENT_07": [
+          { "time": "08:00 - 09:20", "title": "Aula", "desc": "Auditório do CHR", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 3000, "comments": "Materiais de apoio (Canetas, Bloco) - Exposição material Neoortho e Banner" },
+          { "time": "09:20 - 10:30", "title": "Apresentação e discussão de casos", "desc": "CHC-UFPR", "resp": "", "sponsor": "", "price": 0, "comments": "" },
+          { "time": "10:30 - 10:50", "title": "Coffee Break", "desc": "", "resp": "", "sponsor": "", "price": 0, "comments": "" },
+          { "time": "10:50 - 11:10", "title": "Aula", "desc": "", "resp": "", "sponsor": "", "price": 0, "comments": "" },
+          { "time": "11:10 - 12:30", "title": "Apresentação e discussão de casos", "desc": "CHR", "resp": "", "sponsor": "", "price": 0, "comments": "" },
+          { "time": "12:30 - 13:00", "title": "Brunch / Almoço", "desc": "", "resp": "", "sponsor": "", "price": 0, "comments": "" },
+          { "time": "13:00 - 13:20", "title": "Aula", "desc": "", "resp": "", "sponsor": "", "price": 0, "comments": "" },
+          { "time": "13:20 - 16:00", "title": "Apresentação e discussão de casos", "desc": "CHR", "resp": "", "sponsor": "", "price": 0, "comments": "" },
+          { "time": "16:00 - 16:20", "title": "Coffee Break", "desc": "", "resp": "", "sponsor": "", "price": 0, "comments": "" },
+          { "time": "16:20 - 16:40", "title": "Aula", "desc": "", "resp": "", "sponsor": "", "price": 0, "comments": "" },
+          { "time": "16:40 - 18:20", "title": "Apresentação e discussão de casos", "desc": "CHR", "resp": "", "sponsor": "", "price": 0, "comments": "" }
+        ]
+      }
+    };
+
+    // =========================================================
+    //  VARIÁVEIS GERAIS
+    // =========================================================
+    let medicos = [];
+    let materiais = {};
+    let instrumentadores = [];
+    let neoorthos = [];
+    let scheduleData = {};
+    let expandedMaterials = {};
+    let dragState = { tabKey: null, dragIndex: null };
+
+    const regrasMedicos = { "Dr. Bruno A. B. Moura": "CHR", "Dr. Luiz Fernando Bonaroski": "CHR", "Dr. João Luiz Vieira da Silva": "CHC" };
+    const times = ["07:00 - 10:00", "10:00 - 13:00", "14:00 - 17:00"];
+    const salas = ["Sala 1", "Sala 2", "Sala 3", "Sala 4", "Sala 5"];
+    const maxMotorsPerHospital = 5;
+
+    // =========================================================
+    //  INICIALIZAÇÃO E BANCO DE DADOS
+    // =========================================================
+    function loadDataFromCloud() {
+        db.ref('eventData').once('value').then(snapshot => {
+            const data = snapshot.val();
+            if (data) {
+                medicos = data.medicos || defaultDatabaseState.medicos;
+                materiais = data.materiais || defaultDatabaseState.materiais;
+                instrumentadores = data.instrumentadores || defaultDatabaseState.instrumentadores;
+                neoorthos = data.neoorthos || defaultDatabaseState.neoorthos;
+                scheduleData = data.scheduleData || defaultDatabaseState.scheduleData;
+            } else {
+                medicos = [...defaultDatabaseState.medicos];
+                materiais = JSON.parse(JSON.stringify(defaultDatabaseState.materiais));
+                instrumentadores = [...defaultDatabaseState.instrumentadores];
+                neoorthos = [...defaultDatabaseState.neoorthos];
+                scheduleData = JSON.parse(JSON.stringify(defaultDatabaseState.scheduleData));
+            }
+
+            // Preencher cirurgias faltantes (caso adicione novas salas/horários no futuro)
+            ["CHC_08", "CHC_09", "CHR_08", "CHR_09"].forEach(tab => {
+                if (!scheduleData[tab]) scheduleData[tab] = {};
+                salas.forEach(sala => {
+                    if (!scheduleData[tab][sala]) scheduleData[tab][sala] = {};
+                    times.forEach(time => {
+                        if (!scheduleData[tab][sala][time]) scheduleData[tab][sala][time] = { medico: "", material: "", paciente: "", instrumentador: "", motor: false, neoortho: "" };
+                    });
+                });
+            });
+
+            document.getElementById('loadingScreen').style.display = 'none';
+            initUI();
+        }).catch(error => {
+            console.error("Erro ao carregar:", error);
+            document.getElementById('loadingScreen').innerHTML = "Erro ao carregar. Verifique as regras do Firebase.";
+        });
+    }
+
+    function saveDataToCloud() {
+        const btn = document.querySelector('.save-btn');
+        btn.innerText = "Salvando..."; btn.style.opacity = "0.5";
+        const dataToSave = { medicos, materiais, instrumentadores, neoorthos, scheduleData };
+
+        db.ref('eventData').set(dataToSave).then(() => {
+            btn.innerText = "✅ Salvo na Nuvem!";
+            setTimeout(() => { btn.innerText = "☁️ Salvar na Nuvem"; btn.style.opacity = "1"; }, 2000);
+        }).catch(error => {
+            alert("Erro ao salvar dados na nuvem!"); console.error(error);
+            btn.innerText = "☁️ Salvar na Nuvem"; btn.style.opacity = "1";
+        });
+    }
+
+    function initUI() { renderCadastros(); renderMateriais(); showTab('EVENT_05'); }
+
+    function exportData() {
+        const data = { medicos, materiais, instrumentadores, neoorthos, scheduleData };
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
+        const dlAnchorElem = document.createElement('a'); dlAnchorElem.setAttribute("href", dataStr); dlAnchorElem.setAttribute("download", "steps2walk_backup.json"); dlAnchorElem.click();
+    }
+
+    function importData(event) {
+        const file = event.target.files[0]; if (!file) return; const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (data.medicos) medicos = data.medicos; if (data.materiais) materiais = data.materiais; if (data.instrumentadores) instrumentadores = data.instrumentadores; if (data.neoorthos) neoorthos = data.neoorthos; if (data.scheduleData) scheduleData = data.scheduleData;
+                initUI(); alert("Dados importados! Clique em 'Salvar na Nuvem' para atualizar o site.");
+            } catch (error) { alert("Erro ao importar o arquivo."); }
+        }; reader.readAsText(file); event.target.value = "";
+    }
+
+    // =========================================================
+    //  FUNÇÕES AUXILIARES E CONFLITOS
+    // =========================================================
+    function getUsedResourcesSameHospitalTime(tabPrefix, date, time, excludeSala) {
+        const tabKey = `${tabPrefix}_${date}`; const used = { medicos: [], instrumentadores: [], motores: 0 };
+        if (scheduleData[tabKey]) { salas.forEach(sala => { if (sala === excludeSala) return; const slot = scheduleData[tabKey][sala]?.[time]; if (slot) { if (slot.medico) used.medicos.push(slot.medico); if (slot.instrumentador) used.instrumentadores.push(slot.instrumentador); if (slot.motor) used.motores++; } }); }
+        return used;
+    }
+    function isUsedInOtherHospitalDay(resourceType, resourceName, currentHospital, date) {
+        const otherHospital = currentHospital === "CHC" ? "CHR" : "CHC"; const otherTabKey = `${otherHospital}_${date}`;
+        if (!scheduleData[otherTabKey]) return false;
+        for (let sala in scheduleData[otherTabKey]) { for (let time in scheduleData[otherTabKey][sala]) { const slot = scheduleData[otherTabKey][sala][time]; if (resourceType === 'medico' && slot.medico === resourceName) return true; if (resourceType === 'neoortho' && slot.neoortho === resourceName) return true; } }
+        return false;
+    }
+    function formatBRL(value) { return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
+
+    function renderSponsorSummary() {
+        const summary = {}; let totalGeral = 0;
+        ['EVENT_05', 'EVENT_06', 'EVENT_07'].forEach(day => { if (scheduleData[day]) { scheduleData[day].forEach(task => { const sponsorName = task.sponsor.trim() || "Sem Patrocinador"; const cost = parseFloat(task.price) || 0; if (cost > 0) { if (!summary[sponsorName]) summary[sponsorName] = 0; summary[sponsorName] += cost; totalGeral += cost; } }); } });
+        let html = `<div class="summary-box"><div class="summary-title">📊 Resumo de Custos por Patrocinador</div><div class="summary-grid">`;
+        const sponsors = Object.keys(summary).sort();
+        if (sponsors.length === 0) html += `<p style="color:#777; font-size:12px;">Nenhum custo.</p>`; 
+        else sponsors.forEach(spon => html += `<div class="sponsor-card"><div class="sponsor-name">${spon}</div><div class="sponsor-value">${formatBRL(summary[spon])}</div></div>`);
+        html += `</div><div class="total-geral">Total Geral: ${formatBRL(totalGeral)}</div></div>`;
+        return html;
+    }
+
+    function showTab(tabKey) {
+        document.querySelectorAll('.tab-btn').forEach(btn => { btn.classList.remove('active'); if (btn.getAttribute('onclick') === `showTab('${tabKey}')`) btn.classList.add('active'); });
+        if (tabKey.startsWith("EVENT_")) renderEvento(tabKey); else if (tabKey === "REPORT") renderReport(); else renderCirurgias(tabKey);
+    }
+
+    function renderReport() {
+        const container = document.getElementById('scheduleContainer'); let kitUsage = { CHC: {}, CHR: {} };
+        ['CHC_08', 'CHC_09', 'CHR_08', 'CHR_09'].forEach(tab => { const hosp = tab.split('_')[0]; if (!scheduleData[tab]) return; for (let sala in scheduleData[tab]) { for (let time in scheduleData[tab][sala]) { let mat = scheduleData[tab][sala][time].material; if (mat) kitUsage[hosp][mat] = (kitUsage[hosp][mat] || 0) + 1; } } });
+        let componentNeeds = {};
+        ['CHC', 'CHR'].forEach(hosp => { for (let mat in kitUsage[hosp]) { const qty = kitUsage[hosp][mat]; const comps = materiais[mat]?.components || {}; for (let compName in comps) { const compQtyPerKit = comps[compName]; if (!componentNeeds[compName]) componentNeeds[compName] = { chc: 0, chr: 0 }; componentNeeds[compName][hosp.toLowerCase()] += (compQtyPerKit * qty); } } });
+        let html = `<h2 style="color:var(--primary); margin-bottom:15px;">📊 Relatório de Consumo - Cirurgias (08 e 09)</h2>`;
+        html += `<h3 style="color:var(--secondary);">Uso de Kits por Hospital</h3><table><thead><tr><th>Material (Kit)</th><th>Qtd CHC</th><th>Qtd CHR</th><th>Total Geral</th></tr></thead><tbody>`;
+        let allKits = new Set([...Object.keys(kitUsage.CHC), ...Object.keys(kitUsage.CHR)]);
+        if(allKits.size === 0) html += `<tr><td colspan="4" style="color:#777;">Nenhum material alocado nas cirurgias ainda.</td></tr>`;
+        allKits.forEach(kit => { const c = kitUsage.CHC[kit] || 0; const h = kitUsage.CHR[kit] || 0; html += `<tr><td class="left-text"><strong>${kit}</strong></td><td>${c}</td><td>${h}</td><td><strong>${c+h}</strong></td></tr>`; });
+        html += `</tbody></table>`;
+        html += `<h3 style="color:var(--secondary); margin-top:30px;">Previsão de Componentes</h3><table><thead><tr><th>Componente</th><th>Necessário CHC</th><th>Necessário CHR</th><th>Total Necessário</th></tr></thead><tbody>`;
+        if(Object.keys(componentNeeds).length === 0) html += `<tr><td colspan="4" style="color:#777;">Nenhum componente calculado.</td></tr>`;
+        for (let comp in componentNeeds) { const c = componentNeeds[comp].chc; const h = componentNeeds[comp].chr; html += `<tr><td class="left-text"><strong>${comp}</strong></td><td>${c}</td><td>${h}</td><td><strong>${c+h}</strong></td></tr>`; }
+        html += `</tbody></table>`; container.innerHTML = html;
+    }
+
+    function renderEvento(tabKey) {
+        const container = document.getElementById('scheduleContainer'); const events = scheduleData[tabKey] || []; let html = renderSponsorSummary();
+        html += `<div class="timeline-header"><h3 style="margin:0; color:var(--secondary);">Programação do Dia <span class="reorder-hint">Arraste ou use as setas</span></h3><button class="btn btn-add" onclick="addTask('${tabKey}')">+ Adicionar Tarefa</button></div>`;
+        html += `<div class="timeline" id="timeline-${tabKey}">`;
+        if(events.length === 0) html += `<p style="color:#777;">Nenhuma tarefa.</p>`;
+        events.forEach((evt, index) => {
+            html += `<div class="timeline-item" draggable="true" data-tab-key="${tabKey}" data-index="${index}" ondragstart="onDragStart(event, '${tabKey}', ${index})" ondragend="onDragEnd(event)" ondragover="onDragOver(event)" ondragenter="onDragEnter(event, this)" ondragleave="onDragLeave(event, this)" ondrop="onDrop(event, '${tabKey}', ${index})">
+                <div class="timeline-title-row">
+                    <div class="drag-handle" title="Arraste para reordenar"><div class="drag-handle-dots">⠿</div></div>
+                    <div style="flex:1; margin-right:10px;"><label>Horário</label><input type="text" value="${evt.time}" onchange="updateEvento('${tabKey}', ${index}, 'time', this.value)"></div>
+                    <div style="flex:3; margin-right:10px;"><label>Título</label><input type="text" value="${evt.title}" onchange="updateEvento('${tabKey}', ${index}, 'title', this.value)"></div>
+                    <div class="move-btns"><button class="move-btn" onclick="moveTask('${tabKey}', ${index}, -1)" ${index === 0 ? 'disabled' : ''}>▲</button><button class="move-btn" onclick="moveTask('${tabKey}', ${index}, 1)" ${index === events.length - 1 ? 'disabled' : ''}>▼</button></div>
+                    <button class="btn btn-remove" style="margin-left:6px;" onclick="deleteTask('${tabKey}', ${index})">X</button>
+                </div>
+                <div style="margin-bottom:8px;"><label>Descrição</label><input type="text" value="${evt.desc}" onchange="updateEvento('${tabKey}', ${index}, 'desc', this.value)"></div>
+                <div class="timeline-form">
+                    <div><label>Responsável:</label><input type="text" value="${evt.resp}" onchange="updateEvento('${tabKey}', ${index}, 'resp', this.value)"></div>
+                    <div><label>Patrocinador:</label><input type="text" value="${evt.sponsor}" style="border-color:var(--accent);" onchange="updateEvento('${tabKey}', ${index}, 'sponsor', this.value)"></div>
+                    <div><label>Custo (R$):</label><input type="number" step="0.01" value="${evt.price}" onchange="updateEvento('${tabKey}', ${index}, 'price', this.value)"></div>
+                </div>
+                <div style="margin-top:8px;"><label>Comentários:</label><textarea onchange="updateEvento('${tabKey}', ${index}, 'comments', this.value)">${evt.comments}</textarea></div>
+            </div>`;
+        }); html += `</div>`; container.innerHTML = html;
+    }
+
+    function onDragStart(e, tabKey, index) { dragState.tabKey = tabKey; dragState.dragIndex = index; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', index.toString()); requestAnimationFrame(() => e.target.classList.add('dragging')); }
+    function onDragEnd(e) { e.target.classList.remove('dragging'); document.querySelectorAll('.drag-over-top, .drag-over-bottom').forEach(el => el.classList.remove('drag-over-top', 'drag-over-bottom')); dragState.tabKey = null; dragState.dragIndex = null; }
+    function onDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
+    function onDragEnter(e, element) { e.preventDefault(); document.querySelectorAll('.drag-over-top, .drag-over-bottom').forEach(el => el.classList.remove('drag-over-top', 'drag-over-bottom')); const rect = element.getBoundingClientRect(); if (e.clientY < rect.top + rect.height / 2) { element.classList.add('drag-over-top'); element.classList.remove('drag-over-bottom'); } else { element.classList.add('drag-over-bottom'); element.classList.remove('drag-over-top'); } }
+    function onDragLeave(e, element) { if (!element.contains(e.relatedTarget)) element.classList.remove('drag-over-top', 'drag-over-bottom'); }
+    function onDrop(e, tabKey, dropIndex) { e.preventDefault(); document.querySelectorAll('.drag-over-top, .drag-over-bottom').forEach(el => el.classList.remove('drag-over-top', 'drag-over-bottom')); const dragIndex = dragState.dragIndex; if (dragIndex === null || dragIndex === dropIndex || dragState.tabKey !== tabKey) return; const events = scheduleData[tabKey]; const draggedItem = events[dragIndex]; const rect = e.currentTarget.getBoundingClientRect(); const insertBefore = e.clientY < rect.top + rect.height / 2; events.splice(dragIndex, 1); let newIndex = dropIndex; if (dragIndex < dropIndex) newIndex = insertBefore ? dropIndex - 1 : dropIndex; else newIndex = insertBefore ? dropIndex : dropIndex + 1; events.splice(newIndex, 0, draggedItem); renderEvento(tabKey); }
+    function moveTask(tabKey, index, direction) { const events = scheduleData[tabKey]; const newIndex = index + direction; if (newIndex < 0 || newIndex >= events.length) return; const temp = events[index]; events[index] = events[newIndex]; events[newIndex] = temp; renderEvento(tabKey); }
+
+    function updateEvento(tabKey, index, field, value) { if(field === 'price') value = parseFloat(value) || 0; scheduleData[tabKey][index][field] = value; renderEvento(tabKey); }
+    function addTask(tabKey) { if (!scheduleData[tabKey]) scheduleData[tabKey] = []; scheduleData[tabKey].push({ time: "-", title: "Nova Tarefa", desc: "", resp: "", sponsor: "", price: 0, comments: "" }); renderEvento(tabKey); }
+    function deleteTask(tabKey, index) { if(confirm("Excluir tarefa?")) { scheduleData[tabKey].splice(index, 1); renderEvento(tabKey); } }
+
+    function renderCirurgias(tabKey) {
+        const container = document.getElementById('scheduleContainer'); const [hospital, date] = tabKey.split('_'); const hKey = hospital.toLowerCase(); const matOptions = Object.keys(materiais).filter(m => materiais[m][hKey] > 0);
+        const medFilter = medicos.filter(m => { if (regrasMedicos[m] && regrasMedicos[m] !== hospital) return false; return true; }).sort();
+        let html = `<table><thead><tr><th>Horário</th>${salas.map(s => `<th>${s}</th>`).join('')}</tr></thead><tbody>`;
+        times.forEach((time, timeIdx) => {
+            const separatorClass = timeIdx < times.length - 1 ? 'time-separator' : ''; html += `<tr><td class="time-col ${separatorClass}">${time}</td>`;
+            salas.forEach(sala => {
+                const slot = scheduleData[tabKey][sala][time]; const usedSameTime = getUsedResourcesSameHospitalTime(hospital, date, time, sala);
+                let medOpt = `<option value="">Selecione...</option>`; medFilter.forEach(m => { if (usedSameTime.medicos.includes(m) && slot.medico !== m) return; if (isUsedInOtherHospitalDay('medico', m, hospital, date) && slot.medico !== m) return; medOpt += `<option value="${m}" ${slot.medico === m ? 'selected' : ''}>${m}</option>`; });
+                let matOpt = `<option value="">Selecione...</option>`; matOptions.forEach(m => { let usedQty = 0; Object.keys(scheduleData).filter(t => t.startsWith(hospital)).forEach(tk => { salas.forEach(s => times.forEach(t => { if(scheduleData[tk][s][t].material === m) usedQty++; })); }); const restante = materiais[m][hKey] - usedQty; if (restante <= 0 && slot.material !== m) return; matOpt += `<option value="${m}" ${slot.material === m ? 'selected' : ''}>${m} (Disp: ${restante})</option>`; });
+                let instOpt = `<option value="">Selecione...</option>`; instrumentadores.forEach(i => { if (usedSameTime.instrumentadores.includes(i) && slot.instrumentador !== i) return; instOpt += `<option value="${i}" ${slot.instrumentador === i ? 'selected' : ''}>${i}</option>`; });
+                let neoOpt = `<option value="">Selecione...</option>`; neoorthos.forEach(n => { if (isUsedInOtherHospitalDay('neoortho', n, hospital, date) && slot.neoortho !== n) return; neoOpt += `<option value="${n}" ${slot.neoortho === n ? 'selected' : ''}>${n}</option>`; });
+                const motorDisabled = (usedSameTime.motores >= maxMotorsPerHospital && !slot.motor) ? 'disabled' : ''; const motorAlert = (motorDisabled === 'disabled') ? `<span class="alert">Esgotado</span>` : '';
+                html += `<td class="${separatorClass}"><div style="margin-bottom:3px;"><b>Médico:</b><select onchange="updateSlot('${tabKey}','${sala}','${time}','medico',this.value)">${medOpt}</select></div><div style="margin-bottom:3px;"><b>Paciente:</b><input type="text" value="${slot.paciente}" onchange="updateSlot('${tabKey}','${sala}','${time}','paciente',this.value)"></div><div style="margin-bottom:3px;"><b>Material:</b><select onchange="updateSlot('${tabKey}','${sala}','${time}','material',this.value)">${matOpt}</select></div><div style="margin-bottom:3px;"><b>Instrumentador:</b><select onchange="updateSlot('${tabKey}','${sala}','${time}','instrumentador',this.value)">${instOpt}</select></div><div class="checkbox-label" style="margin-bottom:3px;"><b>Motor:</b><input type="checkbox" ${slot.motor ? 'checked' : ''} ${motorDisabled} onchange="updateSlot('${tabKey}','${sala}','${time}','motor',this.checked)"> ${motorAlert}</div><div><b>Neoortho:</b><select onchange="updateSlot('${tabKey}','${sala}','${time}','neoortho',this.value)">${neoOpt}</select></div></td>`;
+            }); html += `</tr>`;
+        }); html += `</tbody></table>`; container.innerHTML = html;
+    }
+
+    function updateSlot(tabKey, sala, time, field, value) {
+        const [hospital, date] = tabKey.split('_');
+        if (field === "medico" || field === "instrumentador") { const usedSameTime = getUsedResourcesSameHospitalTime(hospital, date, time, sala); const listType = field === "medico" ? "medicos" : "instrumentadores"; if (value && usedSameTime[listType].includes(value)) { alert(`Conflito de Horário! ${value} já está alocado neste horário no ${hospital}.`); showTab(tabKey); return; } }
+        if (field === "medico" && value) { if (isUsedInOtherHospitalDay('medico', value, hospital, date)) { alert(`Conflito Diário! ${value} já está alocado no outro hospital neste dia.`); showTab(tabKey); return; } }
+        if (field === "neoortho" && value) { if (isUsedInOtherHospitalDay('neoortho', value, hospital, date)) { alert(`Conflito Diário! ${value} já está alocado no outro hospital neste dia.`); showTab(tabKey); return; } }
+        if (field === "motor" && value === true) { const usedSameTime = getUsedResourcesSameHospitalTime(hospital, date, time, sala); if (usedSameTime.motores >= maxMotorsPerHospital) { alert(`Limite atingido! Os ${maxMotorsPerHospital} motores do ${hospital} já estão em uso neste horário.`); showTab(tabKey); return; } }
+        scheduleData[tabKey][sala][time][field] = value; showTab(tabKey);
+    }
+
+    function toggleMaterialDetails(m) { expandedMaterials[m] = !expandedMaterials[m]; renderMateriais(); }
+    function addComponent(matName) { const nameInput = document.getElementById(`comp-name-${matName}`); const qtyInput = document.getElementById(`comp-qty-${matName}`); const compName = nameInput.value.trim(); const compQty = parseInt(qtyInput.value) || 1; if(compName) { if (!materiais[matName].components) materiais[matName].components = {}; materiais[matName].components[compName] = compQty; nameInput.value = ''; qtyInput.value = '1'; renderMateriais(); } }
+    function removeComponent(matName, compName) { delete materiais[matName].components[compName]; renderMateriais(); }
+
+    function renderMateriais() {
+        const listMat = document.getElementById('listaMateriais');
+        listMat.innerHTML = Object.keys(materiais).map(m => {
+            const isExpanded = expandedMaterials[m]; let compHtml = '';
+            if(isExpanded) {
+                compHtml += `<div class="mat-comp-box"><div style="font-weight:bold; margin-bottom:5px; font-size:11px;">Composição do Kit:</div>`;
+                const comps = materiais[m].components || {}; if(Object.keys(comps).length === 0) compHtml += `<div style="font-size:11px; color:#777; margin-bottom:5px;">Nenhum componente cadastrado.</div>`;
+                for (let cName in comps) { compHtml += `<div class="comp-item"><span>- ${cName} (Qtd: ${comps[cName]})</span><button class="btn btn-remove" onclick="removeComponent('${m}', '${cName}')">X</button></div>`; }
+                compHtml += `<div class="comp-form-grid" style="margin-top:5px;"><div><label>Componente</label><input type="text" id="comp-name-${m}" placeholder="Ex: Parafuso 7mm"></div><div><label>Qtd no Kit</label><input type="number" id="comp-qty-${m}" value="1" min="1"></div><button class="btn btn-add" style="margin-bottom:1px;" onclick="addComponent('${m}')">+</button></div></div>`;
+            }
+            return `<div style="margin-bottom: 8px; border: 1px solid #ddd; padding: 5px; border-radius: 4px; background: white;"><div style="display: grid; grid-template-columns: 1fr 35px 35px auto auto; gap: 4px; align-items: center; font-size: 12px;"><span style="font-weight:bold;">${m}</span><input type="number" class="estoque-input" value="${materiais[m].chc}" onchange="updateMatQty('${m}', 'chc', this.value)"><input type="number" class="estoque-input" value="${materiais[m].chr}" onchange="updateMatQty('${m}', 'chr', this.value)"><button class="btn-outline" onclick="toggleMaterialDetails('${m}')">${isExpanded ? 'Fechar' : 'Compor'}</button><button class="btn btn-remove" onclick="removeMaterial('${m}')">X</button></div>${compHtml}</div>`;
+        }).join('');
+    }
+    function addMaterial() { const input = document.getElementById('newMatNome'); if (input.value && !materiais[input.value]) { materiais[input.value] = {chc: 0, chr: 0, components: {}}; input.value = ''; renderMateriais(); renderCirurgiasView(); } }
+    function removeMaterial(m) { if(confirm(`Remover material ${m}?`)) { delete materiais[m]; renderMateriais(); renderCirurgiasView(); } }
+    function updateMatQty(m, hospital, value) { materiais[m][hospital] = parseInt(value) || 0; renderCirurgiasView(); }
+
+    function addMedico() { const input = document.getElementById('newMedico'); if (input.value && !medicos.includes(input.value)) { medicos.push(input.value); medicos.sort(); input.value = ''; renderCadastros(); renderCirurgiasView(); } }
+    function removeMedico(m) { if(confirm(`Remover ${m}?`)) { medicos = medicos.filter(med => med !== m); renderCadastros(); renderCirurgiasView(); } }
+    function addCad(tipo, inputId) { const input = document.getElementById(inputId); const list = tipo === 'instrumentadores' ? instrumentadores : neoorthos; if (input.value && !list.includes(input.value)) { list.push(input.value); input.value = ''; renderCadastros(); renderCirurgiasView(); } }
+    function removeCad(tipo, nome) { if(confirm(`Remover ${nome}?`)) { if (tipo === 'instrumentadores') { instrumentadores = instrumentadores.filter(i => i !== nome); } else { neoorthos = neoorthos.filter(n => n !== nome); } renderCadastros(); renderCirurgiasView(); } }
+    function renderCirurgiasView() { const activeTab = document.querySelector('.tab-btn.active'); if (activeTab) { const tabKey = activeTab.getAttribute('onclick').match(/'([^']+)'/)[1]; if (!tabKey.startsWith("EVENT_") && tabKey !== "REPORT") showTab(tabKey); } }
+    function renderCadastros() {
+        document.getElementById('listaMedicos').innerHTML = medicos.map(m => `<div class="list-item"><span style="${regrasMedicos[m] ? 'color:var(--secondary);font-weight:bold;' : ''}">${m} ${regrasMedicos[m] ? '('+regrasMedicos[m]+')' : ''}</span><button class="btn btn-remove" onclick="removeMedico('${m.replace(/'/g, "\\'")}')">X</button></div>`).join('');
+        document.getElementById('listaInstrumentadores').innerHTML = instrumentadores.map(i => `<div class="list-item"><span>${i}</span><button class="btn btn-remove" onclick="removeCad('instrumentadores','${i.replace(/'/g, "\\'")}')">X</button></div>`).join('');
+        document.getElementById('listaNeoorthos').innerHTML = neoorthos.map(n => `<div class="list-item"><span>${n}</span><button class="btn btn-remove" onclick="removeCad('neoorthos','${n.replace(/'/g, "\\'")}')">X</button></div>`).join('');
+    }
+
+    loadDataFromCloud();
+</script>
+</body>
+</html>
