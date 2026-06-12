@@ -28,7 +28,7 @@
         .navbar-brand small{color:var(--accent);font-size:9px;letter-spacing:3px;text-transform:uppercase;display:block;font-weight:600}
         .navbar-actions{display:flex;align-items:center;gap:5px}
         .navbar-links{display:none}@media(min-width:768px){.navbar-links{display:flex;gap:2px}}
-        .navbar-links a{color:rgba(255,255,255,.7);font-size:12px;font-weight:600;padding:6px 10px;border-radius:4px;transition:.2s}
+        .navbar-links a{color:rgba(255,255,255,.7);font-size:12px;font-weight:600;padding:6px 10px;border-radius:4px;transition:.2s;cursor:pointer}
         .navbar-links a:hover{color:var(--white);background:rgba(255,255,255,.1)}
         .nav-sep{width:1px;height:18px;background:rgba(255,255,255,.15);margin:0 4px;display:none}
         @media(min-width:768px){.nav-sep{display:block}}
@@ -44,6 +44,8 @@
         .btn-ghost{background:transparent;color:var(--white)}.btn-ghost:hover{background:rgba(255,255,255,.15)}
 
         .view{display:none}.view.active{display:block}
+        .view-iframe-container {height: calc(100vh - 58px); padding-top: 0 !important;}
+        .view-iframe-container iframe {width: 100%; height: 100%; border: none;}
 
         .hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:80px 16px 60px;overflow:hidden}
         .hero-bg{position:absolute;inset:0;background:linear-gradient(160deg,#001a12 0%,var(--primary-dark) 30%,#003d33 60%,#0d1b4a 100%)}
@@ -115,7 +117,6 @@
         .sub-header-left{display:flex;align-items:center;gap:10px}
         .sub-header-sep{width:1px;height:20px;background:rgba(255,255,255,.2)}
         .sub-header h1{font-size:clamp(11px,3vw,15px);font-weight:700;letter-spacing:2px;text-transform:uppercase}
-        .sub-header-right{font-size:10px;opacity:.7}
 
         .filter-bar{background:var(--white);border-bottom:1px solid #eee;padding:12px 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
         .filter-bar input{flex:1;min-width:180px;max-width:380px;padding:8px 14px;border:1.5px solid var(--gray-lighter);border-radius:6px;font-size:13px;transition:.2s}
@@ -132,14 +133,11 @@
         .patient-card-name{font-weight:700;font-size:14px;color:var(--dark)}
         .patient-card-hospital{background:rgba(0,77,64,.1);color:var(--primary);font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;text-transform:uppercase;letter-spacing:.5px}
         .patient-card-info{font-size:11px;color:var(--gray);margin-bottom:6px}
-        .patient-card-meta{display:flex;gap:10px;font-size:10px;color:var(--gray-light);align-items:center}
 
         .meeting-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
         .meeting-card{background:var(--white);border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;transition:all .3s;box-shadow:var(--shadow)}
         .meeting-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-4px)}
         .meeting-cover{position:relative;height:160px;overflow:hidden;background:linear-gradient(135deg,var(--secondary),var(--primary))}
-        .meeting-cover img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
-        .meeting-card:hover .meeting-cover img{transform:scale(1.06)}
         .meeting-cover-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.5),transparent 60%)}
         .meeting-cover-badge{position:absolute;bottom:10px;left:10px;background:var(--accent);color:var(--dark);font-size:10px;font-weight:700;padding:3px 10px;border-radius:10px}
         .meeting-card-body{padding:16px}
@@ -148,7 +146,6 @@
         .meeting-card-desc{font-size:13px;color:var(--gray);line-height:1.6}
 
         .empty-state{text-align:center;padding:60px 20px;color:var(--gray-light)}
-        .empty-state svg{width:60px;height:60px;margin-bottom:12px;stroke:#ddd;fill:none;stroke-width:1}
         .empty-state h3{font-size:16px;color:var(--gray);margin-bottom:4px;font-weight:700}
         .empty-state p{font-size:13px}
 
@@ -168,99 +165,20 @@
         .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--primary);outline:none;box-shadow:0 0 0 3px rgba(0,77,64,.08)}
         .form-textarea{resize:vertical;min-height:70px}
         .form-input-center{text-align:center;font-size:20px;letter-spacing:8px}
-        .form-hint{font-size:10px;color:#bbb;margin-top:3px}
         .form-error{color:var(--danger);font-size:12px;text-align:center;font-weight:700;margin-top:6px}
-
-        .material-rows{display:flex;flex-direction:column;gap:8px}
-        .material-row{display:grid;grid-template-columns:1fr 90px 32px;gap:8px;align-items:center}
-        .material-row .form-input{padding:7px 10px}.material-row .form-input[name="matQty"]{text-align:center}
-        .mat-remove-btn{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--danger);background:transparent;color:var(--danger);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;line-height:1}
-        .mat-remove-btn:hover{background:var(--danger);color:var(--white)}
-        .mat-remove-btn:disabled{opacity:.3;cursor:not-allowed}.mat-remove-btn:disabled:hover{background:transparent;color:var(--danger)}
-
-        .mat-table{width:100%;border-collapse:collapse;font-size:13px;border-radius:var(--radius);overflow:hidden;border:1px solid #eee}
-        .mat-table thead th{background:var(--primary);color:var(--white);padding:8px 12px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
-        .mat-table thead th:last-child{text-align:center;width:80px}
-        .mat-table tbody td{padding:7px 12px;border-bottom:1px solid #f0f0f0}
-        .mat-table tbody td:last-child{text-align:center;font-weight:700}
-        .mat-table tbody tr:nth-child(even){background:#fafafa}
-        .mat-table tbody tr:hover{background:var(--primary-light)}
-
-        .linked-patient-card{display:flex;align-items:center;gap:10px;background:#f8f9fa;border:1px solid #e9ecef;border-radius:var(--radius);padding:10px 14px;margin-bottom:8px;transition:.2s}
-        .linked-patient-card:hover{border-color:var(--primary);background:var(--primary-light)}
-        .linked-patient-name{font-weight:600;font-size:13px;color:var(--dark)}
-        .linked-patient-procedure{font-size:11px;color:var(--gray-light)}
-        .unlink-btn{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--danger);background:transparent;color:var(--danger);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;line-height:1;flex-shrink:0}
-        .unlink-btn:hover{background:var(--danger);color:var(--white)}
-
-        .photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
-        .photo-grid a{display:block;aspect-ratio:1;border-radius:var(--radius);overflow:hidden;border:1px solid #eee;transition:.2s}
-        .photo-grid a:hover{box-shadow:var(--shadow);transform:scale(1.03)}
-        .photo-grid img{width:100%;height:100%;object-fit:cover}
-
-        .detail-section-title{font-weight:700;font-size:13px;color:var(--dark);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;text-transform:uppercase;letter-spacing:.5px}
-        .photo-empty{text-align:center;padding:24px;background:#fafafa;border-radius:var(--radius);border:2px dashed #eee;color:#bbb;font-size:13px}
-        .comment-box{background:#fafafa;border-radius:var(--radius);padding:12px;font-size:13px;white-space:pre-wrap;border:1px solid #eee;line-height:1.7}
-
-        .lightbox{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.94);align-items:center;justify-content:center;padding:20px;cursor:pointer}
-        .lightbox.active{display:flex}
-        .lightbox img{max-width:100%;max-height:100%;object-fit:contain;border-radius:var(--radius);animation:lbIn .3s ease}
-        @keyframes lbIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
-        .lightbox-close{position:absolute;top:16px;right:20px;color:rgba(255,255,255,.7);font-size:36px;font-weight:200;cursor:pointer;z-index:10;transition:.2s}
-        .lightbox-close:hover{color:var(--white)}
-
-        .spinner{width:36px;height:36px;border:3px solid var(--primary);border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
-        @keyframes spin{to{transform:rotate(360deg)}}
-        .spinner-sm{width:14px;height:14px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
 
         .toast-container{position:fixed;bottom:24px;right:24px;z-index:400;display:flex;flex-direction:column;gap:8px}
         .toast{padding:12px 20px;border-radius:var(--radius);color:var(--white);font-size:13px;font-weight:600;box-shadow:var(--shadow-lg);animation:toastIn .3s ease;max-width:340px}
         .toast-success{background:var(--success)}.toast-error{background:var(--danger)}.toast-info{background:var(--secondary)}
         @keyframes toastIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 
-        .db-status{position:fixed;bottom:10px;left:10px;z-index:100;font-size:9px;padding:3px 8px;border-radius:10px;font-weight:700;letter-spacing:.5px;transition:all .3s}
-        .db-status.online{background:#e8f5e9;color:var(--success)}.db-status.offline{background:#fff3e0;color:#e65100}
-
-        .patient-search-list{max-height:220px;overflow-y:auto}
-        .patient-search-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:var(--radius);cursor:pointer;transition:.2s;border:1px solid transparent}
-        .patient-search-item:hover{background:var(--primary-light);border-color:var(--primary)}
-        .patient-search-item-name{font-weight:600;font-size:13px}
-        .patient-search-item-hospital{font-size:10px;color:var(--gray-light)}
-
-        /* === PLANEJAMENTO ESPECIFICO === */
-        .plan-board{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;padding:16px}
-        .plan-day{background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow:hidden}
-        .plan-day-header{padding:14px 16px;font-weight:800;font-size:14px;letter-spacing:1px;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between}
-        .plan-day-header.day-0{background:linear-gradient(135deg,#004d40,#00695c);color:var(--white)}
-        .plan-day-header.day-1{background:linear-gradient(135deg,#1a237e,#283593);color:var(--white)}
-        .plan-day-header.day-2{background:linear-gradient(135deg,#b71c1c,#c62828);color:var(--white)}
-        .plan-day-header.day-3{background:linear-gradient(135deg,#e65100,#f57c00);color:var(--white)}
-        .plan-day-header.day-4{background:linear-gradient(135deg,#c5a003,#dab804);color:var(--dark)}
-        .plan-day-count{background:rgba(255,255,255,.25);padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700}
-        .plan-day-body{padding:8px;min-height:80px}
-        .plan-surgery{display:flex;align-items:center;gap:8px;padding:10px 12px;background:#f8f9fa;border-radius:var(--radius);margin-bottom:6px;border-left:3px solid var(--primary);transition:all .2s;cursor:pointer}
-        .plan-surgery:hover{background:var(--primary-light);box-shadow:var(--shadow)}
-        .plan-surgery.hosp-CHC{border-left-color:var(--primary)}.plan-surgery.hosp-CHR{border-left-color:var(--secondary)}.plan-surgery.hosp-UFPR{border-left-color:var(--accent)}.plan-surgery.hosp-Outro{border-left-color:var(--gray-light)}
-        .plan-surgery-info{flex:1;min-width:0}
-        .plan-surgery-name{font-weight:700;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-        .plan-surgery-detail{font-size:11px;color:var(--gray-light)}
-        .plan-surgery-time{font-size:11px;font-weight:700;color:var(--primary);background:var(--primary-light);padding:2px 8px;border-radius:4px;white-space:nowrap}
-        .plan-surgery-del{width:22px;height:22px;border-radius:50%;border:1px solid var(--danger);background:transparent;color:var(--danger);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;flex-shrink:0}
-        .plan-surgery-del:hover{background:var(--danger);color:var(--white)}
-        .plan-add-btn{width:100%;padding:10px;border:2px dashed var(--gray-lighter);border-radius:var(--radius);background:transparent;color:var(--gray-light);font-size:12px;font-weight:600;cursor:pointer;transition:.2s;margin-top:4px}
-        .plan-add-btn:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light)}
-        .plan-empty{text-align:center;padding:20px 10px;color:#ccc;font-size:12px}
-
         @media(max-width:600px){
             .hero h1{font-size:2.4rem}.form-row{grid-template-columns:1fr}
-            .material-row{grid-template-columns:1fr 65px 28px}
             .schedule-item{flex-direction:column;align-items:flex-start}
             .schedule-desc{border-left:none;padding-left:0;border-top:1px solid rgba(255,255,255,.1);padding-top:10px}
             .navbar-actions .btn span{display:none}
             .filter-bar{flex-direction:column;align-items:stretch}.filter-bar input{max-width:100%}
-            .plan-board{grid-template-columns:1fr}
         }
-        @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
     </style>
 </head>
 <body>
@@ -274,15 +192,11 @@
         </div>
         <div class="navbar-actions">
             <div class="navbar-links">
-                <a href="#sobre" onclick="scrollToSection('sobre')">Sobre</a>
-                <a href="#programacao" onclick="scrollToSection('programacao')">Programacao</a>
-                <a href="#faculdade" onclick="scrollToSection('faculdade')">Faculdade</a>
+                <a onclick="scrollToSection('sobre')">Sobre</a>
+                <a onclick="scrollToSection('programacao')">Programacao</a>
+                <a onclick="scrollToSection('faculdade')">Faculdade</a>
             </div>
             <div class="nav-sep"></div>
-            <button class="btn btn-ghost btn-sm" onclick="toggleLanguage()" id="langToggle" title="Alternar idioma">
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
-                <span id="langToggleText">EN</span>
-            </button>
             <button class="btn btn-secondary btn-sm" onclick="openPassword('pacientes')">
                 <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                 <span>Pacientes</span>
@@ -313,7 +227,7 @@
             <p class="subtitle">Foot and Ankle Training &amp; Surgery</p>
             <p class="desc">Programa completo de treinamento teorico e pratico em cirurgia do pe e tornozelo, com corpo docente internacional e cirurgias ao vivo.</p>
             <div class="hero-actions">
-                <a href="#sobre" onclick="scrollToSection('sobre')"><button class="btn btn-white btn-lg">Conheca o Evento</button></a>
+                <button class="btn btn-white btn-lg" onclick="scrollToSection('sobre')">Conheca o Evento</button>
                 <button class="btn btn-secondary btn-lg" onclick="openPassword('pacientes')">Pacientes</button>
                 <button class="btn btn-accent btn-lg" onclick="openPassword('planejamento')">Planejamento</button>
             </div>
@@ -328,37 +242,13 @@
             <div class="section-header">
                 <div class="section-badge section-badge-light">Sobre o Evento</div>
                 <h2 class="section-title">Excelencia em Cirurgia do Pe e Tornozelo</h2>
-                <p class="section-desc" style="color:var(--gray)">O STEPS2WALK Curitiba 2026 e um evento de alta especializacao que reune os melhores cirurgioes do pe e tornozelo do Brasil e do mundo. Em cinco dias intensivos, os participantes terao acesso a treinamento teorico avancado, praticas em laboratorio cadaverico e cirurgias ao vivo transmitidas em tempo real dos principais hospitais de Curitiba.</p>
+                <p class="section-desc" style="color:var(--gray)">O STEPS2WALK Curitiba 2026 e um evento de alta especializacao que reune os melhores cirurgioes do pe e tornozelo do Brasil e do mundo.</p>
             </div>
             <div class="grid-4">
-                <div class="card"><div class="card-body"><span class="card-icon">&#129462;</span><div class="card-title">Training &amp; Surgery</div><div class="card-text">Programa intensivo de treinamento teorico e pratico, com foco em tecnicas avancadas e procedimentos minimamente invasivos.</div></div></div>
-                <div class="card"><div class="card-body"><span class="card-icon">&#128300;</span><div class="card-title">Corpos Cadavericos</div><div class="card-text">Sessoes praticas em laboratorio de anatomia com corpos cadavericos e supervisao de cirurgioes internacionais.</div></div></div>
-                <div class="card"><div class="card-body"><span class="card-icon">&#127973;</span><div class="card-title">Cirurgias ao Vivo</div><div class="card-text">Transmissao ao vivo de cirurgias realizadas nos hospitais CHC e CHR, com interacao em tempo real.</div></div></div>
-                <div class="card"><div class="card-body"><span class="card-icon">&#127757;</span><div class="card-title">Faculdade Internacional</div><div class="card-text">Corpo docente composto por renomados cirurgioes internacionais e especialistas brasileiros.</div></div></div>
-            </div>
-        </div>
-    </section>
-
-    <section class="section section-gradient">
-        <div class="container">
-            <div class="section-header">
-                <div class="section-badge section-badge-accent">Areas do Evento</div>
-                <h2 class="section-title">Ferramentas para a Equipe</h2>
-                <p class="section-desc">Acesse o registro de pacientes, a galeria de reunioes e o planejamento cirurgico do evento.</p>
-            </div>
-            <div class="grid-2">
-                <div class="tool-card" onclick="openPassword('pacientes')">
-                    <div class="tool-icon tool-icon-blue"><svg viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg></div>
-                    <h3>Registro de Pacientes</h3>
-                    <p>Cadastre pacientes com nome, hospital, medico responsavel, procedimento, fotos e observacoes clinicas.</p>
-                    <button class="btn btn-white">Acessar Pacientes</button>
-                </div>
-                <div class="tool-card" onclick="openPassword('reunioes')">
-                    <div class="tool-icon tool-icon-gold"><svg viewBox="0 0 24 24"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg></div>
-                    <h3>Reunioes do Evento</h3>
-                    <p>Registre fotos dos encontros, reunioes de planejamento e momentos do evento para documentacao completa.</p>
-                    <button class="btn btn-accent">Acessar Reunioes</button>
-                </div>
+                <div class="card"><div class="card-body"><span class="card-icon">&#129462;</span><div class="card-title">Training &amp; Surgery</div><div class="card-text">Programa intensivo de treinamento teorico e pratico.</div></div></div>
+                <div class="card"><div class="card-body"><span class="card-icon">&#128300;</span><div class="card-title">Corpos Cadavericos</div><div class="card-text">Sessoes praticas em laboratorio de anatomia.</div></div></div>
+                <div class="card"><div class="card-body"><span class="card-icon">&#127973;</span><div class="card-title">Cirurgias ao Vivo</div><div class="card-text">Transmissao ao vivo de cirurgias realizadas nos hospitais CHC e CHR.</div></div></div>
+                <div class="card"><div class="card-body"><span class="card-icon">&#127757;</span><div class="card-title">Faculdade Internacional</div><div class="card-text">Corpo docente composto por renomados cirurgioes internacionais.</div></div></div>
             </div>
         </div>
     </section>
@@ -368,14 +258,13 @@
             <div class="section-header">
                 <div class="section-badge section-badge-accent">Programacao</div>
                 <h2 class="section-title">Cronograma do Evento</h2>
-                <p class="section-desc">Cinco dias de imersao completa em cirurgia do pe e tornozelo.</p>
             </div>
             <div style="display:flex;flex-direction:column;gap:12px">
-                <div class="schedule-item"><div class="schedule-date">05 Out</div><div class="schedule-info"><div class="schedule-day">Segunda</div><div class="schedule-loc">UFPR / Fabrica</div></div><div class="schedule-desc">Abertura, palestras teoricas e visita tecnica a fabrica de implantes.</div></div>
-                <div class="schedule-item"><div class="schedule-date">06 Out</div><div class="schedule-info"><div class="schedule-day">Terca</div><div class="schedule-loc">Laboratorio Cadaverico</div></div><div class="schedule-desc">Praticas cirurgicas em corpos cadavericos com tecnicas de fixacao e osteossintese.</div></div>
-                <div class="schedule-item"><div class="schedule-date">07 Out</div><div class="schedule-info"><div class="schedule-day">Quarta</div><div class="schedule-loc">CHR</div></div><div class="schedule-desc">Cirurgias ao vivo e discussoes de casos clinicos complexos no Hospital CHR.</div></div>
-                <div class="schedule-item"><div class="schedule-date">08 Out</div><div class="schedule-info"><div class="schedule-day">Quinta</div><div class="schedule-loc">CHC / CHR</div></div><div class="schedule-desc">Cirurgias simultaneas ao vivo nos hospitais CHC e CHR com diferentes tecnicas.</div></div>
-                <div class="schedule-item"><div class="schedule-date">09 Out</div><div class="schedule-info"><div class="schedule-day">Sexta</div><div class="schedule-loc">CHC / CHR</div></div><div class="schedule-desc">Cirurgias finais, encerramento e entrega de certificados de participacao.</div></div>
+                <div class="schedule-item"><div class="schedule-date">05 Out</div><div class="schedule-info"><div class="schedule-day">Segunda</div><div class="schedule-loc">UFPR / Fabrica</div></div><div class="schedule-desc">Abertura, palestras e visita tecnica.</div></div>
+                <div class="schedule-item"><div class="schedule-date">06 Out</div><div class="schedule-info"><div class="schedule-day">Terca</div><div class="schedule-loc">Laboratorio Cadaverico</div></div><div class="schedule-desc">Praticas cirurgicas em corpos cadavericos.</div></div>
+                <div class="schedule-item"><div class="schedule-date">07 Out</div><div class="schedule-info"><div class="schedule-day">Quarta</div><div class="schedule-loc">CHR</div></div><div class="schedule-desc">Cirurgias ao vivo e discussoes de casos clinicos.</div></div>
+                <div class="schedule-item"><div class="schedule-date">08 Out</div><div class="schedule-info"><div class="schedule-day">Quinta</div><div class="schedule-loc">CHC / CHR</div></div><div class="schedule-desc">Cirurgias simultaneas ao vivo.</div></div>
+                <div class="schedule-item"><div class="schedule-date">09 Out</div><div class="schedule-info"><div class="schedule-day">Sexta</div><div class="schedule-loc">CHC / CHR</div></div><div class="schedule-desc">Cirurgias finais e encerramento.</div></div>
             </div>
         </div>
     </section>
@@ -385,21 +274,8 @@
             <div class="section-header">
                 <div class="section-badge section-badge-light">Corpo Docente</div>
                 <h2 class="section-title">Faculdade Internacional</h2>
-                <p class="section-desc" style="color:var(--gray)">Renomados cirurgioes internacionais e especialistas brasileiros.</p>
             </div>
             <div class="grid-3" id="doctorGrid"></div>
-        </div>
-    </section>
-
-    <section class="section section-gradient">
-        <div class="container" style="text-align:center">
-            <h2 class="section-title">Acesse as Areas Administrativas</h2>
-            <p class="section-desc" style="margin-bottom:30px">Planejamento cirurgico, registro de pacientes e galeria de reunioes.</p>
-            <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center">
-                <button class="btn btn-accent btn-lg" onclick="openPassword('planejamento')">Planejamento</button>
-                <button class="btn btn-white btn-lg" onclick="openPassword('pacientes')">Pacientes</button>
-                <button class="btn btn-secondary btn-lg" onclick="openPassword('reunioes')">Reunioes</button>
-            </div>
         </div>
     </section>
 
@@ -414,21 +290,8 @@
     </footer>
 </div>
 
-<!-- ==================== PLANEJAMENTO VIEW ==================== -->
-<div class="view" id="viewPlanejamento">
-    <div class="sub-header">
-        <div class="sub-header-left">
-            <button class="btn btn-ghost btn-sm" onclick="goHome()">&#8592; Voltar</button>
-            <div class="sub-header-sep"></div>
-            <h1>Planejamento Cirurgico</h1>
-        </div>
-        <div style="display:flex;gap:6px;align-items:center">
-            <span class="sub-header-right" style="margin-right:8px">05 a 09 Out 2026</span>
-            <button class="btn btn-accent btn-sm" onclick="openModal('modalNewSurgery')">+ Cirurgia</button>
-        </div>
-    </div>
-    <div id="planBoard" class="plan-board"></div>
-</div>
+<!-- ==================== PLANEJAMENTO VIEW (INTEGRADO IFRAME) ==================== -->
+<div class="view view-iframe-container" id="viewPlanejamento"></div>
 
 <!-- ==================== PACIENTES VIEW ==================== -->
 <div class="view" id="viewPacientes">
@@ -438,23 +301,12 @@
             <div class="sub-header-sep"></div>
             <h1>Registro de Pacientes</h1>
         </div>
-        <button class="btn btn-accent btn-sm" onclick="openModal('modalNewPatient')">
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
-            <span>Novo Paciente</span>
-        </button>
     </div>
     <div class="filter-bar">
-        <input type="text" id="patientSearch" placeholder="Buscar por nome, medico ou procedimento..." oninput="renderPatients()">
-        <div class="filter-btns">
-            <button class="filter-btn active" onclick="filterHospital(this,'')">Todos</button>
-            <button class="filter-btn" onclick="filterHospital(this,'CHC')">CHC</button>
-            <button class="filter-btn" onclick="filterHospital(this,'CHR')">CHR</button>
-            <button class="filter-btn" onclick="filterHospital(this,'UFPR')">UFPR</button>
-            <button class="filter-btn" onclick="filterHospital(this,'Outro')">Outro</button>
-        </div>
+        <input type="text" id="patientSearch" placeholder="Buscar por nome..." oninput="renderPatients()">
         <span class="filter-count" id="patientCount">0 pacientes</span>
     </div>
-    <div id="patientList"></div>
+    <div id="patientList" class="patient-grid"></div>
 </div>
 
 <!-- ==================== REUNIOES VIEW ==================== -->
@@ -465,23 +317,17 @@
             <div class="sub-header-sep"></div>
             <h1>Reunioes do Evento</h1>
         </div>
-        <button class="btn btn-accent btn-sm" onclick="openModal('modalNewMeeting')">
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
-            <span>Nova Reuniao</span>
-        </button>
     </div>
     <div id="meetingList" style="padding:16px"></div>
 </div>
 
-<!-- ==================== MODALS ==================== -->
-
 <!-- Password Modal -->
 <div class="modal-overlay" id="modalPassword">
     <div class="modal" style="max-width:400px">
-        <div class="modal-header"><h2 id="pwTitle">Acesso</h2><p id="pwDesc">Insira a senha para acessar.</p></div>
+        <div class="modal-header"><h2>Acesso</h2><p>Insira a senha para acessar. (Senha padrao: 2026)</p></div>
         <div class="modal-body">
             <input type="password" id="pwInput" class="form-input form-input-center" placeholder="Digite a senha" onkeydown="if(event.key==='Enter')checkPassword()">
-            <div class="form-error" id="pwError" style="display:none">Senha incorreta. Tente novamente.</div>
+            <div class="form-error" id="pwError" style="display:none">Senha incorreta.</div>
         </div>
         <div class="modal-footer">
             <button class="btn btn-outline" onclick="closeModal('modalPassword')">Cancelar</button>
@@ -490,859 +336,601 @@
     </div>
 </div>
 
-<!-- New Patient Modal -->
-<div class="modal-overlay" id="modalNewPatient">
-    <div class="modal modal-wide">
-        <div class="modal-header"><h2>Cadastrar Novo Paciente</h2><p>Preencha os dados do paciente.</p></div>
-        <div class="modal-body">
-            <div class="form-row">
-                <div class="form-group"><label class="form-label">Nome do Paciente *</label><input type="text" class="form-input" id="pName" placeholder="Nome completo"></div>
-                <div class="form-group"><label class="form-label">Hospital *</label><select class="form-select" id="pHospital"><option>CHC</option><option>CHR</option><option>UFPR</option><option>Outro</option></select></div>
-            </div>
-            <div class="form-row">
-                <div class="form-group"><label class="form-label">Medico Responsavel</label><input type="text" class="form-input" id="pDoctor" placeholder="Nome do medico"></div>
-                <div class="form-group"><label class="form-label">Procedimento</label><input type="text" class="form-input" id="pProcedure" placeholder="Ex: Artrodese do tornozelo"></div>
-            </div>
-            <div class="form-group"><label class="form-label">Observacoes</label><textarea class="form-textarea" id="pComments" placeholder="Notas sobre o paciente..." rows="3"></textarea></div>
-            <div class="form-group">
-                <label class="form-label">Materiais / Componentes</label>
-                <div class="material-rows" id="materialRows">
-                    <div class="material-row"><input type="text" class="form-input" name="matName" placeholder="Nome do material"><input type="number" class="form-input" name="matQty" placeholder="Qtd" min="1"><button type="button" class="mat-remove-btn" disabled onclick="removeMaterialRow(this)">&times;</button></div>
-                </div>
-                <button type="button" class="btn btn-outline btn-sm" style="margin-top:8px" onclick="addMaterialRow()">+ Adicionar Material</button>
-            </div>
-            <div class="form-group"><label class="form-label">Fotos (pre/intra/pos-operatorio)</label><input type="file" class="form-input" id="pPhotos" accept="image/*" multiple><div class="form-hint">Maximo 5 fotos.</div></div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-outline" onclick="closeModal('modalNewPatient')">Cancelar</button>
-            <button class="btn btn-primary" id="btnSavePatient" onclick="savePatient()">Cadastrar</button>
-        </div>
-    </div>
-</div>
-
-<!-- Patient Detail Modal -->
-<div class="modal-overlay" id="modalPatientDetail">
-    <div class="modal modal-wide">
-        <div class="modal-header" id="patientDetailHeader"></div>
-        <div class="modal-body" id="patientDetailBody"></div>
-        <div class="modal-footer" id="patientDetailFooter"></div>
-    </div>
-</div>
-
-<!-- Add Photo Modal -->
-<div class="modal-overlay" id="modalAddPhoto">
-    <div class="modal" style="max-width:400px">
-        <div class="modal-header"><h2>Adicionar Fotos</h2><p id="addPhotoDesc"></p></div>
-        <div class="modal-body"><input type="file" class="form-input" id="addPhotoFile" accept="image/*" multiple><div id="addPhotoLimitMsg" style="color:var(--danger);font-size:11px;font-weight:700;margin-top:4px;display:none"></div></div>
-        <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalAddPhoto')">Cancelar</button><button class="btn btn-primary" onclick="addPatientPhotos()">Enviar Fotos</button></div>
-    </div>
-</div>
-
-<!-- Add Comment Modal -->
-<div class="modal-overlay" id="modalAddComment">
-    <div class="modal" style="max-width:400px">
-        <div class="modal-header"><h2>Adicionar Observacao</h2><p id="addCommentDesc"></p></div>
-        <div class="modal-body"><textarea class="form-textarea" id="addCommentText" placeholder="Digite sua observacao..." rows="4"></textarea></div>
-        <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalAddComment')">Cancelar</button><button class="btn btn-primary" onclick="addPatientComment()">Salvar</button></div>
-    </div>
-</div>
-
-<!-- New Meeting Modal -->
-<div class="modal-overlay" id="modalNewMeeting">
-    <div class="modal modal-wide">
-        <div class="modal-header blue"><h2>Registrar Reuniao</h2><p>Registre os momentos das reunioes do evento.</p></div>
-        <div class="modal-body">
-            <div class="form-group"><label class="form-label">Titulo da Reuniao *</label><input type="text" class="form-input" id="mTitle" placeholder="Ex: Reuniao de planejamento - Dia 1"></div>
-            <div class="form-group"><label class="form-label">Data</label><input type="date" class="form-input" id="mDate"></div>
-            <div class="form-group"><label class="form-label">Descricao</label><textarea class="form-textarea" id="mDesc" placeholder="Descreva a reuniao..." rows="3"></textarea></div>
-            <div class="form-group"><label class="form-label">Vincular Pacientes</label><input type="text" class="form-input" id="mPatientSearch" placeholder="Buscar paciente pelo nome..." oninput="searchMeetingPatients()"><div class="patient-search-list" id="mPatientResults" style="margin-top:8px"></div><div id="mSelectedPatients" style="margin-top:8px"></div></div>
-            <div class="form-group"><label class="form-label">Fotos da Reuniao</label><input type="file" class="form-input" id="mPhotos" accept="image/*" multiple><div class="form-hint">Maximo 10 fotos.</div></div>
-        </div>
-        <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalNewMeeting')">Cancelar</button><button class="btn btn-secondary" id="btnSaveMeeting" onclick="saveMeeting()">Registrar</button></div>
-    </div>
-</div>
-
-<!-- Meeting Detail Modal -->
-<div class="modal-overlay" id="modalMeetingDetail">
-    <div class="modal modal-wide">
-        <div class="modal-header blue" id="meetingDetailHeader"></div>
-        <div class="modal-body" id="meetingDetailBody"></div>
-        <div class="modal-footer" id="meetingDetailFooter"></div>
-    </div>
-</div>
-
-<!-- New Surgery Modal (Planejamento) -->
-<div class="modal-overlay" id="modalNewSurgery">
-    <div class="modal" style="max-width:500px">
-        <div class="modal-header"><h2>Agendar Cirurgia</h2><p>Adicione uma cirurgia ao planejamento do evento.</p></div>
-        <div class="modal-body">
-            <div class="form-group"><label class="form-label">Paciente *</label>
-                <input type="text" class="form-input" id="sPatientSearch" placeholder="Buscar paciente pelo nome..." oninput="searchSurgeryPatients()">
-                <div class="patient-search-list" id="sPatientResults" style="margin-top:6px"></div>
-                <div id="sSelectedPatient" style="margin-top:6px"></div>
-            </div>
-            <div class="form-row">
-                <div class="form-group"><label class="form-label">Dia *</label><select class="form-select" id="sDay"><option value="0">05 Out - Segunda</option><option value="1">06 Out - Terca</option><option value="2">07 Out - Quarta</option><option value="3">08 Out - Quinta</option><option value="4">09 Out - Sexta</option></select></div>
-                <div class="form-group"><label class="form-label">Horario</label><input type="time" class="form-input" id="sTime"></div>
-            </div>
-            <div class="form-row">
-                <div class="form-group"><label class="form-label">Hospital</label><select class="form-select" id="sHospital"><option>CHC</option><option>CHR</option><option>UFPR</option><option>Outro</option></select></div>
-                <div class="form-group"><label class="form-label">Sala</label><input type="text" class="form-input" id="sRoom" placeholder="Ex: Sala 1"></div>
-            </div>
-            <div class="form-group"><label class="form-label">Notas</label><textarea class="form-textarea" id="sNotes" placeholder="Observacoes sobre a cirurgia..." rows="2"></textarea></div>
-        </div>
-        <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalNewSurgery')">Cancelar</button><button class="btn btn-primary" id="btnSaveSurgery" onclick="saveSurgery()">Agendar</button></div>
-    </div>
-</div>
-
-<!-- Lightbox -->
-<div class="lightbox" id="lightbox" onclick="closeLightbox()"><span class="lightbox-close">&times;</span><img id="lightboxImg" src="" alt="Foto"></div>
-
-<!-- Toast -->
+<!-- Toast Container -->
 <div class="toast-container" id="toastContainer"></div>
 
-<!-- DB Status -->
-<div class="db-status offline" id="dbStatus">CONECTANDO...</div>
+<!-- ================================================================== -->
+<!-- CÓDIGO DO PLANEJAMENTO EMBUTIDO (TEMPLATE LITERAL)                -->
+<!-- ================================================================== -->
+<script type="text/template" id="planning-template">
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STEPS2WALK Curitiba 2026 - Neoortho</title>
+    <style>
+        :root {
+            --primary: #004d40; --primary-light: #e0f2f1; --secondary: #1a237e; --accent: #c5a003;
+            --success: #2e7d32; --danger: #c62828; --light: #f5f5f5; --dark: #212121; --white: #ffffff;
+            --border-dark: #455a64;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: var(--light); color: var(--dark); }
+        .header { background: var(--primary); color: var(--white); padding: 20px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-bottom: 4px solid var(--accent); }
+        .header h1 { margin: 0; font-size: 24px; text-transform: uppercase; letter-spacing: 2px; }
+        .header p { margin: 5px 0 0 0; opacity: 0.9; font-size: 14px; }
+        .header-actions { margin-top: 15px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; align-items: center;}
+        .btn-header { padding: 8px 15px; border: 2px solid var(--white); background: transparent; color: var(--white); cursor: pointer; border-radius: 4px; font-weight: bold; transition: 0.3s; font-size: 12px; }
+        .btn-header:hover { background: var(--white); color: var(--primary); }
+        .btn-header.save-btn { border-color: var(--success); color: var(--success); background: rgba(255,255,255,0.1); }
+        .btn-header.save-btn:hover { background: var(--success); color: var(--white); }
+        .btn-header.import-btn { border-color: var(--accent); color: var(--accent); }
+        .btn-header.import-btn:hover { background: var(--accent); color: var(--dark); }
+        
+        .save-status, .conn-status { font-size: 12px; color: rgba(255,255,255,0.9); display: flex; align-items: center; gap: 5px; }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; background: #aaa; }
+        .status-dot.saving { background: var(--accent); animation: pulse 1s infinite; }
+        .status-dot.saved { background: var(--success); }
+        .status-dot.error { background: var(--danger); }
+        .status-dot.online { background: var(--success); }
+        .status-dot.offline { background: var(--danger); animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+
+        .container { display: flex; height: calc(100vh - 190px); }
+        .sidebar { width: 340px; background: var(--white); padding: 15px; box-shadow: 2px 0 5px rgba(0,0,0,0.05); overflow-y: auto; border-right: 1px solid #ddd; transition: all 0.3s ease; }
+        .sidebar.collapsed { display: none; }
+        .section-box { margin-bottom: 20px; }
+        .section-title { font-size: 13px; font-weight: bold; color: var(--primary); text-transform: uppercase; border-bottom: 2px solid var(--primary-light); padding-bottom: 5px; margin-bottom: 10px; }
+        .main { flex: 1; padding: 20px; overflow-y: auto; background: #eceff1; }
+        
+        .header .tabs { display: flex; gap: 5px; margin-top: 20px; margin-bottom: 0; flex-wrap: wrap; justify-content: center; }
+        .header .tab-btn { padding: 8px 12px; border: 2px solid rgba(255,255,255,0.4); background: transparent; color: rgba(255,255,255,0.9); cursor: pointer; border-radius: 4px; font-weight: bold; transition: 0.3s; font-size: 12px; }
+        .header .tab-btn:hover { background: rgba(255,255,255,0.15); }
+        .header .tab-btn.active { background: var(--white); color: var(--primary); border-color: var(--white); }
+        .header .tab-btn.event-tab.active { background: var(--secondary); color: var(--white); border-color: var(--white); }
+        .header .tab-btn.event-tab { border-color: rgba(255,255,255,0.4); color: rgba(255,255,255,0.9); }
+        .header .tab-btn.event-tab:hover { background: rgba(255,255,255,0.15); }
+        .header .tab-btn.report-tab.active { background: var(--accent); color: var(--dark); border-color: var(--accent); }
+        .header .tab-btn.report-tab { border-color: rgba(255,255,255,0.4); color: rgba(255,255,255,0.9); }
+        .header .tab-btn.report-tab:hover { background: rgba(255,255,255,0.15); }
+
+        table { width: 100%; border-collapse: collapse; background: var(--white); box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+        th { background: var(--primary); color: var(--white); font-size: 13px; border-color: rgba(255,255,255,0.2); }
+        .time-col { background: var(--primary-light); font-weight: bold; width: 80px; color: var(--primary); font-size: 12px;}
+        .left-text { text-align: left; }
+        .time-separator { border-bottom: 3px solid var(--border-dark) !important; }
+        select, input[type="text"], input[type="number"] { width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 12px; }
+        textarea { width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 12px; resize: vertical; min-height: 40px; }
+        .timeline-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .timeline { position: relative; padding-left: 30px; }
+        .timeline::before { content: ''; position: absolute; left: 7px; top: 0; bottom: 0; width: 2px; background: var(--secondary); }
+        .timeline-item { position: relative; margin-bottom: 15px; background: var(--white); padding: 12px; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-left: 4px solid var(--accent); }
+        .timeline-item::before { content: ''; position: absolute; left: -27px; top: 15px; width: 12px; height: 12px; background: var(--secondary); border-radius: 50%; border: 2px solid var(--white); }
+        .timeline-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .timeline-form { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 8px; border-top: 1px solid #eee; padding-top: 8px; }
+        .timeline-item.dragging { opacity: 0.35; transform: scale(0.98); }
+        .timeline-item.drag-over-top { border-top: 3px solid var(--secondary); margin-top: -3px; }
+        .timeline-item.drag-over-bottom { border-bottom: 3px solid var(--secondary); margin-bottom: -3px; }
+        .drag-handle { display: flex; flex-direction: column; gap: 1px; margin-right: 6px; cursor: grab; color: #aaa; font-size: 16px; line-height: 1; user-select: none; padding: 0 4px; }
+        .drag-handle-dots { letter-spacing: 1px; font-size: 11px; line-height: 0.9; }
+        .move-btns { display: flex; flex-direction: column; gap: 2px; margin-left: 4px; }
+        .move-btn { width: 22px; height: 16px; border: 1px solid #bbb; background: var(--light); color: #555; border-radius: 3px; cursor: pointer; font-size: 9px; display: flex; align-items: center; justify-content: center; padding: 0; }
+        .move-btn:hover { background: var(--secondary); color: var(--white); border-color: var(--secondary); }
+        .move-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .summary-box { background: var(--white); border: 2px solid var(--accent); border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+        .summary-title { font-weight: bold; color: var(--secondary); font-size: 16px; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;}
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+        .sponsor-card { background: var(--light); padding: 10px; border-radius: 4px; border-left: 3px solid var(--secondary); }
+        .sponsor-name { font-weight: bold; font-size: 13px; }
+        .sponsor-value { font-size: 16px; color: var(--primary); font-weight: bold; margin-top: 5px; }
+        .total-geral { text-align: right; font-size: 18px; color: var(--danger); font-weight: bold; margin-top: 10px; border-top: 2px solid #ddd; padding-top: 10px; }
+        .inline-form { display: flex; gap: 5px; margin-bottom: 8px; align-items: flex-end; }
+        .btn { padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s; height: 30px; }
+        .btn-add { background: var(--success); color: var(--white); }
+        .btn-remove { background: var(--danger); color: var(--white); font-size: 10px; padding: 3px 6px; height: auto; }
+        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); font-size: 10px; padding: 3px 6px; cursor: pointer; border-radius: 4px;}
+        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid #eee; font-size: 12px; }
+        .estoque-input { width: 40px; padding: 2px; text-align: center; }
+        .alert { color: var(--danger); font-size: 11px; font-weight: bold; }
+        .checkbox-label { display: flex; align-items: center; gap: 5px; font-size: 12px; justify-content: center; }
+        label { font-size: 10px; color: #777; display: block; margin-bottom: 2px; }
+        .mat-comp-box { background: var(--light); padding: 8px; border-radius: 4px; margin-top: 5px; border: 1px solid #ddd; }
+        .comp-item { display: flex; justify-content: space-between; font-size: 11px; padding: 2px 0; border-bottom: 1px dashed #ccc; }
+        .comp-form-grid { display: grid; grid-template-columns: 1fr 50px auto; gap: 5px; align-items: flex-end; }
+        #loadingScreen { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; z-index: 9999; }
+    </style>
+</head>
+<body>
+
+<div id="loadingScreen">Conectando ao banco de dados...</div>
+
+<div class="header">
+    <h1>STEPS2WALK® CURITIBA 2026</h1>
+    <p>De 05 à 09 de outubro de 2026 | Foot and Ankle Training & Surgery</p>
+    <div class="header-actions">
+        <button class="btn-header" onclick="toggleSidebar()">☰ Cadastro</button>
+        <div class="conn-status" id="connStatus"><div class="status-dot offline" id="connDot"></div><span id="connText">Conectando...</span></div>
+        <button class="btn-header save-btn" onclick="forceSave()">☁️ Salvar Agora</button>
+        <div class="save-status" id="saveStatus"><div class="status-dot" id="saveDot"></div><span id="saveText">Tudo salvo</span></div>
+        <button class="btn-header" onclick="exportData()">💾 Backup</button>
+        <button class="btn-header import-btn" onclick="document.getElementById('importFile').click()">📂 Importar</button>
+        <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+    </div>
+    
+    <div class="tabs">
+        <button class="tab-btn event-tab" onclick="showTab('EVENT_05')">05 Out - UFPR/Fáb</button>
+        <button class="tab-btn event-tab" onclick="showTab('EVENT_06')">06 Out - Cadaver</button>
+        <button class="tab-btn event-tab" onclick="showTab('EVENT_07')">07 Out - CHR</button>
+        <button class="tab-btn" onclick="showTab('CHC_08')">08 Out - CHC</button>
+        <button class="tab-btn" onclick="showTab('CHR_08')">08 Out - CHR</button>
+        <button class="tab-btn" onclick="showTab('CHC_09')">09 Out - CHC</button>
+        <button class="tab-btn" onclick="showTab('CHR_09')">09 Out - CHR</button>
+        <button class="tab-btn report-tab" onclick="showTab('REPORT')">📊 Relatório</button>
+    </div>
+</div>
+
+<div class="container">
+    <div class="sidebar" id="sidebar">
+        <div class="section-box"><div class="section-title">Médicos</div><div class="inline-form"><input type="text" id="newMedico" placeholder="Nome do Médico"><button class="btn btn-add" onclick="addMedico()">+</button></div><div id="listaMedicos" style="max-height: 120px; overflow-y: auto;"></div></div>
+        <div class="section-box"><div class="section-title">Instrumentadores</div><div class="inline-form"><input type="text" id="newInstrumentador" placeholder="Nome"><button class="btn btn-add" onclick="addCad('instrumentadores', 'newInstrumentador')">+</button></div><div id="listaInstrumentadores" style="max-height: 80px; overflow-y: auto;"></div></div>
+        <div class="section-box"><div class="section-title">Resp. Neoortho</div><div class="inline-form"><input type="text" id="newNeoortho" placeholder="Nome"><button class="btn btn-add" onclick="addCad('neoorthos', 'newNeoortho')">+</button></div><div id="listaNeoorthos" style="max-height: 80px; overflow-y: auto;"></div></div>
+        <div class="section-box"><div class="section-title">Estoque e Composição</div><div style="display: grid; grid-template-columns: 1fr 35px 125px auto auto; gap: 4px; font-size: 10px; font-weight: bold; margin-bottom: 5px; color:#555;"><span>Material</span><span>CHC</span><span>CHR</span><span></span><span></span></div><div id="listaMateriais" style="max-height: 350px; overflow-y: auto;"></div><div class="inline-form" style="margin-top: 10px;"><input type="text" id="newMatNome" placeholder="Novo Material"><button class="btn btn-add" onclick="addMaterial()">+</button></div></div>
+    </div>
+    <div class="main">
+        <div id="scheduleContainer"></div>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
 <script>
-// ============================================================
-// CONFIGURACAO - Firebase Realtime Database via REST API
-// ============================================================
-const DB_URL = 'https://steps2walk-5d8b0-default-rtdb.firebaseio.com';
-const ACCESS_PASSWORD = 'neoortho2026';
-const EVENT_DAYS = [
-    { date: '2026-10-05', label: '05 Out', day: 'Segunda', loc: 'UFPR / Fabrica' },
-    { date: '2026-10-06', label: '06 Out', day: 'Terca', loc: 'Lab. Cadaverico' },
-    { date: '2026-10-07', label: '07 Out', day: 'Quarta', loc: 'CHR' },
-    { date: '2026-10-08', label: '08 Out', day: 'Quinta', loc: 'CHC / CHR' },
-    { date: '2026-10-09', label: '09 Out', day: 'Sexta', loc: 'CHC / CHR' }
-];
+    const firebaseConfig = {
+      apiKey: "AIzaSyD5_-AlE4zSXR0XHZBsyHKXG55x8QodRMs",
+      authDomain: "steps2walk-5d8b0.firebaseapp.com",
+      databaseURL: "https://steps2walk-5d8b0-default-rtdb.firebaseio.com",
+      projectId: "steps2walk-5d8b0",
+      storageBucket: "steps2walk-5d8b0.firebasestorage.app",
+      messagingSenderId: "914390869101",
+      appId: "1:914390869101:web:c2a8bcddce04a839480b64"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-// ============================================================
-// REST API - Firebase Realtime Database
-// ============================================================
-let dbOnline = false;
-
-async function dbGet(path) {
-    try {
-        const res = await fetch(`${DB_URL}/${path}.json`, { method: 'GET' });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        return data;
-    } catch (e) {
-        console.warn('[DB GET erro]', e.message);
-        return null;
-    }
-}
-
-async function dbPush(path, data) {
-    try {
-        const res = await fetch(`${DB_URL}/${path}.json`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const result = await res.json();
-        return result.name; // Firebase gera a chave
-    } catch (e) {
-        console.warn('[DB PUSH erro]', e.message);
-        return null;
-    }
-}
-
-async function dbUpdate(path, data) {
-    try {
-        const res = await fetch(`${DB_URL}/${path}.json`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return true;
-    } catch (e) {
-        console.warn('[DB PATCH erro]', e.message);
-        return false;
-    }
-}
-
-async function dbDelete(path) {
-    try {
-        const res = await fetch(`${DB_URL}/${path}.json`, { method: 'DELETE' });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return true;
-    } catch (e) {
-        console.warn('[DB DELETE erro]', e.message);
-        return false;
-    }
-}
-
-async function checkDbConnection() {
-    try {
-        const res = await fetch(`${DB_URL}/.json?limitToFirst=1`, { method: 'GET' });
-        dbOnline = res.ok;
-        const el = document.getElementById('dbStatus');
-        if (dbOnline) {
-            el.className = 'db-status online';
-            el.textContent = 'FIREBASE ONLINE';
-            console.log('[DB] Firebase Realtime Database conectado!');
-        } else {
-            throw new Error('Nao OK');
-        }
-    } catch (e) {
-        dbOnline = false;
-        const el = document.getElementById('dbStatus');
-        el.className = 'db-status offline';
-        el.textContent = 'MODO LOCAL';
-        console.warn('[DB] Firebase indisponivel, usando localStorage');
-    }
-}
-
-// ============================================================
-// DATA STORE - Camada de abstracao
-// ============================================================
-const DataStore = {
-    patients: [],
-    meetings: [],
-    schedule: [],
-
-    saveLocal() {
-        try {
-            localStorage.setItem('s2w_patients', JSON.stringify(this.patients));
-            localStorage.setItem('s2w_meetings', JSON.stringify(this.meetings));
-            localStorage.setItem('s2w_schedule', JSON.stringify(this.schedule));
-        } catch (e) {
-            console.error('[localStorage] Erro:', e);
-            showToast('Armazenamento local cheio!', 'error');
-        }
-    },
-
-    loadLocal() {
-        try {
-            this.patients = JSON.parse(localStorage.getItem('s2w_patients') || '[]');
-            this.meetings = JSON.parse(localStorage.getItem('s2w_meetings') || '[]');
-            this.schedule = JSON.parse(localStorage.getItem('s2w_schedule') || '[]');
-        } catch (e) {
-            this.patients = []; this.meetings = []; this.schedule = [];
-        }
-    },
-
-    async load() {
-        // Tenta carregar do Firebase
-        const pData = await dbGet('patients');
-        if (pData && typeof pData === 'object') {
-            this.patients = Object.entries(pData).map(([id, val]) => ({ id, ...val }));
-            // Ordena por data de criacao (mais recentes primeiro)
-            this.patients.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
-        } else {
-            this.loadLocal();
-        }
-
-        const mData = await dbGet('meetings');
-        if (mData && typeof mData === 'object') {
-            this.meetings = Object.entries(mData).map(([id, val]) => ({ id, ...val }));
-            this.meetings.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
-        }
-
-        const sData = await dbGet('schedule');
-        if (sData && typeof sData === 'object') {
-            this.schedule = Object.entries(sData).map(([id, val]) => ({ id, ...val }));
-            this.schedule.sort((a, b) => ((a.time || '99:99') + (a.dayIndex || 0)).localeCompare((b.time || '99:99') + (b.dayIndex || 0)));
-        }
-
-        this.saveLocal();
-        console.log(`[DB] Carregado: ${this.patients.length} pacientes, ${this.meetings.length} reunioes, ${this.schedule.length} cirurgias`);
-    },
-
-    // === PACIENTES ===
-    async addPatient(patient) {
-        patient.createdAt = new Date().toISOString();
-        patient.comments = patient.comments || [];
-
-        const firebaseId = await dbPush('patients', patient);
-        if (firebaseId) {
-            patient.id = firebaseId;
-        } else {
-            patient.id = 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
-        }
-        this.patients.unshift(patient);
-        this.saveLocal();
-        return patient;
-    },
-
-    async updatePatient(id, updates) {
-        const idx = this.patients.findIndex(p => p.id === id);
-        if (idx !== -1) { Object.assign(this.patients[idx], updates); }
-        await dbUpdate(`patients/${id}`, updates);
-        this.saveLocal();
-    },
-
-    async deletePatient(id) {
-        this.patients = this.patients.filter(p => p.id !== id);
-        // Remove do schedule tambem
-        this.schedule = this.schedule.filter(s => s.patientId !== id);
-        await dbDelete(`patients/${id}`);
-        this.saveLocal();
-    },
-
-    getPatient(id) { return this.patients.find(p => p.id === id); },
-
-    // === REUNIOES ===
-    async addMeeting(meeting) {
-        meeting.createdAt = new Date().toISOString();
-        const firebaseId = await dbPush('meetings', meeting);
-        if (firebaseId) { meeting.id = firebaseId; } else { meeting.id = 'm_' + Date.now(); }
-        this.meetings.unshift(meeting);
-        this.saveLocal();
-        return meeting;
-    },
-
-    async deleteMeeting(id) {
-        this.meetings = this.meetings.filter(m => m.id !== id);
-        await dbDelete(`meetings/${id}`);
-        this.saveLocal();
-    },
-
-    getMeeting(id) { return this.meetings.find(m => m.id === id); },
-
-    // === PLANEJAMENTO (SCHEDULE) ===
-    async addSurgery(surgery) {
-        surgery.createdAt = new Date().toISOString();
-        const firebaseId = await dbPush('schedule', surgery);
-        if (firebaseId) { surgery.id = firebaseId; } else { surgery.id = 's_' + Date.now(); }
-        this.schedule.push(surgery);
-        this.schedule.sort((a, b) => ((a.time || '99:99') + (a.dayIndex || 0)).localeCompare((b.time || '99:99') + (b.dayIndex || 0)));
-        this.saveLocal();
-        return surgery;
-    },
-
-    async deleteSurgery(id) {
-        this.schedule = this.schedule.filter(s => s.id !== id);
-        await dbDelete(`schedule/${id}`);
-        this.saveLocal();
-    }
-};
-
-// ============================================================
-// UTILIDADES
-// ============================================================
-function openModal(id) { document.getElementById(id).classList.add('active'); }
-function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-
-function showToast(msg, type = 'success') {
-    const c = document.getElementById('toastContainer');
-    const t = document.createElement('div');
-    t.className = `toast toast-${type}`;
-    t.textContent = msg;
-    c.appendChild(t);
-    setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(20px)'; setTimeout(() => t.remove(), 300); }, 3500);
-}
-
-function compressImage(file, maxW = 800, quality = 0.55) {
-    return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const img = new Image();
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                let w = img.width, h = img.height;
-                if (w > maxW) { h = (maxW / w) * h; w = maxW; }
-                canvas.width = w; canvas.height = h;
-                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                resolve(canvas.toDataURL('image/jpeg', quality));
-            };
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
+    db.ref('.info/connected').on('value', snap => {
+        const connDot = document.getElementById('connDot');
+        const connText = document.getElementById('connText');
+        if (snap.val() === true) { connDot.className = 'status-dot online'; connText.innerText = 'Online'; } 
+        else { connDot.className = 'status-dot offline'; connText.innerText = 'Offline'; }
     });
-}
 
-function openLightbox(src) { document.getElementById('lightboxImg').src = src; document.getElementById('lightbox').classList.add('active'); }
-function closeLightbox() { document.getElementById('lightbox').classList.remove('active'); }
+    function sanitizeFirebaseKeys(obj) {
+        if (obj === null || typeof obj !== 'object') return obj;
+        if (Array.isArray(obj)) return obj.map(sanitizeFirebaseKeys);
+        const result = {};
+        for (const key in obj) {
+            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                const safeKey = key.replace(/\./g, '__PNT__').replace(/\$/g, '__DSR__').replace(/#/g, '__HSH__').replace(/\[/g, '__BKT__').replace(/\]/g, '__BKS__').replace(/\//g, '__BRR__');
+                result[safeKey] = sanitizeFirebaseKeys(obj[key]);
+            }
+        }
+        return result;
+    }
 
-function esc(s) { return s ? s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : ''; }
+    function desanitizeFirebaseKeys(obj) {
+        if (obj === null || typeof obj !== 'object') return obj;
+        if (Array.isArray(obj)) return obj.map(desanitizeFirebaseKeys);
+        const result = {};
+        for (const key in obj) {
+            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                const originalKey = key.replace(/__PNT__/g, '.').replace(/__DSR__/g, '$').replace(/__HSH__/g, '#').replace(/__BKT__/g, '[').replace(/__BKS__/g, ']').replace(/__BRR__/g, '/');
+                result[originalKey] = desanitizeFirebaseKeys(obj[key]);
+            }
+        }
+        return result;
+    }
 
-// ============================================================
-// NAVEGACAO
-// ============================================================
-let currentView = 'viewHome';
-let passwordTarget = '';
-let hospitalFilter = '';
+    const defaultDatabaseState = {
+      "medicos": [ "Dr. Thomas San Giovannni", "Dr. Panos Symeonides", "Dr. David kay", "Dr. Henyik Liska", "Dr. Alexandre Leme Godoy dos Santos", "Dr. José Antônio Veiga Sanhudo", "Dr. Bernard Fábio Meyer", "Dr. Orides Rinaldi Merino", "Dr. João Luiz Vieira da Silva", "Dr. Bruno A. B. Moura", "Dr. Luiz Fernando Bonaroski", "Dra. Amanda Damazio de Oliveira", "Dra. Barbara Heloisa Breidenbach Pupim", "Dr. Daniel Kyubin Cho", "Dr. José Tarcio de Campos Filho", "Dr. Alexandre Antonio de Camargo", "Dr. Jamil Faissal Soni" ],
+      "materiais": { "TTL": { "chc": 4, "chr": 3, "components": {} }, "TTCL": { "chc": 0, "chr": 3, "components": {} }, "FlexaFt": { "chc": 21, "chr": 0, "components": {} }, "Placa Retas": { "chc": 6, "chr": 2, "components": {} }, "Placa em T": { "chc": 8, "chr": 2, "components": {} }, "Pudu": { "chc": 5, "chr": 0, "components": {} }, "Osteotomia Calcâneo": { "chc": 3, "chr": 2, "components": {} }, "Parafuso 7mm": { "chc": 100, "chr": 0, "components": {} }, "Parafuso 4.5mm": { "chc": 8, "chr": 0, "components": {} }, "MTF": { "chc": 2, "chr": 4, "components": {} }, "Herbert": { "chc": 0, "chr": 10, "components": {} }, "Parafusos Canulados": { "chc": 0, "chr": 40, "components": {} } },
+      "instrumentadores": [],
+      "neoorthos": [ "Vladimir", "Natacha", "Gustavo", "Maycon" ],
+      "scheduleData": {
+        "CHC_08": { "Sala 1": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }, "Sala 2": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }, "Sala 3": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }, "Sala 4": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }, "Sala 5": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } } },
+        "CHC_09": { "Sala 1": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }, "Sala 2": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }, "Sala 3": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }, "Sala 4": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }, "Sala 5": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } } },
+        "CHR_08": { "Sala 1": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }, "Sala 2": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }, "Sala 3": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }, "Sala 4": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" } }, "Sala 5": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" } } },
+        "CHR_09": { "Sala 1": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }, "Sala 2": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "Vladimir" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }, "Sala 3": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }, "Sala 4": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }, "Sala 5": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } } },
+        "EVENT_05": [ { "time": "7:00", "title": "Fotografos e Equipe", "desc": "", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 10000, "comments": "" }, { "time": "7:00", "title": "Entrega dos Crachás", "desc": "", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 2000, "comments": "Crachás divididos em cores diferentes:\nProfessores (25 Unid.);\nStaffs (25 Unid.);\nInscritos (40 Unid.);\nObservadores (40 Unid.):" }, { "time": "07:30", "title": "Boas-vindas e entrega de materiais", "desc": "Auditório Setor Ciências da Saúde UFPR", "resp": "Dr. João Luiz", "sponsor": "Steps2Walk", "price": 1, "comments": "" }, { "time": "08:00", "title": "Abertura", "desc": "", "resp": "Felipe", "sponsor": "NeoOrtho", "price": 0, "comments": "Empréstimo da Neoortho de um Projetor" }, { "time": "08:30 - 09:20", "title": "Aula", "desc": "", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 10000, "comments": "Materiais de apoio (Canetas, Bloco e Banner com BackDrop - 2,70 x 2m)" }, { "time": "09:20 - 10:30", "title": "Apresentação e discussão de casos", "desc": "CHC-UFPR", "resp": "", "sponsor": "", "price": 0, "comments": "" }, { "time": "10:30 - 10:50", "title": "Coffee Break", "desc": "", "resp": "", "sponsor": "", "price": 0, "comments": "" }, { "time": "10:50 - 11:10", "title": "Aula", "desc": "", "resp": "", "sponsor": "", "price": 0, "comments": "" }, { "time": "11:10 - 12:30", "title": "Apresentação e discussão de casos", "desc": "CHC-UFPR", "resp": "", "sponsor": "", "price": 0, "comments": "" }, { "time": "12:30 - 13:00", "title": "Brunch / Almoço", "desc": "", "resp": "", "sponsor": "", "price": 0, "comments": "" }, { "time": "13:00 - 13:20", "title": "Aula", "desc": "", "resp": "", "sponsor": "", "price": 0, "comments": "" }, { "time": "13:20 - 16:00", "title": "Apresentação e discussão de casos", "desc": "CHC-UFPR", "resp": "", "sponsor": "", "price": 0, "comments": "" }, { "time": "16:00 - 16:20", "title": "Coffee Break", "desc": "", "resp": "", "sponsor": "", "price": 0, "comments": "" }, { "time": "16:20 - 16:40", "title": "Aula", "desc": "", "resp": "", "sponsor": "", "price": 0, "comments": "" }, { "time": "16:40 - 18:20", "title": "Apresentação e discussão de casos", "desc": "CHC-UFPR", "resp": "", "sponsor": "", "price": 0, "comments": "" }, { "time": "18:30", "title": "Saída para visita à fábrica da Neoortho", "desc": "Transfer", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 7200, "comments": "Transfer da UFPR para a Neoortho 60 pessoas (Duas Vans) " }, { "time": "19:30", "title": "Apresentação Institucional e Visita à fábrica", "desc": "", "resp": "Felipe/Douglas", "sponsor": "NeoOrtho", "price": 6000, "comments": "Aluguel de audio e video e técnico" }, { "time": "20:15", "title": "Coquetel", "desc": "", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 21000, "comments": "Servir coquetel para 60 pessoas - Menu - TBD" }, { "time": "21:00", "title": "Transfer retorno hotel", "desc": "", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 7200, "comments": "Transfer da Neoortho para o NH Hotel / Novo Hotel - (Sugerido como hotel indicação do evento)" } ],
+        "EVENT_06": [ { "time": "07:30 - 08:00", "title": "Entrega de Scrubs e paramentação", "desc": "Marc Institute® – Univ. Positivo", "resp": "Heloise", "sponsor": "NeoOrtho", "price": 141000, "comments": "Aluguel da sala, Arco em C." }, { "time": "08:00 - 10:00", "title": "Cadaver Lab", "desc": "", "resp": "Felipe", "sponsor": "NeoOrtho", "price": 130000, "comments": "Motores e Implantes e Instrumentais" }, { "time": "10:00 - 10:30", "title": "Coffee Break", "desc": "", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 3000, "comments": "Menu - TBD" }, { "time": "10:30 - 12:00", "title": "Cadaver Lab", "desc": "", "resp": "Felipe", "sponsor": "NeoOrtho", "price": 1800, "comments": "Instrumentadores Free Lance" }, { "time": "12:00 - 13:00", "title": "Brunch - Lunch Box", "desc": "", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 3000, "comments": "Menu - TBD" }, { "time": "13:00 - 16:00", "title": "Cadaver Lab", "desc": "", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 4000, "comments": "Touca Cirurgica" }, { "time": "16:00 - 16:30", "title": "Coffee Break", "desc": "", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 3000, "comments": "" }, { "time": "16:30 - 19:00", "title": "Cadaver Lab", "desc": "", "resp": "", "sponsor": "", "price": 0, "comments": "" } ],
+        "EVENT_07": [ { "time": "08:00 - 09:20", "title": "Aula", "desc": "Auditório do CHR", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 3000, "comments": "Materiais de apoio (Canetas, Bloco) - Exposição material Neoortho e Banner" }, { "time": "09:20 - 10:30", "title": "Apresentação e discussão de casos", "desc": "CHC-UFPR", "resp": "", "sponsor": "", "price": 0, "comments": "" }, { "time": "10:30 - 10:50", "title": "Coffee Break", "desc": "", "resp": "", "sponsor": "", "price": 0, "comments": "" }, { "time": "10:50 - 11:10", "title": "Aula", "desc": "", "resp": "", "sponsor": "", "price": 0, "comments": "" }, { "time": "11:10 - 12:30", "title": "Apresentação e discussão de casos", "desc": "CHR", "resp": "", "sponsor": "", "price": 0, "comments": "" }, { "time": "12:30 - 13:00", "title": "Brunch / Almoço", "desc": "", "resp": "", "sponsor": "", "price": 0, "comments": "" }, { "time": "13:00 - 13:20", "title": "Aula", "desc": "", "resp": "", "sponsor": "", "price": 0, "comments": "" }, { "time": "13:20 - 16:00", "title": "Apresentação e discussão de casos", "desc": "CHR", "resp": "", "sponsor": "", "price": 0, "comments": "" }, { "time": "16:00 - 16:20", "title": "Coffee Break", "desc": "", "resp": "", "sponsor": "", "price": 0, "comments": "" }, { "time": "16:20 - 16:40", "title": "Aula", "desc": "", "resp": "", "sponsor": "", "price": 0, "comments": "" }, { "time": "16:40 - 18:20", "title": "Apresentação e discussão de casos", "desc": "CHR", "resp": "", "sponsor": "", "price": 0, "comments": "" } ]
+      }
+    };
 
-function showView(viewId) {
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.getElementById(viewId).classList.add('active');
-    currentView = viewId;
-    window.scrollTo(0, 0);
-    document.getElementById('navbar').style.display = viewId === 'viewHome' ? '' : 'none';
-}
+    let medicos = [], materiais = {}, instrumentadores = [], neoorthos = [], scheduleData = {}, expandedMaterials = {}, dragState = { tabKey: null, dragIndex: null };
+    const regrasMedicos = { "Dr. Bruno A. B. Moura": "CHR", "Dr. Luiz Fernando Bonaroski": "CHR", "Dr. João Luiz Vieira da Silva": "CHC" };
+    const times = ["07:00 - 10:00", "10:00 - 13:00", "14:00 - 17:00"];
+    const salas = ["Sala 1", "Sala 2", "Sala 3", "Sala 4", "Sala 5"];
+    const maxMotorsPerHospital = 5;
+    
+    let autoSaveTimer = null;
 
-function goHome() { showView('viewHome'); }
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('collapsed'); }
+    function triggerAutoSave() { clearTimeout(autoSaveTimer); updateSaveStatus('alterado'); autoSaveTimer = setTimeout(() => { saveDataToCloud(); }, 3000); }
+    function updateSaveStatus(status) { const dot = document.getElementById('saveDot'); const text = document.getElementById('saveText'); if (status === 'alterado') { dot.className = 'status-dot'; text.innerText = 'Alterações pendentes...'; } else if (status === 'salvando') { dot.className = 'status-dot saving'; text.innerText = 'Salvando...'; } else if (status === 'salvo') { dot.className = 'status-dot saved'; text.innerText = 'Tudo salvo'; } else if (status === 'erro') { dot.className = 'status-dot error'; text.innerText = 'Erro ao salvar!'; } }
 
-function scrollToSection(id) {
-    if (currentView !== 'viewHome') showView('viewHome');
-    setTimeout(() => { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: 'smooth' }); }, 100);
-}
+    function loadDataFromCloud() {
+        db.ref('eventData').once('value').then(snapshot => {
+            const data = snapshot.val();
+            if (data) {
+                const originalData = desanitizeFirebaseKeys(data);
+                medicos = originalData.medicos || [];
+                materiais = originalData.materiais || {};
+                instrumentadores = originalData.instrumentadores || [];
+                neoorthos = originalData.neoorthos || [];
+                scheduleData = originalData.scheduleData || {};
+            } else {
+                medicos = [...defaultDatabaseState.medicos];
+                materiais = JSON.parse(JSON.stringify(defaultDatabaseState.materiais));
+                instrumentadores = [...defaultDatabaseState.instrumentadores];
+                neoorthos = [...defaultDatabaseState.neoorthos];
+                scheduleData = JSON.parse(JSON.stringify(defaultDatabaseState.scheduleData));
+            }
+            ["CHC_08", "CHC_09", "CHR_08", "CHR_09"].forEach(tab => { if (!scheduleData[tab]) scheduleData[tab] = {}; salas.forEach(sala => { if (!scheduleData[tab][sala]) scheduleData[tab][sala] = {}; times.forEach(time => { if (!scheduleData[tab][sala][time]) scheduleData[tab][sala][time] = { medico: "", material: "", paciente: "", instrumentador: "", motor: false, neoortho: "" }; }); }); });
+            document.getElementById('loadingScreen').style.display = 'none';
+            updateSaveStatus('salvo');
+            initUI();
+        }).catch(error => { 
+            console.error("Erro CRÍTICO ao carregar:", error); 
+            document.getElementById('loadingScreen').innerHTML = "<h2>Erro ao conectar ao Banco de Dados</h2><p>Verifique as regras e domínios no Firebase.</p>"; 
+        });
+    }
 
-window.addEventListener('scroll', () => {
-    const nav = document.getElementById('navbar');
-    nav.classList.toggle('scrolled', window.scrollY > 60);
-});
+    function saveDataToCloud() { 
+        updateSaveStatus('salvando'); 
+        const dataToSave = { medicos, materiais, instrumentadores, neoorthos, scheduleData }; 
+        const safeData = sanitizeFirebaseKeys(dataToSave);
+        db.ref('eventData').set(safeData).then(() => { updateSaveStatus('salvo'); }).catch(error => { updateSaveStatus('erro'); console.error("Erro Firebase:", error); }); 
+    }
+    function forceSave() { clearTimeout(autoSaveTimer); saveDataToCloud(); }
+    function initUI() { renderCadastros(); renderMateriais(); showTab('EVENT_05'); }
+    function exportData() { const data = { medicos, materiais, instrumentadores, neoorthos, scheduleData }; const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2)); const dlAnchorElem = document.createElement('a'); dlAnchorElem.setAttribute("href", dataStr); dlAnchorElem.setAttribute("download", "steps2walk_backup.json"); dlAnchorElem.click(); }
+    function importData(event) { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(e) { try { const data = JSON.parse(e.target.result); if (data.medicos) medicos = data.medicos; if (data.materiais) materiais = data.materiais; if (data.instrumentadores) instrumentadores = data.instrumentadores; if (data.neoorthos) neoorthos = data.neoorthos; if (data.scheduleData) scheduleData = data.scheduleData; initUI(); triggerAutoSave(); alert("Dados importados!"); } catch (error) { alert("Erro ao importar."); } }; reader.readAsText(file); event.target.value = ""; }
 
-// ============================================================
-// SENHA
-// ============================================================
-function openPassword(target) {
-    passwordTarget = target;
-    document.getElementById('pwInput').value = '';
-    document.getElementById('pwError').style.display = 'none';
-    const titles = { pacientes: 'Registro de Pacientes', reunioes: 'Reunioes do Evento', planejamento: 'Planejamento Cirurgico' };
-    document.getElementById('pwTitle').textContent = titles[target] || 'Acesso';
-    document.getElementById('pwDesc').textContent = 'Insira a senha para acessar.';
-    openModal('modalPassword');
-    setTimeout(() => document.getElementById('pwInput').focus(), 200);
-}
+    function getUsedResourcesSameHospitalTime(tabPrefix, date, time, excludeSala) { const tabKey = `${tabPrefix}_${date}`; const used = { medicos: [], instrumentadores: [], motores: 0 }; if (scheduleData[tabKey]) { salas.forEach(sala => { if (sala === excludeSala) return; const slot = scheduleData[tabKey][sala]?.[time]; if (slot) { if (slot.medico) used.medicos.push(slot.medico); if (slot.instrumentador) used.instrumentadores.push(slot.instrumentador); if (slot.motor) used.motores++; } }); } return used; }
+    function isUsedInOtherHospitalDay(resourceType, resourceName, currentHospital, date) { const otherHospital = currentHospital === "CHC" ? "CHR" : "CHC"; const otherTabKey = `${otherHospital}_${date}`; if (!scheduleData[otherTabKey]) return false; for (let sala in scheduleData[otherTabKey]) { for (let time in scheduleData[otherTabKey][sala]) { const slot = scheduleData[otherTabKey][sala][time]; if (resourceType === 'medico' && slot.medico === resourceName) return true; if (resourceType === 'neoortho' && slot.neoortho === resourceName) return true; } } return false; }
+    function formatBRL(value) { return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
 
-function checkPassword() {
-    if (document.getElementById('pwInput').value === ACCESS_PASSWORD) {
-        closeModal('modalPassword');
-        if (passwordTarget === 'pacientes') { showView('viewPacientes'); renderPatients(); }
-        else if (passwordTarget === 'reunioes') { showView('viewReunioes'); renderMeetings(); }
-        else if (passwordTarget === 'planejamento') { showView('viewPlanejamento'); renderSchedule(); }
-    } else {
-        document.getElementById('pwError').style.display = 'block';
+    function renderSponsorSummary() { const summary = {}; let totalGeral = 0; ['EVENT_05', 'EVENT_06', 'EVENT_07'].forEach(day => { if (scheduleData[day]) { scheduleData[day].forEach(task => { const sponsorName = task.sponsor.trim() || "Sem Patrocinador"; const cost = parseFloat(task.price) || 0; if (cost > 0) { if (!summary[sponsorName]) summary[sponsorName] = 0; summary[sponsorName] += cost; totalGeral += cost; } }); } }); let html = `<div class="summary-box"><div class="summary-title">📊 Resumo de Custos</div><div class="summary-grid">`; const sponsors = Object.keys(summary).sort(); if (sponsors.length === 0) html += `<p style="color:#777; font-size:12px;">Nenhum custo.</p>`; else sponsors.forEach(spon => html += `<div class="sponsor-card"><div class="sponsor-name">${spon}</div><div class="sponsor-value">${formatBRL(summary[spon])}</div></div>`); html += `</div><div class="total-geral">Total Geral: ${formatBRL(totalGeral)}</div></div>`; return html; }
+    function showTab(tabKey) { document.querySelectorAll('.tab-btn').forEach(btn => { btn.classList.remove('active'); if (btn.getAttribute('onclick') === `showTab('${tabKey}')`) btn.classList.add('active'); }); if (tabKey.startsWith("EVENT_")) renderEvento(tabKey); else if (tabKey === "REPORT") renderReport(); else renderCirurgias(tabKey); }
+    
+    function renderReport() { const container = document.getElementById('scheduleContainer'); let kitUsage = { CHC: {}, CHR: {} }; ['CHC_08', 'CHC_09', 'CHR_08', 'CHR_09'].forEach(tab => { const hosp = tab.split('_')[0]; if (!scheduleData[tab]) return; for (let sala in scheduleData[tab]) { for (let time in scheduleData[tab][sala]) { let mat = scheduleData[tab][sala][time].material; if (mat) kitUsage[hosp][mat] = (kitUsage[hosp][mat] || 0) + 1; } } }); let html = `<h2 style="color:var(--primary);">Relatório</h2><table><thead><tr><th>Kit</th><th>CHC</th><th>CHR</th><th>Total</th></tr></thead><tbody>`; let allKits = new Set([...Object.keys(kitUsage.CHC), ...Object.keys(kitUsage.CHR)]); allKits.forEach(kit => { const c = kitUsage.CHC[kit] || 0; const h = kitUsage.CHR[kit] || 0; html += `<tr><td class="left-text"><strong>${kit}</strong></td><td>${c}</td><td>${h}</td><td><strong>${c+h}</strong></td></tr>`; }); html += `</tbody></table>`; container.innerHTML = html; }
+
+    function renderEvento(tabKey) { const container = document.getElementById('scheduleContainer'); const events = scheduleData[tabKey] || []; let html = renderSponsorSummary(); html += `<div class="timeline-header"><h3 style="margin:0; color:var(--secondary);">Programação</h3><button class="btn btn-add" onclick="addTask('${tabKey}')">+ Tarefa</button></div><div class="timeline" id="timeline-${tabKey}">`; if(events.length === 0) html += `<p style="color:#777;">Nenhuma tarefa.</p>`; events.forEach((evt, index) => { html += `<div class="timeline-item" draggable="true" data-tab-key="${tabKey}" data-index="${index}" ondragstart="onDragStart(event, '${tabKey}', ${index})" ondragend="onDragEnd(event)" ondragover="onDragOver(event)" ondragenter="onDragEnter(event, this)" ondragleave="onDragLeave(event, this)" ondrop="onDrop(event, '${tabKey}', ${index})"><div class="timeline-title-row"><div class="drag-handle"><div class="drag-handle-dots">⠿</div></div><div style="flex:1; margin-right:10px;"><label>Horário</label><input type="text" value="${evt.time}" onchange="updateEvento('${tabKey}', ${index}, 'time', this.value)"></div><div style="flex:3; margin-right:10px;"><label>Título</label><input type="text" value="${evt.title}" onchange="updateEvento('${tabKey}', ${index}, 'title', this.value)"></div><div class="move-btns"><button class="move-btn" onclick="moveTask('${tabKey}', ${index}, -1)" ${index === 0 ? 'disabled' : ''}>▲</button><button class="move-btn" onclick="moveTask('${tabKey}', ${index}, 1)" ${index === events.length - 1 ? 'disabled' : ''}>▼</button></div><button class="btn btn-remove" onclick="deleteTask('${tabKey}', ${index})">X</button></div><div style="margin-bottom:8px;"><label>Descrição</label><input type="text" value="${evt.desc}" onchange="updateEvento('${tabKey}', ${index}, 'desc', this.value)"></div><div class="timeline-form"><div><label>Resp:</label><input type="text" value="${evt.resp}" onchange="updateEvento('${tabKey}', ${index}, 'resp', this.value)"></div><div><label>Patrocinador:</label><input type="text" value="${evt.sponsor}" onchange="updateEvento('${tabKey}', ${index}, 'sponsor', this.value)"></div><div><label>Custo (R$):</label><input type="number" step="0.01" value="${evt.price}" onchange="updateEvento('${tabKey}', ${index}, 'price', this.value)"></div></div><div style="margin-top:8px;"><label>Comentários:</label><textarea onchange="updateEvento('${tabKey}', ${index}, 'comments', this.value)">${evt.comments}</textarea></div></div>`; }); html += `</div>`; container.innerHTML = html; }
+
+    function onDragStart(e, tabKey, index) { dragState.tabKey = tabKey; dragState.dragIndex = index; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', index.toString()); requestAnimationFrame(() => e.target.classList.add('dragging')); } function onDragEnd(e) { e.target.classList.remove('dragging'); document.querySelectorAll('.drag-over-top, .drag-over-bottom').forEach(el => el.classList.remove('drag-over-top', 'drag-over-bottom')); dragState.tabKey = null; dragState.dragIndex = null; } function onDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; } function onDragEnter(e, element) { e.preventDefault(); document.querySelectorAll('.drag-over-top, .drag-over-bottom').forEach(el => el.classList.remove('drag-over-top', 'drag-over-bottom')); const rect = element.getBoundingClientRect(); if (e.clientY < rect.top + rect.height / 2) { element.classList.add('drag-over-top'); element.classList.remove('drag-over-bottom'); } else { element.classList.add('drag-over-bottom'); element.classList.remove('drag-over-top'); } } function onDragLeave(e, element) { if (!element.contains(e.relatedTarget)) element.classList.remove('drag-over-top', 'drag-over-bottom'); } function onDrop(e, tabKey, dropIndex) { e.preventDefault(); document.querySelectorAll('.drag-over-top, .drag-over-bottom').forEach(el => el.classList.remove('drag-over-top', 'drag-over-bottom')); const dragIndex = dragState.dragIndex; if (dragIndex === null || dragIndex === dropIndex || dragState.tabKey !== tabKey) return; const events = scheduleData[tabKey]; const draggedItem = events[dragIndex]; const rect = e.currentTarget.getBoundingClientRect(); const insertBefore = e.clientY < rect.top + rect.height / 2; events.splice(dragIndex, 1); let newIndex = dropIndex; if (dragIndex < dropIndex) newIndex = insertBefore ? dropIndex - 1 : dropIndex; else newIndex = insertBefore ? dropIndex : dropIndex + 1; events.splice(newIndex, 0, draggedItem); renderEvento(tabKey); triggerAutoSave(); }
+    function moveTask(tabKey, index, direction) { const events = scheduleData[tabKey]; const newIndex = index + direction; if (newIndex < 0 || newIndex >= events.length) return; const temp = events[index]; events[index] = events[newIndex]; events[newIndex] = temp; renderEvento(tabKey); triggerAutoSave(); }
+
+    function updateEvento(tabKey, index, field, value) { if(field === 'price') value = parseFloat(value) || 0; scheduleData[tabKey][index][field] = value; triggerAutoSave(); }
+    function addTask(tabKey) { if (!scheduleData[tabKey]) scheduleData[tabKey] = []; scheduleData[tabKey].push({ time: "-", title: "Nova Tarefa", desc: "", resp: "", sponsor: "", price: 0, comments: "" }); renderEvento(tabKey); triggerAutoSave(); }
+    function deleteTask(tabKey, index) { if(confirm("Excluir tarefa?")) { scheduleData[tabKey].splice(index, 1); renderEvento(tabKey); triggerAutoSave(); } }
+
+    function renderCirurgias(tabKey) { const container = document.getElementById('scheduleContainer'); const [hospital, date] = tabKey.split('_'); const hKey = hospital.toLowerCase(); const matOptions = Object.keys(materiais).filter(m => materiais[m][hKey] > 0); const medFilter = medicos.filter(m => { if (regrasMedicos[m] && regrasMedicos[m] !== hospital) return false; return true; }).sort(); let html = `<table><thead><tr><th>Horário</th>${salas.map(s => `<th>${s}</th>`).join('')}</tr></thead><tbody>`; times.forEach((time, timeIdx) => { const separatorClass = timeIdx < times.length - 1 ? 'time-separator' : ''; html += `<tr><td class="time-col ${separatorClass}">${time}</td>`; salas.forEach(sala => { const slot = scheduleData[tabKey][sala][time]; const usedSameTime = getUsedResourcesSameHospitalTime(hospital, date, time, sala); let medOpt = `<option value="">Selecione...</option>`; medFilter.forEach(m => { if (usedSameTime.medicos.includes(m) && slot.medico !== m) return; if (isUsedInOtherHospitalDay('medico', m, hospital, date) && slot.medico !== m) return; medOpt += `<option value="${m}" ${slot.medico === m ? 'selected' : ''}>${m}</option>`; }); let matOpt = `<option value="">Selecione...</option>`; matOptions.forEach(m => { let usedQty = 0; Object.keys(scheduleData).filter(t => t.startsWith(hospital)).forEach(tk => { salas.forEach(s => times.forEach(t => { if(scheduleData[tk][s][t].material === m) usedQty++; })); }); const restante = materiais[m][hKey] - usedQty; if (restante <= 0 && slot.material !== m) return; matOpt += `<option value="${m}" ${slot.material === m ? 'selected' : ''}>${m} (Disp: ${restante})</option>`; }); let instOpt = `<option value="">Selecione...</option>`; instrumentadores.forEach(i => { if (usedSameTime.instrumentadores.includes(i) && slot.instrumentador !== i) return; instOpt += `<option value="${i}" ${slot.instrumentador === i ? 'selected' : ''}>${i}</option>`; }); let neoOpt = `<option value="">Selecione...</option>`; neoorthos.forEach(n => { if (isUsedInOtherHospitalDay('neoortho', n, hospital, date) && slot.neoortho !== n) return; neoOpt += `<option value="${n}" ${slot.neoortho === n ? 'selected' : ''}>${n}</option>`; }); const motorDisabled = (usedSameTime.motores >= maxMotorsPerHospital && !slot.motor) ? 'disabled' : ''; const motorAlert = (motorDisabled === 'disabled') ? `<span class="alert">Esgotado</span>` : ''; html += `<td class="${separatorClass}"><div style="margin-bottom:3px;"><b>Médico:</b><select onchange="updateSlot('${tabKey}','${sala}','${time}','medico',this.value)">${medOpt}</select></div><div style="margin-bottom:3px;"><b>Paciente:</b><input type="text" value="${slot.paciente}" onchange="updateSlot('${tabKey}','${sala}','${time}','paciente',this.value)"></div><div style="margin-bottom:3px;"><b>Material:</b><select onchange="updateSlot('${tabKey}','${sala}','${time}','material',this.value)">${matOpt}</select></div><div style="margin-bottom:3px;"><b>Instrumentador:</b><select onchange="updateSlot('${tabKey}','${sala}','${time}','instrumentador',this.value)">${instOpt}</select></div><div class="checkbox-label" style="margin-bottom:3px;"><b>Motor:</b><input type="checkbox" ${slot.motor ? 'checked' : ''} ${motorDisabled} onchange="updateSlot('${tabKey}','${sala}','${time}','motor',this.checked)"> ${motorAlert}</div><div><b>Neoortho:</b><select onchange="updateSlot('${tabKey}','${sala}','${time}','neoortho',this.value)">${neoOpt}</select></div></td>`; }); html += `</tr>`; }); html += `</tbody></table>`; container.innerHTML = html; }
+
+    function updateSlot(tabKey, sala, time, field, value) { const [hospital, date] = tabKey.split('_'); if (field === "medico" || field === "instrumentador") { const usedSameTime = getUsedResourcesSameHospitalTime(hospital, date, time, sala); const listType = field === "medico" ? "medicos" : "instrumentadores"; if (value && usedSameTime[listType].includes(value)) { alert(`Conflito! ${value} já alocado.`); showTab(tabKey); return; } } if (field === "medico" && value) { if (isUsedInOtherHospitalDay('medico', value, hospital, date)) { alert(`Conflito! ${value} já alocado.`); showTab(tabKey); return; } } if (field === "neoortho" && value) { if (isUsedInOtherHospitalDay('neoortho', value, hospital, date)) { alert(`Conflito! ${value} já alocado.`); showTab(tabKey); return; } } if (field === "motor" && value === true) { const usedSameTime = getUsedResourcesSameHospitalTime(hospital, date, time, sala); if (usedSameTime.motores >= maxMotorsPerHospital) { alert(`Limite atingido!`); showTab(tabKey); return; } } scheduleData[tabKey][sala][time][field] = value; triggerAutoSave(); showTab(tabKey); }
+
+    // --- FUNÇÕES COMPLETADAS QUE ESTAVAM CORTADAS ---
+    function toggleMaterialDetails(matName) {
+        expandedMaterials[matName] = !expandedMaterials[matName];
+        renderMateriais();
+    }
+    function addMaterial() {
+        const nome = document.getElementById('newMatNome').value.trim();
+        if (!nome) return;
+        if (!materiais[nome]) {
+            materiais[nome] = { chc: 0, chr: 0, components: {} };
+            document.getElementById('newMatNome').value = '';
+            renderMateriais();
+            triggerAutoSave();
+        } else { alert("Material já existe!"); }
+    }
+    function removeMaterial(matName) {
+        if(confirm("Excluir material " + matName + "?")) {
+            delete materiais[matName];
+            renderMateriais();
+            triggerAutoSave();
+        }
+    }
+    function updateEstoque(matName, hospital, value) {
+        materiais[matName][hospital.toLowerCase()] = parseInt(value) || 0;
+        triggerAutoSave();
+    }
+    function addComponent(matName) {
+        const compName = prompt("Nome do componente para " + matName + ":");
+        if (compName && compName.trim() !== "") {
+            const compQty = prompt("Quantidade:", "1");
+            if (!materiais[matName].components) materiais[matName].components = {};
+            materiais[matName].components[compName.trim()] = parseInt(compQty) || 1;
+            renderMateriais();
+            triggerAutoSave();
+        }
+    }
+    function removeComponent(matName, compName) {
+        if (materiais[matName].components) {
+            delete materiais[matName].components[compName];
+            renderMateriais();
+            triggerAutoSave();
+        }
+    }
+    function renderCadastros() {
+        const renderList = (arr, type) => arr.map((item, i) => `<div class="list-item"><span>${item}</span><button class="btn btn-remove" onclick="removeCad('${type}', ${i})">X</button></div>`).join('');
+        document.getElementById('listaMedicos').innerHTML = renderList(medicos, 'medicos');
+        document.getElementById('listaInstrumentadores').innerHTML = renderList(instrumentadores, 'instrumentadores');
+        document.getElementById('listaNeoorthos').innerHTML = renderList(neoorthos, 'neoorthos');
+    }
+    function addMedico() {
+        const input = document.getElementById('newMedico');
+        if (input.value.trim()) { medicos.push(input.value.trim()); input.value = ''; renderCadastros(); triggerAutoSave(); }
+    }
+    function addCad(type, inputId) {
+        const input = document.getElementById(inputId);
+        const arr = type === 'instrumentadores' ? instrumentadores : neoorthos;
+        if (input.value.trim()) { arr.push(input.value.trim()); input.value = ''; renderCadastros(); triggerAutoSave(); }
+    }
+    function removeCad(type, index) {
+        const arr = type === 'medicos' ? medicos : (type === 'instrumentadores' ? instrumentadores : neoorthos);
+        arr.splice(index, 1);
+        renderCadastros();
+        triggerAutoSave();
+    }
+    function renderMateriais() {
+        const container = document.getElementById('listaMateriais');
+        let html = '';
+        for (let mat in materiais) {
+            const m = materiais[mat];
+            const isExpanded = expandedMaterials[mat];
+            html += `<div style="border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 5px;">
+                <div style="display: grid; grid-template-columns: 1fr 35px 125px auto auto; gap: 4px; align-items: center; font-size: 12px;">
+                    <span>${mat}</span>
+                    <input type="number" class="estoque-input" value="${m.chc}" onchange="updateEstoque('${mat}','CHC',this.value)">
+                    <input type="number" class="estoque-input" value="${m.chr}" onchange="updateEstoque('${mat}','CHR',this.value)">
+                    <button class="btn-outline" onclick="toggleMaterialDetails('${mat}')">${isExpanded ? '▼' : '►'}</button>
+                    <button class="btn btn-remove" onclick="removeMaterial('${mat}')">X</button>
+                </div>
+                ${isExpanded ? `<div class="mat-comp-box">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-weight:bold; font-size:11px;"><span>Componente</span><span>Qtd</span></div>
+                    ${m.components ? Object.keys(m.components).map(comp => `<div class="comp-item"><span>${comp}</span><div><span>${m.components[comp]}</span> <button class="btn btn-remove" onclick="removeComponent('${mat}','${comp}')">X</button></div></div>`).join('') : ''}
+                    <button class="btn btn-add" style="margin-top:5px; width:100%;" onclick="addComponent('${mat}')">+ Componente</button>
+                </div>` : ''}
+            </div>`;
+        }
+        container.innerHTML = html;
+    }
+
+    loadDataFromCloud();
+</script>
+</body>
+</html>
+</script>
+<!-- ================================================================== -->
+<!-- FIM DO CÓDIGO DO PLANEJAMENTO EMBUTIDO                             -->
+<!-- ================================================================== -->
+
+
+<script>
+    // --- STATE SITE PRINCIPAL ---
+    let patients = JSON.parse(localStorage.getItem('s2w_patients')) || [];
+    let meetings = JSON.parse(localStorage.getItem('s2w_meetings')) || [];
+    let currentPasswordTarget = null;
+    const PASSWORD = "2026";
+
+    const doctors = [
+        "Dr. Hans Müller", "Dr. Carlos Souza", "Dr. João Silva", 
+        "Dr. Peter Smith", "Dr. Ana Costa", "Dr. Luis Fernandez",
+        "Dr. Marcio Oliveira", "Dr. Claire Dupont", "Dr. Roberto Lima"
+    ];
+
+    // --- INIT ---
+    window.addEventListener('scroll', () => {
+        document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+    });
+
+    function init() {
+        renderDoctors();
+        renderPatients();
+        renderMeetings();
+        createParticles();
+    }
+
+    function createParticles() {
+        const container = document.getElementById('heroParticles');
+        if(!container) return;
+        for(let i=0; i<15; i++) {
+            const p = document.createElement('div');
+            p.className = 'hero-particle';
+            p.style.width = p.style.height = Math.random() * 20 + 5 + 'px';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.top = Math.random() * 100 + '%';
+            p.style.animationDelay = Math.random() * 5 + 's';
+            container.appendChild(p);
+        }
+    }
+
+    // --- VIEWS & NAV ---
+    function switchView(id) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        window.scrollTo(0, 0);
+        
+        // Carrega o Planejamento via Iframe para isolar o código e o Firebase
+        if(id === 'viewPlanejamento') loadPlanningApp();
+    }
+
+    function goHome() { switchView('viewHome'); }
+
+    function scrollToSection(id) {
+        goHome();
+        setTimeout(() => { document.getElementById(id).scrollIntoView({ behavior: 'smooth' }); }, 100);
+    }
+
+    // --- MODALS ---
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('active'); });
+    });
+
+    // --- PASSWORD ---
+    function openPassword(target) {
+        currentPasswordTarget = target;
+        document.getElementById('pwError').style.display = 'none';
         document.getElementById('pwInput').value = '';
-        document.getElementById('pwInput').focus();
-    }
-}
-
-// ============================================================
-// FILTRO HOSPITAL
-// ============================================================
-function filterHospital(btn, value) {
-    hospitalFilter = value;
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    renderPatients();
-}
-
-// ============================================================
-// PACIENTES - RENDER
-// ============================================================
-function renderPatients() {
-    const search = (document.getElementById('patientSearch')?.value || '').toLowerCase();
-    let list = DataStore.patients;
-    if (hospitalFilter) list = list.filter(p => p.hospital === hospitalFilter);
-    if (search) list = list.filter(p => (p.name||'').toLowerCase().includes(search) || (p.doctor||'').toLowerCase().includes(search) || (p.procedure||'').toLowerCase().includes(search));
-
-    const container = document.getElementById('patientList');
-    document.getElementById('patientCount').textContent = list.length + ' paciente' + (list.length !== 1 ? 's' : '');
-
-    if (!list.length) {
-        container.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg><h3>Nenhum paciente encontrado</h3><p>Cadastre o primeiro paciente.</p></div>`;
-        return;
+        openModal('modalPassword');
+        setTimeout(() => document.getElementById('pwInput').focus(), 200);
     }
 
-    container.innerHTML = '<div class="patient-grid">' + list.map(p => {
-        const pc = (p.photos||[]).length, mc = (p.materials||[]).length;
-        return `<div class="patient-card" onclick="openPatientDetail('${p.id}')">
-            <div class="patient-card-top"><span class="patient-card-name">${esc(p.name)}</span><span class="patient-card-hospital">${esc(p.hospital)}</span></div>
-            <div class="patient-card-info">${esc(p.procedure||'Sem procedimento')} ${p.doctor?'- Dr(a). '+esc(p.doctor):''}</div>
-            <div class="patient-card-meta"><span>${pc} foto${pc!==1?'s':''}</span><span>${mc} material${mc!==1?'is':''}</span><span>${new Date(p.createdAt).toLocaleDateString('pt-BR')}</span></div>
-        </div>`;
-    }).join('') + '</div>';
-}
-
-// ============================================================
-// PACIENTES - DETALHE
-// ============================================================
-function openPatientDetail(id) {
-    const p = DataStore.getPatient(id); if (!p) return;
-    document.getElementById('patientDetailHeader').innerHTML = `<h2>${esc(p.name)}</h2><p>${esc(p.hospital)} ${p.doctor?'- Dr(a). '+esc(p.doctor):''}</p>`;
-
-    let body = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
-        <div style="background:var(--primary-light);padding:10px 14px;border-radius:var(--radius)"><div style="font-size:10px;color:var(--primary);font-weight:700;text-transform:uppercase">Procedimento</div><div style="font-size:14px;font-weight:600">${esc(p.procedure||'Nao informado')}</div></div>
-        <div style="background:var(--primary-light);padding:10px 14px;border-radius:var(--radius)"><div style="font-size:10px;color:var(--primary);font-weight:700;text-transform:uppercase">Cadastrado em</div><div style="font-size:14px;font-weight:600">${new Date(p.createdAt).toLocaleDateString('pt-BR')} ${new Date(p.createdAt).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</div></div>
-    </div>`;
-
-    if (p.materials && p.materials.length) {
-        body += `<div class="detail-section-title">Materiais / Componentes</div><table class="mat-table"><thead><tr><th>Material</th><th>Qtd</th></tr></thead><tbody>${p.materials.map(m=>`<tr><td>${esc(m.name)}</td><td>${m.qty}</td></tr>`).join('')}</tbody></table>`;
+    function checkPassword() {
+        if(document.getElementById('pwInput').value === PASSWORD) {
+            closeModal('modalPassword');
+            if(currentPasswordTarget === 'pacientes') switchView('viewPacientes');
+            if(currentPasswordTarget === 'reunioes') switchView('viewReunioes');
+            if(currentPasswordTarget === 'planejamento') switchView('viewPlanejamento');
+        } else {
+            document.getElementById('pwError').style.display = 'block';
+        }
     }
 
-    const photos = p.photos || [];
-    body += `<div class="detail-section-title">Fotos (${photos.length}) <button class="btn btn-primary btn-sm" onclick="openAddPhotoModal('${p.id}')">+ Foto</button></div>`;
-    body += photos.length ? '<div class="photo-grid">' + photos.map(ph=>`<a href="javascript:void(0)" onclick="openLightbox('${ph}')"><img src="${ph}" alt="Foto" loading="lazy"></a>`).join('')+'</div>' : '<div class="photo-empty">Nenhuma foto cadastrada</div>';
-
-    const comments = p.comments || [];
-    body += `<div class="detail-section-title" style="margin-top:16px">Observacoes (${comments.length}) <button class="btn btn-primary btn-sm" onclick="openAddCommentModal('${p.id}')">+ Observacao</button></div>`;
-    body += comments.length ? comments.map(c=>`<div class="comment-box" style="margin-bottom:8px"><div style="font-size:10px;color:var(--gray-light);margin-bottom:4px">${new Date(c.date).toLocaleString('pt-BR')}</div>${esc(c.text)}</div>`).join('') : '<div class="photo-empty">Nenhuma observacao cadastrada</div>';
-
-    document.getElementById('patientDetailBody').innerHTML = body;
-    document.getElementById('patientDetailFooter').innerHTML = `<button class="btn btn-danger btn-sm" onclick="deletePatientConfirm('${p.id}')">Excluir</button><button class="btn btn-outline" onclick="closeModal('modalPatientDetail')">Fechar</button>`;
-    openModal('modalPatientDetail');
-}
-
-function deletePatientConfirm(id) {
-    if (confirm('Excluir este paciente? Acao irreversivel.')) { DataStore.deletePatient(id); closeModal('modalPatientDetail'); renderPatients(); showToast('Paciente excluido'); }
-}
-
-// ============================================================
-// PACIENTES - FOTOS / COMENTARIOS
-// ============================================================
-let addPhotoPatientId = null;
-function openAddPhotoModal(pid) {
-    addPhotoPatientId = pid;
-    const p = DataStore.getPatient(pid);
-    document.getElementById('addPhotoDesc').textContent = `${p?.name||''} (${(p?.photos||[]).length} fotos)`;
-    document.getElementById('addPhotoFile').value = '';
-    document.getElementById('addPhotoLimitMsg').style.display = 'none';
-    openModal('modalAddPhoto');
-}
-
-async function addPatientPhotos() {
-    const files = document.getElementById('addPhotoFile').files;
-    if (!files.length) { showToast('Selecione ao menos uma foto','error'); return; }
-    const p = DataStore.getPatient(addPhotoPatientId); if (!p) return;
-    const cur = p.photos || [];
-    if (cur.length + files.length > 20) { document.getElementById('addPhotoLimitMsg').style.display='block'; document.getElementById('addPhotoLimitMsg').textContent=`Limite 20 fotos. Atuais: ${cur.length}`; return; }
-    const newP = [];
-    for (let i = 0; i < files.length; i++) { try { newP.push(await compressImage(files[i])); } catch(e){} }
-    await DataStore.updatePatient(addPhotoPatientId, { photos: [...cur, ...newP] });
-    closeModal('modalAddPhoto'); openPatientDetail(addPhotoPatientId); showToast(`${newP.length} foto(s) adicionada(s)`);
-}
-
-let addCommentPatientId = null;
-function openAddCommentModal(pid) {
-    addCommentPatientId = pid;
-    const p = DataStore.getPatient(pid);
-    document.getElementById('addCommentDesc').textContent = p?.name||'';
-    document.getElementById('addCommentText').value = '';
-    openModal('modalAddComment');
-    setTimeout(() => document.getElementById('addCommentText').focus(), 200);
-}
-
-async function addPatientComment() {
-    const text = document.getElementById('addCommentText').value.trim();
-    if (!text) { showToast('Digite uma observacao','error'); return; }
-    const p = DataStore.getPatient(addCommentPatientId); if (!p) return;
-    const comments = [...(p.comments||[]), { text, date: new Date().toISOString() }];
-    await DataStore.updatePatient(addCommentPatientId, { comments });
-    closeModal('modalAddComment'); openPatientDetail(addCommentPatientId); showToast('Observacao adicionada');
-}
-
-// ============================================================
-// PACIENTES - SALVAR
-// ============================================================
-async function savePatient() {
-    const name = document.getElementById('pName').value.trim();
-    if (!name) { showToast('Nome e obrigatorio','error'); return; }
-
-    const btn = document.getElementById('btnSavePatient');
-    btn.disabled = true; btn.textContent = 'Salvando...';
-
-    const materials = [];
-    document.querySelectorAll('#materialRows .material-row').forEach(row => {
-        const n = row.querySelector('[name="matName"]').value.trim();
-        const q = parseInt(row.querySelector('[name="matQty"]').value) || 0;
-        if (n && q > 0) materials.push({ name: n, qty: q });
-    });
-
-    const photoFiles = document.getElementById('pPhotos').files;
-    const photos = [];
-    for (let i = 0; i < Math.min(photoFiles.length, 5); i++) { try { photos.push(await compressImage(photoFiles[i])); } catch(e){} }
-
-    const commentsText = document.getElementById('pComments').value.trim();
-    await DataStore.addPatient({
-        name, hospital: document.getElementById('pHospital').value,
-        doctor: document.getElementById('pDoctor').value.trim(),
-        procedure: document.getElementById('pProcedure').value.trim(),
-        comments: commentsText ? [{ text: commentsText, date: new Date().toISOString() }] : [],
-        materials, photos
-    });
-
-    btn.disabled = false; btn.textContent = 'Cadastrar';
-    closeModal('modalNewPatient'); resetPatientForm(); renderPatients(); showToast('Paciente cadastrado');
-}
-
-function resetPatientForm() {
-    ['pName','pDoctor','pProcedure','pComments','pPhotos'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-    document.getElementById('pHospital').selectedIndex = 0;
-    document.getElementById('materialRows').innerHTML = `<div class="material-row"><input type="text" class="form-input" name="matName" placeholder="Nome do material"><input type="number" class="form-input" name="matQty" placeholder="Qtd" min="1"><button type="button" class="mat-remove-btn" disabled onclick="removeMaterialRow(this)">&times;</button></div>`;
-}
-
-function addMaterialRow() {
-    const c = document.getElementById('materialRows');
-    if (c.querySelectorAll('.material-row').length >= 10) { showToast('Maximo 10 materiais','error'); return; }
-    const row = document.createElement('div'); row.className = 'material-row';
-    row.innerHTML = `<input type="text" class="form-input" name="matName" placeholder="Nome do material"><input type="number" class="form-input" name="matQty" placeholder="Qtd" min="1"><button type="button" class="mat-remove-btn" onclick="removeMaterialRow(this)">&times;</button>`;
-    c.appendChild(row);
-    c.querySelectorAll('.mat-remove-btn').forEach(b => b.disabled = false);
-}
-
-function removeMaterialRow(btn) {
-    btn.closest('.material-row').remove();
-    const rows = document.querySelectorAll('#materialRows .material-row');
-    if (rows.length === 1) rows[0].querySelector('.mat-remove-btn').disabled = true;
-}
-
-// ============================================================
-// REUNIOES - RENDER
-// ============================================================
-function renderMeetings() {
-    const list = DataStore.meetings;
-    const container = document.getElementById('meetingList');
-    if (!list.length) {
-        container.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg><h3>Nenhuma reuniao</h3><p>Registre a primeira reuniao.</p></div>`;
-        return;
+    // --- TOAST ---
+    function showToast(msg, type = 'success') {
+        const c = document.getElementById('toastContainer');
+        const t = document.createElement('div');
+        t.className = `toast toast-${type}`;
+        t.textContent = msg;
+        c.appendChild(t);
+        setTimeout(() => t.remove(), 3000);
     }
-    container.innerHTML = '<div class="meeting-grid">' + list.map(m => {
-        const cover = (m.photos&&m.photos.length) ? m.photos[0] : '';
-        const pCount = (m.patientIds||[]).length;
-        return `<div class="meeting-card" onclick="openMeetingDetail('${m.id}')">
-            <div class="meeting-cover">${cover?`<img src="${cover}" alt="Foto" loading="lazy">`:'<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.3)"><svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg></div>'}
-            <div class="meeting-cover-overlay"></div><div class="meeting-cover-badge">${(m.photos||[]).length} foto${(m.photos||[]).length!==1?'s':''}</div></div>
-            <div class="meeting-card-body"><div class="meeting-card-title">${esc(m.title)}</div><div class="meeting-card-date">${m.date?new Date(m.date+'T12:00:00').toLocaleDateString('pt-BR'):'Sem data'}${pCount?' - '+pCount+' paciente'+(pCount>1?'s':''):''}</div>${m.description?`<div class="meeting-card-desc">${esc(m.description).substring(0,120)}</div>`:''}</div></div>`;
-    }).join('') + '</div>';
-}
 
-function openMeetingDetail(id) {
-    const m = DataStore.getMeeting(id); if (!m) return;
-    document.getElementById('meetingDetailHeader').innerHTML = `<h2>${esc(m.title)}</h2><p>${m.date?new Date(m.date+'T12:00:00').toLocaleDateString('pt-BR'):'Sem data'}</p>`;
-    let body = '';
-    if (m.description) body += `<div style="margin-bottom:16px"><div class="detail-section-title">Descricao</div><div class="comment-box">${esc(m.description)}</div></div>`;
-    const pids = m.patientIds || [];
-    if (pids.length) {
-        body += `<div class="detail-section-title">Pacientes Vinculados (${pids.length})</div>`;
-        pids.forEach(pid => {
-            const p = DataStore.getPatient(pid);
-            if (p) body += `<div class="linked-patient-card" onclick="closeModal('modalMeetingDetail');setTimeout(()=>openPatientDetail('${p.id}'),300)" style="cursor:pointer"><div class="doctor-avatar">${esc(p.name.charAt(0).toUpperCase())}</div><div style="flex:1"><div class="linked-patient-name">${esc(p.name)}</div><div class="linked-patient-procedure">${esc(p.procedure||'')} - ${esc(p.hospital)}</div></div></div>`;
-        });
+    // --- DOCTORS ---
+    function renderDoctors() {
+        const grid = document.getElementById('doctorGrid');
+        grid.innerHTML = doctors.map(d => {
+            const initials = d.split(' ').map(n => n[0]).join('').substring(0,2);
+            return `<div class="doctor-item"><div class="doctor-avatar">${initials}</div><div class="doctor-name">${d}</div></div>`;
+        }).join('');
     }
-    const photos = m.photos || [];
-    body += `<div class="detail-section-title" style="margin-top:16px">Fotos (${photos.length})</div>`;
-    body += photos.length ? '<div class="photo-grid">'+photos.map(ph=>`<a href="javascript:void(0)" onclick="openLightbox('${ph}')"><img src="${ph}" alt="Foto" loading="lazy"></a>`).join('')+'</div>' : '<div class="photo-empty">Nenhuma foto</div>';
-    document.getElementById('meetingDetailBody').innerHTML = body;
-    document.getElementById('meetingDetailFooter').innerHTML = `<button class="btn btn-danger btn-sm" onclick="deleteMeetingConfirm('${m.id}')">Excluir</button><button class="btn btn-outline" onclick="closeModal('modalMeetingDetail')">Fechar</button>`;
-    openModal('modalMeetingDetail');
-}
 
-function deleteMeetingConfirm(id) {
-    if (confirm('Excluir esta reuniao?')) { DataStore.deleteMeeting(id); closeModal('modalMeetingDetail'); renderMeetings(); showToast('Reuniao excluida'); }
-}
+    // --- PATIENTS ---
+    function savePatient() {
+        const name = document.getElementById('pName').value;
+        if(!name) return showToast('Nome do paciente é obrigatório', 'error');
 
-// ============================================================
-// REUNIOES - SALVAR
-// ============================================================
-let selectedMeetingPatients = [];
+        const newPatient = {
+            id: Date.now(),
+            name,
+            hospital: document.getElementById('pHospital').value,
+            doctor: document.getElementById('pDoctor').value,
+            procedure: document.getElementById('pProcedure').value
+        };
 
-function searchMeetingPatients() {
-    const q = document.getElementById('mPatientSearch').value.toLowerCase();
-    const r = document.getElementById('mPatientResults');
-    if (!q) { r.innerHTML = ''; return; }
-    r.innerHTML = DataStore.patients.filter(p=>p.name.toLowerCase().includes(q)).slice(0,8).map(p=>
-        `<div class="patient-search-item" onclick="selectMeetingPatient('${p.id}')"><div class="doctor-avatar">${esc(p.name.charAt(0).toUpperCase())}</div><div><div class="patient-search-item-name">${esc(p.name)}</div><div class="patient-search-item-hospital">${esc(p.hospital)} - ${esc(p.procedure||'')}</div></div></div>`
-    ).join('');
-}
+        patients.push(newPatient);
+        localStorage.setItem('s2w_patients', JSON.stringify(patients));
+        closeModal('modalNewPatient');
+        renderPatients();
+        showToast('Paciente cadastrado com sucesso!');
+        
+        document.getElementById('pName').value = '';
+        document.getElementById('pDoctor').value = '';
+        document.getElementById('pProcedure').value = '';
+    }
 
-function selectMeetingPatient(id) {
-    if (selectedMeetingPatients.includes(id)) return;
-    selectedMeetingPatients.push(id);
-    document.getElementById('mPatientSearch').value = '';
-    document.getElementById('mPatientResults').innerHTML = '';
-    renderSelectedMeetingPatients();
-}
+    function renderPatients() {
+        const list = document.getElementById('patientList');
+        const search = document.getElementById('patientSearch').value.toLowerCase();
+        
+        let filtered = patients.filter(p => p.name.toLowerCase().includes(search) || p.doctor.toLowerCase().includes(search));
 
-function removeMeetingPatient(id) {
-    selectedMeetingPatients = selectedMeetingPatients.filter(pid => pid !== id);
-    renderSelectedMeetingPatients();
-}
+        document.getElementById('patientCount').textContent = `${filtered.length} pacientes`;
 
-function renderSelectedMeetingPatients() {
-    const c = document.getElementById('mSelectedPatients');
-    if (!selectedMeetingPatients.length) { c.innerHTML = ''; return; }
-    c.innerHTML = selectedMeetingPatients.map(pid => {
-        const p = DataStore.getPatient(pid); if (!p) return '';
-        return `<div class="linked-patient-card"><div class="doctor-avatar">${esc(p.name.charAt(0).toUpperCase())}</div><div style="flex:1"><div class="linked-patient-name">${esc(p.name)}</div><div class="linked-patient-procedure">${esc(p.hospital)}</div></div><button class="unlink-btn" onclick="removeMeetingPatient('${pid}')">&times;</button></div>`;
-    }).join('');
-}
+        if(filtered.length === 0) {
+            list.innerHTML = `<div class="empty-state"><h3>Nenhum paciente encontrado</h3><p>Cadastre um novo paciente.</p></div>`;
+            return;
+        }
 
-async function saveMeeting() {
-    const title = document.getElementById('mTitle').value.trim();
-    if (!title) { showToast('Titulo obrigatorio','error'); return; }
-    const btn = document.getElementById('btnSaveMeeting');
-    btn.disabled = true; btn.textContent = 'Salvando...';
-    const photoFiles = document.getElementById('mPhotos').files;
-    const photos = [];
-    for (let i = 0; i < Math.min(photoFiles.length, 10); i++) { try { photos.push(await compressImage(photoFiles[i], 900, 0.6)); } catch(e){} }
-    await DataStore.addMeeting({ title, date: document.getElementById('mDate').value, description: document.getElementById('mDesc').value.trim(), patientIds: [...selectedMeetingPatients], photos });
-    btn.disabled = false; btn.textContent = 'Registrar';
-    closeModal('modalNewMeeting'); resetMeetingForm(); renderMeetings(); showToast('Reuniao registrada');
-}
-
-function resetMeetingForm() {
-    ['mTitle','mDate','mDesc','mPhotos','mPatientSearch'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-    document.getElementById('mPatientResults').innerHTML = '';
-    selectedMeetingPatients = []; renderSelectedMeetingPatients();
-}
-
-// ============================================================
-// PLANEJAMENTO - RENDER
-// ============================================================
-function renderSchedule() {
-    const board = document.getElementById('planBoard');
-    board.innerHTML = EVENT_DAYS.map((day, idx) => {
-        const surgeries = DataStore.schedule.filter(s => parseInt(s.dayIndex) === idx);
-        return `<div class="plan-day">
-            <div class="plan-day-header day-${idx}">
-                <span>${day.label} - ${day.day}</span>
-                <span class="plan-day-count">${surgeries.length} cirurgia${surgeries.length!==1?'s':''}</span>
+        list.innerHTML = filtered.map(p => `
+            <div class="patient-card">
+                <div class="patient-card-top">
+                    <div class="patient-card-name">${p.name}</div>
+                    <div class="patient-card-hospital">${p.hospital}</div>
+                </div>
+                <div class="patient-card-info">${p.procedure || 'Sem procedimento'} ${p.doctor ? '- Dr. '+p.doctor : ''}</div>
             </div>
-            <div class="plan-day-body">
-                ${surgeries.length ? surgeries.map(s => {
-                    const p = DataStore.getPatient(s.patientId);
-                    return `<div class="plan-surgery hosp-${esc(s.hospital||'CHC')}" onclick="openPatientDetail('${s.patientId}')">
-                        <div class="plan-surgery-info">
-                            <div class="plan-surgery-name">${p ? esc(p.name) : esc(s.patientName||'Paciente removido')}</div>
-                            <div class="plan-surgery-detail">${esc(s.hospital||'')} ${s.room?'- '+esc(s.room):''} ${p&&p.procedure?'| '+esc(p.procedure):''} ${p&&p.doctor?'| Dr(a). '+esc(p.doctor):''}</div>
-                        </div>
-                        ${s.time ? `<span class="plan-surgery-time">${s.time}</span>` : ''}
-                        <button class="plan-surgery-del" onclick="event.stopPropagation();removeSurgery('${s.id}')" title="Remover">&times;</button>
-                    </div>`;
-                }).join('') : '<div class="plan-empty">Nenhuma cirurgia agendada</div>'}
-                <button class="plan-add-btn" onclick="addSurgeryToDay(${idx})">+ Adicionar cirurgia</button>
+        `).join('');
+    }
+
+    // --- MEETINGS ---
+    function saveMeeting() {
+        const title = document.getElementById('mTitle').value;
+        if(!title) return showToast('Título da reunião é obrigatório', 'error');
+
+        const newMeeting = {
+            id: Date.now(),
+            title,
+            date: document.getElementById('mDate').value,
+            desc: document.getElementById('mDesc').value
+        };
+
+        meetings.push(newMeeting);
+        localStorage.setItem('s2w_meetings', JSON.stringify(meetings));
+        closeModal('modalNewMeeting');
+        renderMeetings();
+        showToast('Reunião registrada com sucesso!');
+        
+        document.getElementById('mTitle').value = '';
+        document.getElementById('mDate').value = '';
+        document.getElementById('mDesc').value = '';
+    }
+
+    function renderMeetings() {
+        const list = document.getElementById('meetingList');
+        if(meetings.length === 0) {
+            list.innerHTML = `<div class="empty-state"><h3>Nenhuma reunião registrada</h3><p>Clique em "Nova Reunião" para adicionar.</p></div>`;
+            return;
+        }
+
+        list.innerHTML = `<div class="meeting-grid">${meetings.map(m => `
+            <div class="meeting-card">
+                <div class="meeting-cover">
+                    <div style="width:100%;height:100%;background:linear-gradient(135deg,#1a237e,#004d40)"></div>
+                    <div class="meeting-cover-overlay"></div>
+                    <div class="meeting-cover-badge">${m.date || 'Sem data'}</div>
+                </div>
+                <div class="meeting-card-body">
+                    <div class="meeting-card-title">${m.title}</div>
+                    <div class="meeting-card-desc">${m.desc || 'Sem descrição'}</div>
+                </div>
             </div>
-        </div>`;
-    }).join('');
-}
-
-function addSurgeryToDay(dayIdx) {
-    document.getElementById('sDay').value = dayIdx;
-    document.getElementById('sTime').value = '';
-    document.getElementById('sHospital').selectedIndex = 0;
-    document.getElementById('sRoom').value = '';
-    document.getElementById('sNotes').value = '';
-    document.getElementById('sPatientSearch').value = '';
-    document.getElementById('sPatientResults').innerHTML = '';
-    selectedSurgeryPatient = null;
-    document.getElementById('sSelectedPatient').innerHTML = '';
-    openModal('modalNewSurgery');
-    setTimeout(() => document.getElementById('sPatientSearch').focus(), 200);
-}
-
-let selectedSurgeryPatient = null;
-
-function searchSurgeryPatients() {
-    const q = document.getElementById('sPatientSearch').value.toLowerCase();
-    const r = document.getElementById('sPatientResults');
-    if (!q) { r.innerHTML = ''; return; }
-    r.innerHTML = DataStore.patients.filter(p => p.name.toLowerCase().includes(q)).slice(0, 8).map(p =>
-        `<div class="patient-search-item" onclick="selectSurgeryPatient('${p.id}')"><div class="doctor-avatar">${esc(p.name.charAt(0).toUpperCase())}</div><div><div class="patient-search-item-name">${esc(p.name)}</div><div class="patient-search-item-hospital">${esc(p.hospital)} - ${esc(p.procedure||'')}</div></div></div>`
-    ).join('');
-}
-
-function selectSurgeryPatient(id) {
-    selectedSurgeryPatient = id;
-    const p = DataStore.getPatient(id);
-    document.getElementById('sPatientSearch').value = '';
-    document.getElementById('sPatientResults').innerHTML = '';
-    document.getElementById('sSelectedPatient').innerHTML = p ?
-        `<div class="linked-patient-card"><div class="doctor-avatar">${esc(p.name.charAt(0).toUpperCase())}</div><div style="flex:1"><div class="linked-patient-name">${esc(p.name)}</div><div class="linked-patient-procedure">${esc(p.hospital)} - ${esc(p.procedure||'')}</div></div></div>` : '';
-    if (p && p.hospital) document.getElementById('sHospital').value = p.hospital;
-}
-
-async function saveSurgery() {
-    if (!selectedSurgeryPatient) { showToast('Selecione um paciente','error'); return; }
-    const p = DataStore.getPatient(selectedSurgeryPatient);
-    const btn = document.getElementById('btnSaveSurgery');
-    btn.disabled = true; btn.textContent = 'Salvando...';
-
-    await DataStore.addSurgery({
-        patientId: selectedSurgeryPatient,
-        patientName: p?.name || '',
-        dayIndex: document.getElementById('sDay').value,
-        time: document.getElementById('sTime').value,
-        hospital: document.getElementById('sHospital').value,
-        room: document.getElementById('sRoom').value.trim(),
-        notes: document.getElementById('sNotes').value.trim()
-    });
-
-    btn.disabled = false; btn.textContent = 'Agendar';
-    closeModal('modalNewSurgery'); renderSchedule(); showToast('Cirurgia agendada');
-}
-
-async function removeSurgery(id) {
-    if (confirm('Remover esta cirurgia do planejamento?')) {
-        await DataStore.deleteSurgery(id);
-        renderSchedule();
-        showToast('Cirurgia removida do planejamento');
+        `).join('')}</div>`;
     }
-}
 
-// ============================================================
-// FACULDADE
-// ============================================================
-const doctors = [
-    { name: 'Dr. Paulo Amatucci', specialty: 'Cirurgia do Pe e Tornozelo', country: 'Brasil' },
-    { name: 'Dr. Gustavo Araujo', specialty: 'Ortopedia e Traumatologia', country: 'Brasil' },
-    { name: 'Dr. Fernando Raduan', specialty: 'Cirurgia do Pe e Tornozelo', country: 'Brasil' },
-    { name: 'Dr. Jorge Hidalgo', specialty: 'Foot & Ankle Surgery', country: 'Costa Rica' },
-    { name: 'Dr. Pau Golano', specialty: 'Anatomia / Cadaver Lab', country: 'Espanha' },
-    { name: 'Dr. C. Niek van Dijk', specialty: 'Ankle Arthroscopy', country: 'Holanda' },
-    { name: 'Dr. Victor Valderrabano', specialty: 'Foot & Ankle Reconstruction', country: 'Suica' },
-    { name: 'Dr. Leonardo Marote', specialty: 'Traumatologia Esportiva', country: 'Brasil' },
-    { name: 'Dr. Bruno de Souza', specialty: 'Artroscopia do Tornozelo', country: 'Brasil' },
-    { name: 'Dr. Ricardo Canto', specialty: 'Cirurgia Minimamente Invasiva', country: 'Brasil' },
-    { name: 'Dr. Samuel Sveid', specialty: 'Foot & Ankle Surgery', country: 'Brasil' },
-    { name: 'Dr. Andre Leme', specialty: 'Cirurgia do Pe e Tornozelo', country: 'Brasil' },
-];
+    // --- IFRAME PLANEJAMENTO INTEGRATION ---
+    function loadPlanningApp() {
+        const container = document.getElementById('viewPlanejamento');
+        // Evita recarregar o iframe se já estiver na tela
+        if(container.querySelector('iframe')) return; 
 
-function renderDoctors() {
-    document.getElementById('doctorGrid').innerHTML = doctors.map(d => `
-        <div class="doctor-item"><div class="doctor-avatar">${d.name.split(' ').pop().charAt(0)}</div><div><div class="doctor-name">${d.name}</div><div style="font-size:11px;color:var(--gray-light)">${d.specialty} - ${d.country}</div></div></div>`).join('');
-}
-
-// ============================================================
-// PARTICULAS DO HERO
-// ============================================================
-function createParticles() {
-    const c = document.getElementById('heroParticles');
-    for (let i = 0; i < 12; i++) {
-        const p = document.createElement('div'); p.className = 'hero-particle';
-        const s = 40 + Math.random() * 120;
-        p.style.cssText = `width:${s}px;height:${s}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-delay:${Math.random()*5}s;animation-duration:${6+Math.random()*6}s;background:${Math.random()>.5?'rgba(197,160,3,.08)':'rgba(26,35,126,.08)'};`;
-        c.appendChild(p);
+        const template = document.getElementById('planning-template').innerHTML;
+        const iframe = document.createElement('iframe');
+        iframe.style.width = '100%';
+        iframe.style.height = '100%';
+        iframe.style.border = 'none';
+        iframe.srcdoc = template;
+        container.appendChild(iframe);
     }
-}
 
-function toggleLanguage() {
-    const t = document.getElementById('langToggleText');
-    t.textContent = t.textContent === 'EN' ? 'PT' : 'EN';
-    showToast(t.textContent === 'EN' ? 'Idioma: Portugues' : 'Language: English', 'info');
-}
-
-// ============================================================
-// EVENTOS GLOBAIS
-// ============================================================
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') { document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active')); closeLightbox(); }
-});
-
-document.querySelectorAll('.modal-overlay').forEach(o => {
-    o.addEventListener('click', (e) => { if (e.target === o) o.classList.remove('active'); });
-});
-
-// ============================================================
-// INICIALIZACAO
-// ============================================================
-async function init() {
-    createParticles();
-    renderDoctors();
-    await checkDbConnection();
-    await DataStore.load();
-    console.log('[STEPS2WALK] App inicializado');
-}
-
-init();
+    // Init app
+    init();
 </script>
 </body>
 </html>
