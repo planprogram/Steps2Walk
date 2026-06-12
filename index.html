@@ -27,14 +27,11 @@
         .navbar{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--primary-dark);color:var(--white);transition:all .3s;border-bottom:1px solid rgba(255,255,255,.05)}
         .navbar.scrolled{background:rgba(0,36,26,.97);backdrop-filter:blur(12px);box-shadow:0 4px 24px rgba(0,0,0,.2)}
         .navbar-inner{max-width:1200px;margin:0 auto;padding:0 16px;display:flex;align-items:center;justify-content:space-between;height:58px}
-        .navbar-brand{display:flex;align-items:center;gap:10px}
+        .navbar-brand{display:flex;align-items:center;gap:10px;cursor:pointer}
         .navbar-brand img{width:36px;height:36px;border-radius:50%;border:2px solid var(--accent);object-fit:cover}
         .navbar-brand h1{font-size:14px;font-weight:900;letter-spacing:2.5px;text-transform:uppercase}
         .navbar-brand small{color:var(--accent);font-size:9px;letter-spacing:3px;text-transform:uppercase;display:block;font-weight:600}
         .navbar-actions{display:flex;align-items:center;gap:5px}
-        .navbar-links{display:none}@media(min-width:768px){.navbar-links{display:flex;gap:2px}}
-        .navbar-links a{color:rgba(255,255,255,.7);font-size:12px;font-weight:600;padding:6px 10px;border-radius:4px;transition:.2s;cursor:pointer}
-        .navbar-links a:hover{color:var(--white);background:rgba(255,255,255,.1)}
 
         .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 16px;border:none;border-radius:6px;font-weight:700;font-size:12px;cursor:pointer;transition:all .2s;white-space:nowrap}
         .btn-sm{padding:5px 11px;font-size:11px}.btn-lg{padding:14px 28px;font-size:15px;border-radius:8px}
@@ -44,11 +41,27 @@
         .btn-white{background:var(--white);color:var(--primary)}.btn-white:hover{background:var(--primary-light)}
         .btn-outline{background:transparent;border:1.5px solid var(--primary);color:var(--primary)}.btn-outline:hover{background:var(--primary);color:var(--white)}
         .btn-danger{background:var(--danger);color:var(--white)}.btn-danger:hover{background:#d32f2f}
-        .btn-ghost{background:transparent;color:var(--white)}.btn-ghost:hover{background:rgba(255,255,255,.15)}
+        .btn-ghost{background:transparent;color:var(--white);border:1px solid rgba(255,255,255,.2)}.btn-ghost:hover{background:rgba(255,255,255,.15)}
+
+        /* Botão Home na Navbar - bem visível */
+        .btn-home-nav{display:flex;align-items:center;gap:5px;background:var(--accent);color:var(--dark);border:none;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:800;cursor:pointer;transition:.2s;letter-spacing:.5px}
+        .btn-home-nav:hover{background:var(--accent-hover);transform:translateY(-1px)}
 
         .view{display:none}.view.active{display:block}
-        .view-iframe-container {height: calc(100vh - 58px); padding-top: 0 !important;}
-        .view-iframe-container iframe {width: 100%; height: 100%; border: none;}
+        .view-iframe-container{height:calc(100vh - 58px);padding-top:0 !important;position:relative}
+        .view-iframe-container iframe{width:100%;height:100%;border:none}
+
+        /* FAB - Botão Flutuante */
+        .fab{position:fixed;z-index:150;border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,.3);transition:all .3s;font-size:28px;font-weight:900}
+        .fab:hover{transform:scale(1.1);box-shadow:0 6px 28px rgba(0,0,0,.4)}
+        .fab-home{bottom:24px;right:24px;width:52px;height:52px;background:var(--accent);color:var(--dark)}
+        .fab-add{bottom:24px;right:24px;width:56px;height:56px;background:var(--accent);color:var(--dark);font-size:32px}
+        .fab-add-patient{background:var(--primary);color:var(--white)}
+        .fab-add-meeting{background:var(--secondary);color:var(--white)}
+
+        /* Pulsar para chamar atenção */
+        @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(197,160,3,.5)}70%{box-shadow:0 0 0 14px rgba(197,160,3,0)}100%{box-shadow:0 0 0 0 rgba(197,160,3,0)}}
+        .fab-pulse{animation:pulse 2s infinite}
 
         .hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:80px 16px 60px;overflow:hidden}
         .hero-bg{position:absolute;inset:0;background:linear-gradient(160deg,#001a12 0%,var(--primary-dark) 30%,#003d33 60%,#0d1b4a 100%)}
@@ -65,13 +78,11 @@
         .hero .desc{font-size:14px;color:rgba(255,255,255,.5);max-width:580px;margin:0 auto 32px;line-height:1.7}
 
         .section{padding:80px 16px}.section-dark{background:var(--primary-dark);color:var(--white)}
-        .section-gradient{background:linear-gradient(160deg,#0d1b4a,#1a237e,#00251a);color:var(--white)}
         .section-header{text-align:center;margin-bottom:50px}
         .section-badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;padding:4px 14px;border-radius:20px;margin-bottom:12px}
         .section-badge-light{background:rgba(0,77,64,.1);color:var(--primary)}
         .section-badge-accent{background:var(--accent);color:var(--dark)}
         .section-title{font-size:clamp(1.5rem,4vw,2.5rem);font-weight:900;margin-bottom:12px;letter-spacing:-.5px}
-        .section-desc{font-size:14px;max-width:660px;margin:0 auto;opacity:.7;line-height:1.7}
         .container{max-width:1100px;margin:0 auto}
 
         .card{background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow);overflow:hidden;transition:all .3s;border:1px solid rgba(0,0,0,.04)}
@@ -79,14 +90,12 @@
         .card-body{padding:28px 24px;text-align:center}
         .card-icon{font-size:40px;margin-bottom:14px;display:block}
         .card-title{font-weight:700;color:var(--primary);font-size:16px;margin-bottom:8px}
-        .card-text{font-size:13px;color:var(--gray);line-height:1.7}
         .grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
         .grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
-        .grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px}
 
         .schedule-item{background:rgba(255,255,255,.06);backdrop-filter:blur(4px);border-radius:var(--radius-lg);padding:20px;border:1px solid rgba(255,255,255,.08);transition:all .3s;display:flex;flex-wrap:wrap;align-items:center;gap:16px}
         .schedule-date{background:var(--accent);color:var(--dark);font-weight:900;font-size:15px;padding:8px 14px;border-radius:var(--radius);text-align:center;min-width:75px}
-        .schedule-info{flex:1;min-width:180px}.schedule-day{font-weight:600;font-size:15px}.schedule-loc{color:var(--accent);font-size:12px;font-weight:600}
+        .schedule-info{flex:1;min-width:180px}.schedule-day{font-weight:600;font-size:15px}
         .schedule-desc{font-size:13px;opacity:.75;border-left:1px solid rgba(255,255,255,.15);padding-left:16px;flex:2;min-width:200px}
 
         .doctor-item{display:flex;align-items:center;gap:10px;background:var(--white);border-radius:var(--radius);padding:10px 14px;border:1px solid #eee;transition:all .2s}
@@ -94,22 +103,27 @@
         .doctor-avatar{width:36px;height:36px;border-radius:50%;background:var(--primary-light);color:var(--primary);font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
         .doctor-name{font-weight:600;font-size:13px}
 
-        .tool-card{background:rgba(255,255,255,.05);backdrop-filter:blur(6px);border-radius:var(--radius-lg);border:1px solid rgba(255,255,255,.1);padding:40px 28px;text-align:center;cursor:pointer;transition:all .3s}
-        .tool-card:hover{border-color:rgba(197,160,3,.5);transform:translateY(-4px);background:rgba(255,255,255,.08)}
-        .tool-icon{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
-        .tool-icon-blue{background:rgba(26,35,126,.3)}.tool-icon-gold{background:rgba(197,160,3,.25)}
-        .tool-icon svg{width:28px;height:28px;stroke:var(--white);fill:none;stroke-width:1.5}
-        .tool-card h3{font-size:20px;font-weight:700;color:var(--white);margin-bottom:8px}
-        .tool-card p{font-size:13px;color:rgba(255,255,255,.55);margin-bottom:18px;line-height:1.7}
-
         .footer{background:#111;color:rgba(255,255,255,.5);padding:28px 16px}
         .footer-inner{max-width:1100px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px}
 
-        .sub-header{background:var(--primary-dark);color:var(--white);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 16px rgba(0,0,0,.15);position:sticky;top:0;z-index:50;border-bottom:3px solid var(--accent);flex-wrap:wrap;gap:10px}
+        /* Sub-header - BARRA VERDE/AZUL NO TOPO DAS PÁGINAS INTERNAS */
+        .sub-header{background:var(--primary-dark);color:var(--white);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 16px rgba(0,0,0,.15);position:sticky;top:0;z-index:50;border-bottom:3px solid var(--accent);flex-wrap:wrap;gap:10px}
         .sub-header.blue{background:#0d1b4a}
         .sub-header-left{display:flex;align-items:center;gap:10px}
-        .sub-header-sep{width:1px;height:20px;background:rgba(255,255,255,.2)}
-        .sub-header h1{font-size:clamp(11px,3vw,15px);font-weight:700;letter-spacing:2px;text-transform:uppercase}
+        .sub-header-sep{width:1px;height:22px;background:rgba(255,255,255,.2)}
+        .sub-header h1{font-size:clamp(12px,3vw,16px);font-weight:700;letter-spacing:2px;text-transform:uppercase}
+        .sub-header-right{display:flex;align-items:center;gap:8px}
+
+        /* Botão Home nos sub-headers */
+        .btn-home-sub{display:flex;align-items:center;gap:5px;background:var(--accent);color:var(--dark);border:none;padding:7px 14px;border-radius:6px;font-size:12px;font-weight:800;cursor:pointer;transition:.2s}
+        .btn-home-sub:hover{background:var(--accent-hover);transform:translateY(-1px)}
+
+        /* Botão de ação grande nos sub-headers */
+        .btn-action{display:flex;align-items:center;gap:6px;padding:10px 20px;border:none;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;transition:.2s;letter-spacing:.3px}
+        .btn-action:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.3)}
+        .btn-action-accent{background:var(--accent);color:var(--dark)}
+        .btn-action-accent:hover{background:var(--accent-hover)}
+        .btn-action-white{background:var(--white);color:var(--primary)}
 
         .filter-bar{background:var(--white);border-bottom:1px solid #eee;padding:12px 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
         .filter-bar input{flex:1;min-width:180px;max-width:380px;padding:8px 14px;border:1.5px solid var(--gray-lighter);border-radius:6px;font-size:13px}
@@ -121,18 +135,24 @@
         .patient-card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
         .patient-card-name{font-weight:700;font-size:14px;color:var(--dark)}
         .patient-card-hospital{background:rgba(0,77,64,.1);color:var(--primary);font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px}
-        .patient-card-info{font-size:11px;color:var(--gray);margin-bottom:6px}
+        .patient-card-info{font-size:11px;color:var(--gray);margin-bottom:4px}
+        .patient-card-photos{font-size:10px;color:var(--accent);font-weight:600;margin-top:4px}
 
         .meeting-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
         .meeting-card{background:var(--white);border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;transition:all .3s;box-shadow:var(--shadow)}
         .meeting-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-4px)}
-        .meeting-cover{position:relative;height:160px;overflow:hidden;background:linear-gradient(135deg,var(--secondary),var(--primary))}
-        .meeting-cover-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.5),transparent 60%)}
+        .meeting-cover{position:relative;height:180px;overflow:hidden;background:linear-gradient(135deg,var(--secondary),var(--primary))}
+        .meeting-cover img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+        .meeting-card:hover .meeting-cover img{transform:scale(1.05)}
+        .meeting-cover-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.55),transparent 60%)}
         .meeting-cover-badge{position:absolute;bottom:10px;left:10px;background:var(--accent);color:var(--dark);font-size:10px;font-weight:700;padding:3px 10px;border-radius:10px}
+        .meeting-cover-delete{position:absolute;top:8px;right:8px;background:rgba(198,40,40,.9);color:white;border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:.2s;opacity:0}
+        .meeting-card:hover .meeting-cover-delete{opacity:1}
+        .meeting-cover-delete:hover{background:var(--danger);transform:scale(1.15)}
         .meeting-card-body{padding:16px}
         .meeting-card-title{font-weight:700;font-size:16px;margin-bottom:4px}
         .meeting-card-date{font-size:12px;color:var(--gray-light);margin-bottom:6px}
-        .meeting-card-desc{font-size:13px;color:var(--gray);line-height:1.6}
+        .meeting-card-desc{font-size:13px;color:var(--gray);line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 
         .empty-state{text-align:center;padding:60px 20px;color:var(--gray-light)}
         .empty-state h3{font-size:16px;color:var(--gray);margin-bottom:4px;font-weight:700}
@@ -154,34 +174,80 @@
         .form-textarea{resize:vertical;min-height:70px}
         .form-input-center{text-align:center;font-size:20px;letter-spacing:8px}
         .form-error{color:var(--danger);font-size:12px;text-align:center;font-weight:700;margin-top:6px}
+        .form-hint{font-size:10px;color:var(--gray-light);margin-top:3px}
+        .form-counter{font-size:11px;text-align:right;margin-top:2px;font-weight:600}
+        .form-counter.ok{color:var(--success)}.form-counter.warn{color:var(--accent)}.form-counter.limit{color:var(--danger)}
 
-        /* Photo Grid CSS */
-        .photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-top:10px}
-        .photo-grid img{width:100%;height:100px;object-fit:cover;border-radius:var(--radius);border:1px solid #eee;cursor:pointer;transition:0.2s}
+        /* Preview de fotos */
+        .photo-preview-area{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+        .photo-preview-item{position:relative;width:72px;height:72px}
+        .photo-preview-item img{width:100%;height:100%;object-fit:cover;border-radius:6px;border:2px solid #eee}
+        .photo-preview-item .remove-photo{position:absolute;top:-5px;right:-5px;background:var(--danger);color:white;border:none;width:20px;height:20px;border-radius:50%;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;transition:.2s}
+        .photo-preview-item .remove-photo:hover{transform:scale(1.2)}
+
+        .photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-top:10px}
+        .photo-grid img{width:100%;height:120px;object-fit:cover;border-radius:var(--radius);border:1px solid #eee;cursor:pointer;transition:.2s}
         .photo-grid img:hover{transform:scale(1.05);box-shadow:var(--shadow)}
 
-        .toast-container{position:fixed;bottom:24px;right:24px;z-index:400;display:flex;flex-direction:column;gap:8px}
-        .toast{padding:12px 20px;border-radius:var(--radius);color:var(--white);font-size:13px;font-weight:600;box-shadow:var(--shadow-lg);animation:toastIn .3s ease;max-width:340px}
+        /* Lightbox */
+        .lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:500;align-items:center;justify-content:center;cursor:zoom-out}
+        .lightbox.active{display:flex}
+        .lightbox img{max-width:92%;max-height:92vh;object-fit:contain;border-radius:8px}
+        .lightbox-close{position:absolute;top:16px;right:20px;background:rgba(255,255,255,.15);color:white;border:none;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center}
+        .lightbox-close:hover{background:rgba(255,255,255,.3)}
+        .lightbox-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.15);color:white;border:none;width:44px;height:44px;border-radius:50%;cursor:pointer;font-size:24px;display:flex;align-items:center;justify-content:center}
+        .lightbox-nav:hover{background:rgba(255,255,255,.3)}
+        .lightbox-prev{left:16px}.lightbox-next{right:16px}
+        .lightbox-counter{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.7);font-size:13px;font-weight:600}
+
+        .toast-container{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:400;display:flex;flex-direction:column;gap:8px;align-items:center}
+        .toast{padding:12px 24px;border-radius:var(--radius);color:var(--white);font-size:13px;font-weight:600;box-shadow:var(--shadow-lg);animation:toastIn .3s ease;max-width:360px;text-align:center}
         .toast-success{background:var(--success)}.toast-error{background:var(--danger)}.toast-info{background:var(--secondary)}
         @keyframes toastIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 
         .db-status{position:fixed;bottom:10px;left:10px;z-index:100;font-size:9px;padding:3px 8px;border-radius:10px;font-weight:700;transition:all .3s}
         .db-status.online{background:#e8f5e9;color:var(--success)}.db-status.offline{background:#fff3e0;color:#e65100}
 
-        @media(max-width:600px){.hero h1{font-size:2.4rem}.form-row{grid-template-columns:1fr}.navbar-actions .btn span{display:none}}
+        @media(max-width:600px){
+            .hero h1{font-size:2.4rem}
+            .form-row{grid-template-columns:1fr}
+            .navbar-actions .btn span.hide-mobile{display:none}
+            .sub-header{padding:10px 12px}
+            .btn-action{padding:8px 14px;font-size:12px}
+            .meeting-grid{grid-template-columns:1fr}
+        }
     </style>
 </head>
 <body>
 
 <div class="db-status offline" id="mainDbStatus">Conectando...</div>
 
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <button class="lightbox-close" onclick="closeLightbox()">&#10005;</button>
+    <button class="lightbox-nav lightbox-prev" onclick="event.stopPropagation();navLightbox(-1)">&#8249;</button>
+    <img id="lightboxImg" src="" alt="Foto">
+    <button class="lightbox-nav lightbox-next" onclick="event.stopPropagation();navLightbox(1)">&#8250;</button>
+    <div class="lightbox-counter" id="lightboxCounter"></div>
+</div>
+
+<!-- FAB Home - aparece no Planejamento -->
+<button class="fab fab-home fab-pulse" id="fabHome" onclick="goHome()" title="Voltar ao Home" style="display:none">🏠</button>
+
+<!-- FAB Adicionar Paciente - aparece na tela de pacientes -->
+<button class="fab fab-add fab-add-patient fab-pulse" id="fabAddPatient" onclick="openModal('modalNewPatient')" title="Cadastrar Novo Paciente" style="display:none">＋</button>
+
+<!-- FAB Adicionar Evento - aparece na tela de reuniões -->
+<button class="fab fab-add fab-add-meeting fab-pulse" id="fabAddMeeting" onclick="openModal('modalNewMeeting')" title="Criar Novo Evento" style="display:none">＋</button>
+
 <nav class="navbar" id="navbar">
     <div class="navbar-inner">
-        <div class="navbar-brand">
+        <div class="navbar-brand" onclick="goHome()">
             <img src="https://steps2walk-5d8b0.web.app/logo-s2w.png" alt="Logo" onerror="this.style.display='none'">
             <div><h1>STEPS2WALK&reg;</h1><small>Curitiba 2026</small></div>
         </div>
         <div class="navbar-actions">
+            <button class="btn-home-nav" onclick="goHome()">🏠 Home</button>
             <button class="btn btn-secondary btn-sm" onclick="openPassword('pacientes')">Pacientes</button>
             <button class="btn btn-secondary btn-sm" onclick="openPassword('reunioes')">Reunioes</button>
             <button class="btn btn-accent btn-sm" onclick="openPassword('planejamento')">Planejamento</button>
@@ -189,6 +255,7 @@
     </div>
 </nav>
 
+<!-- ==================== HOME ==================== -->
 <div class="view active" id="viewHome">
     <section class="hero">
         <div class="hero-bg"></div><div class="hero-particles" id="heroParticles"></div><div class="hero-overlay"></div>
@@ -239,126 +306,214 @@
             <div class="grid-3" id="doctorGrid"></div>
         </div>
     </section>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <div>STEPS2WALK&reg; Curitiba 2026 &mdash; Neoortho</div>
+        </div>
+    </footer>
 </div>
 
-<!-- PLANEJAMENTO VIEW -->
+<!-- ==================== PLANEJAMENTO ==================== -->
 <div class="view view-iframe-container" id="viewPlanejamento"></div>
 
-<!-- PACIENTES VIEW -->
+<!-- ==================== PACIENTES ==================== -->
 <div class="view" id="viewPacientes">
     <div class="sub-header">
         <div class="sub-header-left">
-            <button class="btn btn-ghost btn-sm" onclick="goHome()">&#8592; Voltar</button>
+            <button class="btn-home-sub" onclick="goHome()">🏠 Home</button>
             <div class="sub-header-sep"></div>
             <h1>Registro de Pacientes</h1>
         </div>
-        <!-- BOTÃO CLARO E VÍSIVEL PARA NOVO PACIENTE -->
-        <button class="btn btn-accent" onclick="openModal('modalNewPatient')">+ Cadastrar Paciente</button>
+        <div class="sub-header-right">
+            <button class="btn-action btn-action-accent" onclick="openModal('modalNewPatient')">＋ Cadastrar Paciente</button>
+        </div>
     </div>
     <div class="filter-bar">
-        <input type="text" id="patientSearch" placeholder="Buscar paciente..." oninput="renderPatients()">
-        <span class="filter-count" id="patientCount">0</span>
+        <input type="text" id="patientSearch" placeholder="Buscar paciente por nome ou medico..." oninput="renderPatients()">
+        <span class="filter-count" id="patientCount">0 pacientes</span>
     </div>
     <div id="patientList" class="patient-grid"></div>
 </div>
 
-<!-- REUNIOES VIEW -->
+<!-- ==================== REUNIOES / EVENTOS ==================== -->
 <div class="view" id="viewReunioes">
     <div class="sub-header blue">
         <div class="sub-header-left">
-            <button class="btn btn-ghost btn-sm" onclick="goHome()">&#8592; Voltar</button>
+            <button class="btn-home-sub" onclick="goHome()">🏠 Home</button>
             <div class="sub-header-sep"></div>
-            <h1>Reunioes e Fotos do Evento</h1>
+            <h1>Eventos e Reunioes</h1>
         </div>
-        <button class="btn btn-accent" onclick="openModal('modalNewMeeting')">+ Nova Reuniao / Foto</button>
+        <div class="sub-header-right">
+            <button class="btn-action btn-action-white" onclick="openModal('modalNewMeeting')">＋ Novo Evento</button>
+        </div>
     </div>
     <div id="meetingList" style="padding:16px"></div>
 </div>
 
-<!-- MODAIS -->
+<!-- ==================== MODAIS ==================== -->
+
+<!-- Modal Senha -->
 <div class="modal-overlay" id="modalPassword">
     <div class="modal" style="max-width:400px">
-        <div class="modal-header"><h2>Acesso</h2><p>Senha: 2026</p></div>
-        <div class="modal-body"><input type="password" id="pwInput" class="form-input form-input-center" placeholder="Senha" onkeydown="if(event.key==='Enter')checkPassword()"><div class="form-error" id="pwError" style="display:none">Senha incorreta.</div></div>
-        <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalPassword')">Cancelar</button><button class="btn btn-primary" onclick="checkPassword()">Entrar</button></div>
+        <div class="modal-header"><h2>Acesso Restrito</h2><p>Digite a senha para acessar</p></div>
+        <div class="modal-body">
+            <input type="password" id="pwInput" class="form-input form-input-center" placeholder="Senha" onkeydown="if(event.key==='Enter')checkPassword()">
+            <div class="form-error" id="pwError" style="display:none">Senha incorreta.</div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('modalPassword')">Cancelar</button>
+            <button class="btn btn-primary" onclick="checkPassword()">Entrar</button>
+        </div>
     </div>
 </div>
 
+<!-- Modal Novo Paciente -->
 <div class="modal-overlay" id="modalNewPatient">
     <div class="modal modal-wide">
-        <div class="modal-header"><h2>Cadastrar Novo Paciente</h2><p>Os dados e fotos serão salvos online em tempo real.</p></div>
+        <div class="modal-header">
+            <h2>＋ Cadastrar Novo Paciente</h2>
+            <p>Preencha os dados e adicione ate 5 fotos do paciente.</p>
+        </div>
         <div class="modal-body">
             <div class="form-row">
-                <div class="form-group"><label class="form-label">Nome do Paciente *</label><input type="text" class="form-input" id="pName"></div>
-                <div class="form-group"><label class="form-label">Hospital *</label><select class="form-select" id="pHospital"><option>CHC</option><option>CHR</option><option>UFPR</option><option>Outro</option></select></div>
+                <div class="form-group">
+                    <label class="form-label">Nome do Paciente *</label>
+                    <input type="text" class="form-input" id="pName" placeholder="Nome completo">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Hospital *</label>
+                    <select class="form-select" id="pHospital">
+                        <option value="">Selecione...</option>
+                        <option>CHC</option><option>CHR</option><option>UFPR</option><option>Outro</option>
+                    </select>
+                </div>
             </div>
             <div class="form-row">
-                <div class="form-group"><label class="form-label">Medico Responsavel</label><input type="text" class="form-input" id="pDoctor"></div>
-                <div class="form-group"><label class="form-label">Procedimento</label><input type="text" class="form-input" id="pProcedure"></div>
+                <div class="form-group">
+                    <label class="form-label">Medico Responsavel</label>
+                    <input type="text" class="form-input" id="pDoctor" placeholder="Nome do medico">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Procedimento</label>
+                    <input type="text" class="form-input" id="pProcedure" placeholder="Tipo de procedimento">
+                </div>
             </div>
-            <div class="form-group"><label class="form-label">Observacoes</label><textarea class="form-textarea" id="pComments" rows="2"></textarea></div>
-            
-            <!-- CAMPO DE FOTO RESTAURADO -->
             <div class="form-group">
-                <label class="form-label">Fotos (Pré/Pós Operatório)</label>
-                <input type="file" class="form-input" id="pPhotos" accept="image/*" multiple>
-                <div style="font-size:10px;color:#bbb;margin-top:3px">Selecione as fotos do paciente. Elas serão salvas no banco de dados.</div>
+                <label class="form-label">Descricao / Observacoes</label>
+                <textarea class="form-textarea" id="pComments" rows="3" placeholder="Descricao detalhada do caso clinico, observacoes, etc."></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Fotos do Paciente</label>
+                <div class="form-counter" id="pPhotoCounter">0 / 5 fotos</div>
+                <input type="file" class="form-input" id="pPhotos" accept="image/*" multiple onchange="handlePatientPhotoSelect(this)">
+                <div class="form-hint">Selecione ate 5 fotos (pre-operatorio, pos-operatorio, radiografias)</div>
+                <div class="photo-preview-area" id="pPhotoPreview"></div>
             </div>
         </div>
-        <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalNewPatient')">Cancelar</button><button class="btn btn-primary" onclick="savePatient()">Salvar Paciente</button></div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('modalNewPatient');clearPatientForm()">Cancelar</button>
+            <button class="btn btn-primary" onclick="savePatient()">Salvar Paciente</button>
+        </div>
     </div>
 </div>
 
-<!-- MODAL DETALHE PACIENTE -->
+<!-- Modal Detalhe Paciente -->
 <div class="modal-overlay" id="modalPatientDetail">
     <div class="modal modal-wide">
         <div class="modal-header"><h2 id="detailTitle">Detalhes do Paciente</h2></div>
         <div class="modal-body" id="detailBody"></div>
-        <div class="modal-footer"><button class="btn btn-danger" id="detailDeleteBtn">Excluir Paciente</button><button class="btn btn-outline" onclick="closeModal('modalPatientDetail')">Fechar</button></div>
+        <div class="modal-footer">
+            <button class="btn btn-danger" id="detailDeleteBtn">Excluir Paciente</button>
+            <button class="btn btn-outline" onclick="closeModal('modalPatientDetail')">Fechar</button>
+        </div>
     </div>
 </div>
 
+<!-- Modal Novo Evento -->
 <div class="modal-overlay" id="modalNewMeeting">
     <div class="modal modal-wide">
-        <div class="modal-header blue"><h2>Registrar Reuniao / Foto do Evento</h2></div>
-        <div class="modal-body">
-            <div class="form-group"><label class="form-label">Titulo *</label><input type="text" class="form-input" id="mTitle"></div>
-            <div class="form-group"><label class="form-label">Data</label><input type="date" class="form-input" id="mDate"></div>
-            <div class="form-group"><label class="form-label">Descricao</label><textarea class="form-textarea" id="mDesc" rows="2"></textarea></div>
-            <div class="form-group"><label class="form-label">Fotos da Reuniao</label><input type="file" class="form-input" id="mPhotos" accept="image/*" multiple></div>
+        <div class="modal-header blue">
+            <h2>＋ Criar Novo Evento</h2>
+            <p>Registre um evento ou reuniao com fotos e descricao.</p>
         </div>
-        <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalNewMeeting')">Cancelar</button><button class="btn btn-secondary" onclick="saveMeeting()">Salvar</button></div>
+        <div class="modal-body">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Titulo do Evento *</label>
+                    <input type="text" class="form-input" id="mTitle" placeholder="Ex: Reuniao de Abertura">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Data</label>
+                    <input type="date" class="form-input" id="mDate">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Descricao</label>
+                <textarea class="form-textarea" id="mDesc" rows="3" placeholder="Descreva o evento, participantes, temas..."></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Fotos do Evento</label>
+                <input type="file" class="form-input" id="mPhotos" accept="image/*" multiple onchange="handleMeetingPhotoSelect(this)">
+                <div class="form-hint">Adicione fotos do evento</div>
+                <div class="photo-preview-area" id="mPhotoPreview"></div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('modalNewMeeting');clearMeetingForm()">Cancelar</button>
+            <button class="btn btn-secondary" onclick="saveMeeting()">Salvar Evento</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Detalhe Evento -->
+<div class="modal-overlay" id="modalMeetingDetail">
+    <div class="modal modal-wide">
+        <div class="modal-header blue"><h2 id="meetingDetailTitle">Detalhes do Evento</h2></div>
+        <div class="modal-body" id="meetingDetailBody"></div>
+        <div class="modal-footer">
+            <button class="btn btn-danger" id="meetingDeleteBtn">Excluir Evento</button>
+            <button class="btn btn-outline" onclick="closeModal('modalMeetingDetail')">Fechar</button>
+        </div>
     </div>
 </div>
 
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
+    // ==================== FIREBASE ====================
     const firebaseConfig = {
-      apiKey: "AIzaSyD5_-AlE4zSXR0XHZBsyHKXG55x8QodRMs",
-      authDomain: "steps2walk-5d8b0.firebaseapp.com",
-      databaseURL: "https://steps2walk-5d8b0-default-rtdb.firebaseio.com",
-      projectId: "steps2walk-5d8b0",
-      storageBucket: "steps2walk-5d8b0.firebasestorage.app",
-      messagingSenderId: "914390869101",
-      appId: "1:914390869101:web:c2a8bcddce04a839480b64"
+        apiKey: "AIzaSyD5_-AlE4zSXR0XHZBsyHKXG55x8QodRMs",
+        authDomain: "steps2walk-5d8b0.firebaseapp.com",
+        databaseURL: "https://steps2walk-5d8b0-default-rtdb.firebaseio.com",
+        projectId: "steps2walk-5d8b0",
+        storageBucket: "steps2walk-5d8b0.firebasestorage.app",
+        messagingSenderId: "914390869101",
+        appId: "1:914390869101:web:c2a8bcddce04a839480b64"
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
     db.ref('.info/connected').on('value', snap => {
         const el = document.getElementById('mainDbStatus');
-        if (snap.val() === true) { el.className = 'db-status online'; el.innerText = 'Banco Online'; } 
+        if(snap.val() === true) { el.className = 'db-status online'; el.innerText = 'Banco Online'; }
         else { el.className = 'db-status offline'; el.innerText = 'Banco Offline'; }
     });
 
+    // ==================== VARIAVEIS ====================
     let patients = [];
     let meetings = [];
     let currentPasswordTarget = null;
-    const PASSWORD = "2026"; 
+    const PASSWORD = "2026";
     const doctors = ["Dr. Thomas San Giovannni", "Dr. Panos Symeonides", "Dr. Alexandre Leme", "Dr. Bruno Moura", "Dr. Orides Merino", "Dra. Amanda Damazio", "Dr. Jamil Soni"];
+    let tempPatientPhotos = [];
+    let tempMeetingPhotos = [];
+    let lightboxImages = [];
+    let lightboxIndex = 0;
 
-    window.addEventListener('scroll', () => { document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50); });
+    window.addEventListener('scroll', () => {
+        document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+    });
 
     function init() {
         renderDoctors();
@@ -368,98 +523,312 @@
     }
 
     function createParticles() {
-        const c = document.getElementById('heroParticles'); if(!c) return;
-        for(let i=0; i<15; i++) { const p = document.createElement('div'); p.className = 'hero-particle'; p.style.width = p.style.height = Math.random() * 20 + 5 + 'px'; p.style.left = Math.random() * 100 + '%'; p.style.top = Math.random() * 100 + '%'; c.appendChild(p); }
+        const c = document.getElementById('heroParticles');
+        if(!c) return;
+        for(let i = 0; i < 15; i++) {
+            const p = document.createElement('div');
+            p.className = 'hero-particle';
+            p.style.width = p.style.height = Math.random() * 20 + 5 + 'px';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.top = Math.random() * 100 + '%';
+            p.style.animationDelay = Math.random() * 5 + 's';
+            c.appendChild(p);
+        }
     }
 
-    function switchView(id) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo(0, 0); if(id === 'viewPlanejamento') loadPlanningApp(); }
-    function goHome() { switchView('viewHome'); }
-    function scrollToSection(id) { goHome(); setTimeout(() => { document.getElementById(id).scrollIntoView({ behavior: 'smooth' }); }, 100); }
+    // ==================== NAVEGACAO ====================
+    function switchView(id) {
+        // Esconder todas as views
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        // Mostrar a view selecionada
+        document.getElementById(id).classList.add('active');
+        window.scrollTo(0, 0);
+
+        // Controlar visibilidade dos FABs
+        document.getElementById('fabHome').style.display = (id === 'viewPlanejamento') ? 'flex' : 'none';
+        document.getElementById('fabAddPatient').style.display = (id === 'viewPacientes') ? 'flex' : 'none';
+        document.getElementById('fabAddMeeting').style.display = (id === 'viewReunioes') ? 'flex' : 'none';
+
+        // Carregar iframe do planejamento
+        if(id === 'viewPlanejamento') loadPlanningApp();
+    }
+
+    function goHome() {
+        switchView('viewHome');
+    }
+
+    function scrollToSection(id) {
+        goHome();
+        setTimeout(() => {
+            const el = document.getElementById(id);
+            if(el) el.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+    }
+
+    // ==================== MODAIS ====================
     function openModal(id) { document.getElementById(id).classList.add('active'); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-    document.querySelectorAll('.modal-overlay').forEach(o => { o.addEventListener('click', (e) => { if (e.target === o) o.classList.remove('active'); }); });
 
-    function openPassword(target) { currentPasswordTarget = target; document.getElementById('pwError').style.display = 'none'; document.getElementById('pwInput').value = ''; openModal('modalPassword'); }
-    function checkPassword() {
-        if(document.getElementById('pwInput').value === PASSWORD) { closeModal('modalPassword'); if(currentPasswordTarget === 'pacientes') switchView('viewPacientes'); if(currentPasswordTarget === 'reunioes') switchView('viewReunioes'); if(currentPasswordTarget === 'planejamento') switchView('viewPlanejamento'); } 
-        else { document.getElementById('pwError').style.display = 'block'; }
+    document.querySelectorAll('.modal-overlay').forEach(o => {
+        o.addEventListener('click', (e) => { if(e.target === o) o.classList.remove('active'); });
+    });
+
+    function openPassword(target) {
+        currentPasswordTarget = target;
+        document.getElementById('pwError').style.display = 'none';
+        document.getElementById('pwInput').value = '';
+        openModal('modalPassword');
+        setTimeout(() => document.getElementById('pwInput').focus(), 100);
     }
-    function showToast(msg, type = 'success') { const c = document.getElementById('toastContainer'); const t = document.createElement('div'); t.className = `toast toast-${type}`; t.textContent = msg; c.appendChild(t); setTimeout(() => t.remove(), 3000); }
-    function renderDoctors() { const g = document.getElementById('doctorGrid'); g.innerHTML = doctors.map(d => { const i = d.split(' ').map(n => n[0]).join('').substring(0,2); return `<div class="doctor-item"><div class="doctor-avatar">${i}</div><div class="doctor-name">${d}</div></div>`; }).join(''); }
 
-    // --- FUNÇÃO DE COMPRESSÃO DE IMAGEM PARA SALVAR NO BANCO ---
-    function processFiles(files) {
+    function checkPassword() {
+        if(document.getElementById('pwInput').value === PASSWORD) {
+            closeModal('modalPassword');
+            if(currentPasswordTarget === 'pacientes') switchView('viewPacientes');
+            if(currentPasswordTarget === 'reunioes') switchView('viewReunioes');
+            if(currentPasswordTarget === 'planejamento') switchView('viewPlanejamento');
+        } else {
+            document.getElementById('pwError').style.display = 'block';
+        }
+    }
+
+    function showToast(msg, type = 'success') {
+        const c = document.getElementById('toastContainer');
+        const t = document.createElement('div');
+        t.className = `toast toast-${type}`;
+        t.textContent = msg;
+        c.appendChild(t);
+        setTimeout(() => t.remove(), 3500);
+    }
+
+    function renderDoctors() {
+        const g = document.getElementById('doctorGrid');
+        g.innerHTML = doctors.map(d => {
+            const i = d.split(' ').map(n => n[0]).join('').substring(0, 2);
+            return `<div class="doctor-item"><div class="doctor-avatar">${i}</div><div class="doctor-name">${d}</div></div>`;
+        }).join('');
+    }
+
+    // ==================== LIGHTBOX ====================
+    function openLightbox(images, startIndex) {
+        lightboxImages = images;
+        lightboxIndex = startIndex || 0;
+        updateLightbox();
+        document.getElementById('lightbox').classList.add('active');
+    }
+    function closeLightbox() { document.getElementById('lightbox').classList.remove('active'); }
+    function navLightbox(dir) {
+        lightboxIndex += dir;
+        if(lightboxIndex < 0) lightboxIndex = lightboxImages.length - 1;
+        if(lightboxIndex >= lightboxImages.length) lightboxIndex = 0;
+        updateLightbox();
+    }
+    function updateLightbox() {
+        document.getElementById('lightboxImg').src = lightboxImages[lightboxIndex];
+        document.getElementById('lightboxCounter').textContent = `${lightboxIndex + 1} / ${lightboxImages.length}`;
+    }
+    document.addEventListener('keydown', (e) => {
+        if(!document.getElementById('lightbox').classList.contains('active')) return;
+        if(e.key === 'Escape') closeLightbox();
+        if(e.key === 'ArrowLeft') navLightbox(-1);
+        if(e.key === 'ArrowRight') navLightbox(1);
+    });
+
+    // ==================== COMPRESSAO DE IMAGEM ====================
+    function compressBase64Image(base64, maxWidth, quality) {
         return new Promise((resolve) => {
-            let photos = []; let processed = 0;
-            if(files.length === 0) resolve([]);
-            Array.from(files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = new Image();
-                    img.onload = function() {
-                        const canvas = document.createElement('canvas');
-                        const MAX_WIDTH = 400; // Comprime para no máximo 400px de largura
-                        const scale = MAX_WIDTH / img.width;
-                        canvas.width = MAX_WIDTH; canvas.height = img.height * scale;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        photos.push(canvas.toDataURL('image/jpeg', 0.6)); // Qualidade 60%
-                        processed++;
-                        if(processed === files.length) resolve(photos);
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            });
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const scale = maxWidth / img.width;
+                canvas.width = maxWidth;
+                canvas.height = img.height * scale;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                resolve(canvas.toDataURL('image/jpeg', quality));
+            };
+            img.src = base64;
         });
     }
 
-    // --- PACIENTES EM TEMPO REAL ---
-    function loadPatientsFromDB() { db.ref('patientsData').on('value', snapshot => { patients = snapshot.val() ? Object.values(snapshot.val()) : []; renderPatients(); }); }
+    // ==================== FOTOS PACIENTE (max 5) ====================
+    function handlePatientPhotoSelect(input) {
+        const files = Array.from(input.files);
+        const currentCount = tempPatientPhotos.length;
+        const available = 5 - currentCount;
+
+        if(available <= 0) {
+            showToast('Limite de 5 fotos atingido!', 'error');
+            input.value = '';
+            return;
+        }
+        if(files.length > available) {
+            showToast(`Voce so pode adicionar mais ${available} foto(s). Maximo: 5`, 'error');
+            input.value = '';
+            return;
+        }
+
+        files.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                tempPatientPhotos.push(e.target.result);
+                renderPatientPhotoPreview();
+            };
+            reader.readAsDataURL(file);
+        });
+        input.value = '';
+    }
+
+    function renderPatientPhotoPreview() {
+        const container = document.getElementById('pPhotoPreview');
+        const counter = document.getElementById('pPhotoCounter');
+        counter.textContent = `${tempPatientPhotos.length} / 5 fotos`;
+        counter.className = 'form-counter ' + (tempPatientPhotos.length >= 5 ? 'limit' : tempPatientPhotos.length >= 3 ? 'warn' : 'ok');
+
+        container.innerHTML = tempPatientPhotos.map((src, i) => `
+            <div class="photo-preview-item">
+                <img src="${src}" alt="Foto ${i+1}">
+                <button class="remove-photo" onclick="removePatientPhoto(${i})">&#10005;</button>
+            </div>
+        `).join('');
+    }
+
+    function removePatientPhoto(index) {
+        tempPatientPhotos.splice(index, 1);
+        renderPatientPhotoPreview();
+    }
+
+    function clearPatientForm() {
+        document.getElementById('pName').value = '';
+        document.getElementById('pHospital').value = '';
+        document.getElementById('pDoctor').value = '';
+        document.getElementById('pProcedure').value = '';
+        document.getElementById('pComments').value = '';
+        document.getElementById('pPhotos').value = '';
+        tempPatientPhotos = [];
+        document.getElementById('pPhotoPreview').innerHTML = '';
+        document.getElementById('pPhotoCounter').textContent = '0 / 5 fotos';
+        document.getElementById('pPhotoCounter').className = 'form-counter ok';
+    }
+
+    // ==================== FOTOS EVENTO ====================
+    function handleMeetingPhotoSelect(input) {
+        const files = Array.from(input.files);
+        files.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                tempMeetingPhotos.push(e.target.result);
+                renderMeetingPhotoPreview();
+            };
+            reader.readAsDataURL(file);
+        });
+        input.value = '';
+    }
+
+    function renderMeetingPhotoPreview() {
+        const container = document.getElementById('mPhotoPreview');
+        container.innerHTML = tempMeetingPhotos.map((src, i) => `
+            <div class="photo-preview-item">
+                <img src="${src}" alt="Foto ${i+1}">
+                <button class="remove-photo" onclick="removeMeetingPhoto(${i})">&#10005;</button>
+            </div>
+        `).join('');
+    }
+
+    function removeMeetingPhoto(index) {
+        tempMeetingPhotos.splice(index, 1);
+        renderMeetingPhotoPreview();
+    }
+
+    function clearMeetingForm() {
+        document.getElementById('mTitle').value = '';
+        document.getElementById('mDate').value = '';
+        document.getElementById('mDesc').value = '';
+        document.getElementById('mPhotos').value = '';
+        tempMeetingPhotos = [];
+        document.getElementById('mPhotoPreview').innerHTML = '';
+    }
+
+    // ==================== PACIENTES CRUD ====================
+    function loadPatientsFromDB() {
+        db.ref('patientsData').on('value', snapshot => {
+            patients = snapshot.val() ? Object.values(snapshot.val()) : [];
+            renderPatients();
+        });
+    }
 
     async function savePatient() {
-        const name = document.getElementById('pName').value;
-        if(!name) return showToast('Nome do paciente é obrigatório', 'error');
-        
-        showToast('Processando fotos, aguarde...', 'info');
-        const files = document.getElementById('pPhotos').files;
-        const photos = await processFiles(files);
+        const name = document.getElementById('pName').value.trim();
+        const hospital = document.getElementById('pHospital').value;
+
+        if(!name) { showToast('Nome do paciente e obrigatorio!', 'error'); return; }
+        if(!hospital) { showToast('Selecione o hospital!', 'error'); return; }
+
+        showToast('Salvando paciente e fotos...', 'info');
+
+        let compressedPhotos = [];
+        for(const src of tempPatientPhotos) {
+            try {
+                const c = await compressBase64Image(src, 500, 0.65);
+                compressedPhotos.push(c);
+            } catch(err) { compressedPhotos.push(src); }
+        }
 
         const newPatient = {
-            id: Date.now(), name,
-            hospital: document.getElementById('pHospital').value,
-            doctor: document.getElementById('pDoctor').value,
-            procedure: document.getElementById('pProcedure').value,
-            comments: document.getElementById('pComments').value,
-            photos: photos
+            id: Date.now(),
+            name: name,
+            hospital: hospital,
+            doctor: document.getElementById('pDoctor').value.trim(),
+            procedure: document.getElementById('pProcedure').value.trim(),
+            comments: document.getElementById('pComments').value.trim(),
+            photos: compressedPhotos,
+            createdAt: new Date().toISOString()
         };
 
         db.ref('patientsData/' + newPatient.id).set(newPatient).then(() => {
-            closeModal('modalNewPatient'); showToast('Paciente salvo online!');
-            document.getElementById('pName').value = ''; document.getElementById('pDoctor').value = ''; document.getElementById('pProcedure').value = ''; document.getElementById('pComments').value = '';
-        }).catch(err => showToast('Erro ao salvar', 'error'));
+            closeModal('modalNewPatient');
+            clearPatientForm();
+            showToast('Paciente cadastrado com sucesso!');
+        }).catch(err => showToast('Erro ao salvar: ' + err.message, 'error'));
     }
 
     function deletePatient(id) {
-        if(confirm("Excluir paciente do banco de dados?")) { db.ref('patientsData/' + id).remove(); closeModal('modalPatientDetail'); showToast('Paciente excluído', 'info'); }
+        if(confirm("Excluir este paciente do banco de dados?")) {
+            db.ref('patientsData/' + id).remove();
+            closeModal('modalPatientDetail');
+            showToast('Paciente excluido', 'info');
+        }
     }
 
     function openPatientDetail(id) {
         const p = patients.find(pt => pt.id === id);
         if(!p) return;
         document.getElementById('detailTitle').innerText = p.name;
-        
-        let html = `<div style="margin-bottom:10px"><strong>Hospital:</strong> ${p.hospital}</div>`;
-        if(p.doctor) html += `<div style="margin-bottom:10px"><strong>Médico:</strong> ${p.doctor}</div>`;
-        if(p.procedure) html += `<div style="margin-bottom:10px"><strong>Procedimento:</strong> ${p.procedure}</div>`;
-        if(p.comments) html += `<div style="margin-bottom:10px"><strong>Obs:</strong> ${p.comments}</div>`;
-        
+
+        let html = '';
+        html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">`;
+        html += `<div style="background:var(--primary-light);padding:10px 14px;border-radius:8px"><div style="font-size:10px;color:var(--gray-light);font-weight:700;text-transform:uppercase">Hospital</div><div style="font-weight:700;color:var(--primary)">${p.hospital}</div></div>`;
+        if(p.doctor) html += `<div style="background:#e8eaf6;padding:10px 14px;border-radius:8px"><div style="font-size:10px;color:var(--gray-light);font-weight:700;text-transform:uppercase">Medico</div><div style="font-weight:700;color:var(--secondary)">${p.doctor}</div></div>`;
+        html += `</div>`;
+
+        if(p.procedure) {
+            html += `<div style="margin-bottom:14px"><div style="font-size:10px;color:var(--gray-light);font-weight:700;text-transform:uppercase;margin-bottom:2px">Procedimento</div><div style="font-weight:600">${p.procedure}</div></div>`;
+        }
+        if(p.comments) {
+            html += `<div style="margin-bottom:14px"><div style="font-size:10px;color:var(--gray-light);font-weight:700;text-transform:uppercase;margin-bottom:2px">Descricao / Observacoes</div><div style="font-size:13px;color:var(--gray);line-height:1.7;background:#fafafa;padding:12px;border-radius:8px;border-left:3px solid var(--primary)">${p.comments}</div></div>`;
+        }
         if(p.photos && p.photos.length > 0) {
-            html += `<div class="form-label" style="margin-top:16px">Fotos Registradas</div><div class="photo-grid">`;
-            p.photos.forEach(src => { html += `<img src="${src}" onclick="window.open('${src}','_blank')">`; });
-            html += `</div>`;
+            html += `<div style="margin-top:16px"><div class="form-label">Fotos do Paciente (${p.photos.length})</div><div class="photo-grid">`;
+            p.photos.forEach((src, i) => {
+                html += `<img src="${src}" alt="Foto ${i+1}" onclick="event.stopPropagation();openLightboxByData('patient',${p.id},${i})" style="cursor:zoom-in">`;
+            });
+            html += `</div></div>`;
         } else {
-            html += `<div style="color:#999; font-size:13px; margin-top:10px">Nenhuma foto cadastrada.</div>`;
+            html += `<div style="color:var(--gray-light);font-size:13px;margin-top:10px;text-align:center;padding:20px;background:#fafafa;border-radius:8px">Nenhuma foto cadastrada.</div>`;
+        }
+        if(p.createdAt) {
+            const d = new Date(p.createdAt);
+            html += `<div style="font-size:10px;color:var(--gray-light);margin-top:14px;text-align:right">Cadastrado em ${d.toLocaleDateString('pt-BR')} as ${d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</div>`;
         }
 
         document.getElementById('detailBody').innerHTML = html;
@@ -467,62 +836,159 @@
         openModal('modalPatientDetail');
     }
 
+    // Função auxiliar para abrir lightbox a partir dos dados salvos
+    function openLightboxByData(type, id, index) {
+        let item;
+        if(type === 'patient') item = patients.find(p => p.id === id);
+        else item = meetings.find(m => m.id === id);
+        if(item && item.photos) openLightbox(item.photos, index);
+    }
+
     function renderPatients() {
         const list = document.getElementById('patientList');
         const search = document.getElementById('patientSearch').value.toLowerCase();
-        let filtered = patients.filter(p => p.name.toLowerCase().includes(search) || (p.doctor || '').toLowerCase().includes(search));
-        document.getElementById('patientCount').textContent = `${filtered.length} pacientes`;
-        if(filtered.length === 0) { list.innerHTML = `<div class="empty-state"><h3>Nenhum paciente</h3><p>Clique em "+ Cadastrar Paciente"</p></div>`; return; }
+        let filtered = patients.filter(p =>
+            p.name.toLowerCase().includes(search) ||
+            (p.doctor || '').toLowerCase().includes(search) ||
+            (p.procedure || '').toLowerCase().includes(search) ||
+            (p.hospital || '').toLowerCase().includes(search)
+        );
+        document.getElementById('patientCount').textContent = `${filtered.length} paciente${filtered.length !== 1 ? 's' : ''}`;
+
+        if(filtered.length === 0) {
+            list.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><h3>Nenhum paciente encontrado</h3><p>Clique no botao "＋ Cadastrar Paciente" para adicionar</p></div>`;
+            return;
+        }
+
         list.innerHTML = filtered.map(p => `
             <div class="patient-card" onclick="openPatientDetail(${p.id})">
                 <div class="patient-card-top">
                     <div class="patient-card-name">${p.name}</div>
                     <div class="patient-card-hospital">${p.hospital}</div>
                 </div>
-                <div class="patient-card-info">${p.procedure || 'Sem procedimento'} ${p.doctor ? '- Dr. '+p.doctor : ''}</div>
+                <div class="patient-card-info">${p.procedure || 'Sem procedimento'} ${p.doctor ? '- ' + p.doctor : ''}</div>
+                ${p.photos && p.photos.length > 0 ? `<div class="patient-card-photos">&#128247; ${p.photos.length} foto${p.photos.length > 1 ? 's' : ''}</div>` : ''}
             </div>
         `).join('');
     }
 
-    // --- REUNIÕES EM TEMPO REAL ---
-    function loadMeetingsFromDB() { db.ref('meetingsData').on('value', snapshot => { meetings = snapshot.val() ? Object.values(snapshot.val()) : []; renderMeetings(); }); }
-
-    async function saveMeeting() {
-        const title = document.getElementById('mTitle').value;
-        if(!title) return showToast('Título é obrigatório', 'error');
-
-        showToast('Processando fotos...', 'info');
-        const files = document.getElementById('mPhotos').files;
-        const photos = await processFiles(files);
-
-        const newMeeting = { id: Date.now(), title, date: document.getElementById('mDate').value, desc: document.getElementById('mDesc').value, photos: photos };
-        db.ref('meetingsData/' + newMeeting.id).set(newMeeting).then(() => { closeModal('modalNewMeeting'); showToast('Reunião salva online!'); document.getElementById('mTitle').value = ''; document.getElementById('mDate').value = ''; document.getElementById('mDesc').value = ''; });
+    // ==================== EVENTOS / REUNIOES CRUD ====================
+    function loadMeetingsFromDB() {
+        db.ref('meetingsData').on('value', snapshot => {
+            meetings = snapshot.val() ? Object.values(snapshot.val()) : [];
+            renderMeetings();
+        });
     }
 
-    function deleteMeeting(id) { if(confirm("Excluir reunião?")) { db.ref('meetingsData/' + id).remove(); showToast('Reunião excluída', 'info'); } }
+    async function saveMeeting() {
+        const title = document.getElementById('mTitle').value.trim();
+        if(!title) { showToast('Titulo do evento e obrigatorio!', 'error'); return; }
+
+        showToast('Salvando evento e fotos...', 'info');
+
+        let compressedPhotos = [];
+        for(const src of tempMeetingPhotos) {
+            try {
+                const c = await compressBase64Image(src, 600, 0.65);
+                compressedPhotos.push(c);
+            } catch(err) { compressedPhotos.push(src); }
+        }
+
+        const newMeeting = {
+            id: Date.now(),
+            title: title,
+            date: document.getElementById('mDate').value,
+            desc: document.getElementById('mDesc').value.trim(),
+            photos: compressedPhotos,
+            createdAt: new Date().toISOString()
+        };
+
+        db.ref('meetingsData/' + newMeeting.id).set(newMeeting).then(() => {
+            closeModal('modalNewMeeting');
+            clearMeetingForm();
+            showToast('Evento salvo com sucesso!');
+        }).catch(err => showToast('Erro ao salvar: ' + err.message, 'error'));
+    }
+
+    function deleteMeeting(id) {
+        if(confirm("Excluir este evento?")) {
+            db.ref('meetingsData/' + id).remove();
+            closeModal('modalMeetingDetail');
+            showToast('Evento excluido', 'info');
+        }
+    }
+
+    function openMeetingDetail(id) {
+        const m = meetings.find(mt => mt.id === id);
+        if(!m) return;
+
+        document.getElementById('meetingDetailTitle').innerText = m.title;
+        let html = '';
+
+        if(m.date) {
+            const d = new Date(m.date + 'T12:00:00');
+            html += `<div style="margin-bottom:12px"><span style="background:var(--accent);color:var(--dark);font-weight:700;font-size:12px;padding:4px 12px;border-radius:6px">&#128197; ${d.toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'})}</span></div>`;
+        }
+        if(m.desc) {
+            html += `<div style="margin-bottom:16px"><div style="font-size:10px;color:var(--gray-light);font-weight:700;text-transform:uppercase;margin-bottom:4px">Descricao</div><div style="font-size:14px;color:var(--gray);line-height:1.7;background:#fafafa;padding:14px;border-radius:8px;border-left:3px solid var(--secondary)">${m.desc}</div></div>`;
+        }
+        if(m.photos && m.photos.length > 0) {
+            html += `<div style="margin-top:16px"><div class="form-label">Fotos do Evento (${m.photos.length})</div><div class="photo-grid">`;
+            m.photos.forEach((src, i) => {
+                html += `<img src="${src}" alt="Foto ${i+1}" onclick="event.stopPropagation();openLightboxByData('meeting',${m.id},${i})" style="cursor:zoom-in">`;
+            });
+            html += `</div></div>`;
+        } else {
+            html += `<div style="color:var(--gray-light);font-size:13px;text-align:center;padding:20px;background:#fafafa;border-radius:8px">Nenhuma foto neste evento.</div>`;
+        }
+
+        document.getElementById('meetingDetailBody').innerHTML = html;
+        document.getElementById('meetingDeleteBtn').onclick = () => deleteMeeting(m.id);
+        openModal('modalMeetingDetail');
+    }
 
     function renderMeetings() {
         const list = document.getElementById('meetingList');
-        if(meetings.length === 0) { list.innerHTML = `<div class="empty-state"><h3>Nenhuma reunião</h3><p>Clique em "+ Nova Reuniao / Foto"</p></div>`; return; }
-        list.innerHTML = `<div class="meeting-grid">${meetings.map(m => `
-            <div class="meeting-card" onclick="deleteMeeting(${m.id})">
+        if(meetings.length === 0) {
+            list.innerHTML = `<div class="empty-state"><h3>Nenhum evento registrado</h3><p>Clique no botao "＋ Novo Evento" para criar</p></div>`;
+            return;
+        }
+
+        const sorted = [...meetings].sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+
+        list.innerHTML = `<div class="meeting-grid">${sorted.map(m => {
+            let dateFormatted = 'Sem data';
+            if(m.date) {
+                const d = new Date(m.date + 'T12:00:00');
+                dateFormatted = d.toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
+            }
+            return `
+            <div class="meeting-card" onclick="openMeetingDetail(${m.id})">
                 <div class="meeting-cover">
-                    ${m.photos && m.photos.length > 0 ? `<img src="${m.photos[0]}" style="width:100%;height:100%;object-fit:cover">` : ''}
+                    ${m.photos && m.photos.length > 0 ? `<img src="${m.photos[0]}" alt="${m.title}">` : ''}
                     <div class="meeting-cover-overlay"></div>
-                    <div class="meeting-cover-badge">${m.photos && m.photos.length > 0 ? '📷 '+m.photos.length+' Fotos' : 'Sem Fotos'}</div>
+                    <div class="meeting-cover-badge">${m.photos && m.photos.length > 0 ? '&#128247; ' + m.photos.length + ' Foto' + (m.photos.length > 1 ? 's' : '') : 'Sem Fotos'}</div>
+                    <button class="meeting-cover-delete" onclick="event.stopPropagation();deleteMeeting(${m.id})" title="Excluir evento">&#10005;</button>
                 </div>
                 <div class="meeting-card-body">
                     <div class="meeting-card-title">${m.title}</div>
-                    <div class="meeting-card-date">${m.date || 'Sem data'}</div>
-                    <div class="meeting-card-desc">${m.desc || ''}</div>
+                    <div class="meeting-card-date">${dateFormatted}</div>
+                    ${m.desc ? `<div class="meeting-card-desc">${m.desc}</div>` : ''}
                 </div>
-            </div>
-        `).join('')}</div>`;
+            </div>`;
+        }).join('')}</div>`;
     }
 
-    // --- PLANEJAMENTO IFRAME ---
-    function loadPlanningApp() { const c = document.getElementById('viewPlanejamento'); if(c.querySelector('iframe')) return; const i = document.createElement('iframe'); i.src = 'planejamento.html'; c.appendChild(i); }
+    // ==================== PLANEJAMENTO ====================
+    function loadPlanningApp() {
+        const c = document.getElementById('viewPlanejamento');
+        if(c.querySelector('iframe')) return;
+        const i = document.createElement('iframe');
+        i.src = 'planejamento.html';
+        c.appendChild(i);
+    }
 
+    // ==================== INICIAR ====================
     init();
 </script>
 </body>
