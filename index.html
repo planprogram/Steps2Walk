@@ -6,6 +6,11 @@
     <title>STEPS2WALK Curitiba 2026 - Neoortho</title>
     <link rel="icon" href="https://steps2walk-5d8b0.web.app/favicon.ico" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
     <style>
         :root {
             --primary: #004d40; --primary-light: #e0f2f1; --primary-dark: #00251a;
@@ -38,6 +43,7 @@
         .btn-secondary{background:var(--secondary);color:var(--white)}.btn-secondary:hover{background:#283593}
         .btn-white{background:var(--white);color:var(--primary)}.btn-white:hover{background:var(--primary-light)}
         .btn-outline{background:transparent;border:1.5px solid var(--primary);color:var(--primary)}.btn-outline:hover{background:var(--primary);color:var(--white)}
+        .btn-danger{background:var(--danger);color:var(--white)}.btn-danger:hover{background:#d32f2f}
         .btn-ghost{background:transparent;color:var(--white)}.btn-ghost:hover{background:rgba(255,255,255,.15)}
 
         .view{display:none}.view.active{display:block}
@@ -57,9 +63,6 @@
         .hero h2{font-size:clamp(1.2rem,4vw,2rem);font-weight:600;color:var(--accent);margin-bottom:8px;letter-spacing:4px;text-transform:uppercase}
         .hero .subtitle{font-size:clamp(1rem,2.5vw,1.2rem);color:rgba(255,255,255,.7);font-weight:300;margin-bottom:8px}
         .hero .desc{font-size:14px;color:rgba(255,255,255,.5);max-width:580px;margin:0 auto 32px;line-height:1.7}
-        .hero-actions{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
-        .scroll-indicator{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);animation:bounce 2.5s ease-in-out infinite;color:rgba(255,255,255,.3)}
-        @keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(12px)}}
 
         .section{padding:80px 16px}.section-dark{background:var(--primary-dark);color:var(--white)}
         .section-gradient{background:linear-gradient(160deg,#0d1b4a,#1a237e,#00251a);color:var(--white)}
@@ -79,6 +82,7 @@
         .card-text{font-size:13px;color:var(--gray);line-height:1.7}
         .grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
         .grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+        .grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px}
 
         .schedule-item{background:rgba(255,255,255,.06);backdrop-filter:blur(4px);border-radius:var(--radius-lg);padding:20px;border:1px solid rgba(255,255,255,.08);transition:all .3s;display:flex;flex-wrap:wrap;align-items:center;gap:16px}
         .schedule-date{background:var(--accent);color:var(--dark);font-weight:900;font-size:15px;padding:8px 14px;border-radius:var(--radius);text-align:center;min-width:75px}
@@ -86,37 +90,90 @@
         .schedule-desc{font-size:13px;opacity:.75;border-left:1px solid rgba(255,255,255,.15);padding-left:16px;flex:2;min-width:200px}
 
         .doctor-item{display:flex;align-items:center;gap:10px;background:var(--white);border-radius:var(--radius);padding:10px 14px;border:1px solid #eee;transition:all .2s}
+        .doctor-item:hover{box-shadow:var(--shadow);border-color:var(--primary-light)}
         .doctor-avatar{width:36px;height:36px;border-radius:50%;background:var(--primary-light);color:var(--primary);font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
         .doctor-name{font-weight:600;font-size:13px}
 
+        .tool-card{background:rgba(255,255,255,.05);backdrop-filter:blur(6px);border-radius:var(--radius-lg);border:1px solid rgba(255,255,255,.1);padding:40px 28px;text-align:center;cursor:pointer;transition:all .3s}
+        .tool-card:hover{border-color:rgba(197,160,3,.5);transform:translateY(-4px);background:rgba(255,255,255,.08)}
+        .tool-icon{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+        .tool-icon-blue{background:rgba(26,35,126,.3)}.tool-icon-gold{background:rgba(197,160,3,.25)}
+        .tool-icon svg{width:28px;height:28px;stroke:var(--white);fill:none;stroke-width:1.5}
+        .tool-card h3{font-size:20px;font-weight:700;color:var(--white);margin-bottom:8px}
+        .tool-card p{font-size:13px;color:rgba(255,255,255,.55);margin-bottom:18px;line-height:1.7}
+
         .footer{background:#111;color:rgba(255,255,255,.5);padding:28px 16px}
         .footer-inner{max-width:1100px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px}
-        .footer-brand{display:flex;align-items:center;gap:10px}
-        .footer-brand img{width:28px;height:28px;border-radius:50%;border:1px solid rgba(197,160,3,.4)}
-        .footer-brand strong{color:var(--white);font-size:12px;letter-spacing:1.5px}
-        .footer-brand small{font-size:10px;display:block}
-        .footer-info{text-align:right;font-size:11px}
+
+        .sub-header{background:var(--primary-dark);color:var(--white);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 16px rgba(0,0,0,.15);position:sticky;top:0;z-index:50;border-bottom:3px solid var(--accent);flex-wrap:wrap;gap:10px}
+        .sub-header.blue{background:#0d1b4a}
+        .sub-header-left{display:flex;align-items:center;gap:10px}
+        .sub-header-sep{width:1px;height:20px;background:rgba(255,255,255,.2)}
+        .sub-header h1{font-size:clamp(11px,3vw,15px);font-weight:700;letter-spacing:2px;text-transform:uppercase}
+
+        .filter-bar{background:var(--white);border-bottom:1px solid #eee;padding:12px 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+        .filter-bar input{flex:1;min-width:180px;max-width:380px;padding:8px 14px;border:1.5px solid var(--gray-lighter);border-radius:6px;font-size:13px}
+        .filter-count{font-size:11px;color:var(--gray-light);background:#f0f0f0;padding:4px 10px;border-radius:20px}
+
+        .patient-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;padding:16px}
+        .patient-card{background:var(--white);border-radius:var(--radius);border-left:4px solid var(--primary);padding:16px;cursor:pointer;transition:all .2s;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+        .patient-card:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+        .patient-card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+        .patient-card-name{font-weight:700;font-size:14px;color:var(--dark)}
+        .patient-card-hospital{background:rgba(0,77,64,.1);color:var(--primary);font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px}
+        .patient-card-info{font-size:11px;color:var(--gray);margin-bottom:6px}
+
+        .meeting-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+        .meeting-card{background:var(--white);border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;transition:all .3s;box-shadow:var(--shadow)}
+        .meeting-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-4px)}
+        .meeting-cover{position:relative;height:160px;overflow:hidden;background:linear-gradient(135deg,var(--secondary),var(--primary))}
+        .meeting-cover-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.5),transparent 60%)}
+        .meeting-cover-badge{position:absolute;bottom:10px;left:10px;background:var(--accent);color:var(--dark);font-size:10px;font-weight:700;padding:3px 10px;border-radius:10px}
+        .meeting-card-body{padding:16px}
+        .meeting-card-title{font-weight:700;font-size:16px;margin-bottom:4px}
+        .meeting-card-date{font-size:12px;color:var(--gray-light);margin-bottom:6px}
+        .meeting-card-desc{font-size:13px;color:var(--gray);line-height:1.6}
+
+        .empty-state{text-align:center;padding:60px 20px;color:var(--gray-light)}
+        .empty-state h3{font-size:16px;color:var(--gray);margin-bottom:4px;font-weight:700}
 
         .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}
         .modal-overlay.active{display:flex}
-        .modal{background:var(--white);border-radius:var(--radius-lg);width:100%;max-width:400px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.25);animation:modalIn .25s ease}
+        .modal{background:var(--white);border-radius:var(--radius-lg);width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.25);animation:modalIn .25s ease}
         @keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
         .modal-header{padding:20px 24px 0}.modal-header h2{font-size:18px;font-weight:800;color:var(--primary);margin-bottom:4px}
-        .modal-header p{font-size:13px;color:var(--gray-light)}
+        .modal-header.blue h2{color:var(--secondary)}.modal-header p{font-size:13px;color:var(--gray-light)}
         .modal-body{padding:16px 24px}.modal-footer{padding:0 24px 20px;display:flex;gap:8px;justify-content:flex-end}
-        .form-input{width:100%;padding:9px 14px;border:1.5px solid var(--gray-lighter);border-radius:6px;font-size:13px;transition:.2s;background:var(--white)}
+        .modal-wide{max-width:680px}
+
+        .form-group{margin-bottom:14px}
+        .form-label{display:block;font-size:11px;font-weight:700;color:var(--gray-light);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+        .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+        .form-input,.form-select,.form-textarea{width:100%;padding:9px 14px;border:1.5px solid var(--gray-lighter);border-radius:6px;font-size:13px;transition:.2s;background:var(--white)}
+        .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--primary);outline:none;box-shadow:0 0 0 3px rgba(0,77,64,.08)}
+        .form-textarea{resize:vertical;min-height:70px}
         .form-input-center{text-align:center;font-size:20px;letter-spacing:8px}
         .form-error{color:var(--danger);font-size:12px;text-align:center;font-weight:700;margin-top:6px}
+
+        /* Photo Grid CSS */
+        .photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-top:10px}
+        .photo-grid img{width:100%;height:100px;object-fit:cover;border-radius:var(--radius);border:1px solid #eee;cursor:pointer;transition:0.2s}
+        .photo-grid img:hover{transform:scale(1.05);box-shadow:var(--shadow)}
 
         .toast-container{position:fixed;bottom:24px;right:24px;z-index:400;display:flex;flex-direction:column;gap:8px}
         .toast{padding:12px 20px;border-radius:var(--radius);color:var(--white);font-size:13px;font-weight:600;box-shadow:var(--shadow-lg);animation:toastIn .3s ease;max-width:340px}
         .toast-success{background:var(--success)}.toast-error{background:var(--danger)}.toast-info{background:var(--secondary)}
         @keyframes toastIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 
-        @media(max-width:600px){.hero h1{font-size:2.4rem}.navbar-actions .btn span{display:none}}
+        .db-status{position:fixed;bottom:10px;left:10px;z-index:100;font-size:9px;padding:3px 8px;border-radius:10px;font-weight:700;transition:all .3s}
+        .db-status.online{background:#e8f5e9;color:var(--success)}.db-status.offline{background:#fff3e0;color:#e65100}
+
+        @media(max-width:600px){.hero h1{font-size:2.4rem}.form-row{grid-template-columns:1fr}.navbar-actions .btn span{display:none}}
     </style>
 </head>
 <body>
+
+<div class="db-status offline" id="mainDbStatus">Conectando...</div>
 
 <nav class="navbar" id="navbar">
     <div class="navbar-inner">
@@ -125,32 +182,23 @@
             <div><h1>STEPS2WALK&reg;</h1><small>Curitiba 2026</small></div>
         </div>
         <div class="navbar-actions">
-            <div class="navbar-links">
-                <a onclick="scrollToSection('sobre')">Sobre</a>
-                <a onclick="scrollToSection('programacao')">Programacao</a>
-                <a onclick="scrollToSection('faculdade')">Faculdade</a>
-            </div>
-            <button class="btn btn-accent btn-sm" onclick="openPassword('planejamento')">
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                <span>Planejamento</span>
-            </button>
+            <button class="btn btn-secondary btn-sm" onclick="openPassword('pacientes')">Pacientes</button>
+            <button class="btn btn-secondary btn-sm" onclick="openPassword('reunioes')">Reunioes</button>
+            <button class="btn btn-accent btn-sm" onclick="openPassword('planejamento')">Planejamento</button>
         </div>
     </div>
 </nav>
 
 <div class="view active" id="viewHome">
     <section class="hero">
-        <div class="hero-bg"></div>
-        <div class="hero-particles" id="heroParticles"></div>
-        <div class="hero-overlay"></div>
+        <div class="hero-bg"></div><div class="hero-particles" id="heroParticles"></div><div class="hero-overlay"></div>
         <div class="hero-content">
             <img src="https://steps2walk-5d8b0.web.app/logo-s2w.png" alt="Logo" class="hero-logo" onerror="this.style.display='none'">
             <div class="hero-badge">05 a 09 de Outubro de 2026</div>
-            <h1>STEPS2WALK&reg;</h1>
-            <h2>CURITIBA 2026</h2>
+            <h1>STEPS2WALK&reg;</h1><h2>CURITIBA 2026</h2>
             <p class="subtitle">Foot and Ankle Training &amp; Surgery</p>
             <p class="desc">Programa completo de treinamento teorico e pratico em cirurgia do pe e tornozelo, com corpo docente internacional e cirurgias ao vivo.</p>
-            <div class="hero-actions">
+            <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center">
                 <button class="btn btn-white btn-lg" onclick="scrollToSection('sobre')">Conheca o Evento</button>
                 <button class="btn btn-accent btn-lg" onclick="openPassword('planejamento')">Planejamento</button>
             </div>
@@ -162,136 +210,318 @@
             <div class="section-header">
                 <div class="section-badge section-badge-light">Sobre o Evento</div>
                 <h2 class="section-title">Excelencia em Cirurgia do Pe e Tornozelo</h2>
-                <p class="section-desc" style="color:var(--gray)">O STEPS2WALK Curitiba 2026 e um evento de alta especializacao que reune os melhores cirurgioes do pe e tornozelo do Brasil e do mundo.</p>
             </div>
             <div class="grid-4">
-                <div class="card"><div class="card-body"><span class="card-icon">&#129462;</span><div class="card-title">Training &amp; Surgery</div><div class="card-text">Programa intensivo de treinamento teorico e pratico.</div></div></div>
-                <div class="card"><div class="card-body"><span class="card-icon">&#128300;</span><div class="card-title">Corpos Cadavericos</div><div class="card-text">Sessoes praticas em laboratorio de anatomia.</div></div></div>
-                <div class="card"><div class="card-body"><span class="card-icon">&#127973;</span><div class="card-title">Cirurgias ao Vivo</div><div class="card-text">Transmissao ao vivo de cirurgias realizadas nos hospitais CHC e CHR.</div></div></div>
-                <div class="card"><div class="card-body"><span class="card-icon">&#127757;</span><div class="card-title">Faculdade Internacional</div><div class="card-text">Corpo docente composto por renomados cirurgioes internacionais.</div></div></div>
+                <div class="card"><div class="card-body"><span class="card-icon">&#129462;</span><div class="card-title">Training & Surgery</div></div></div>
+                <div class="card"><div class="card-body"><span class="card-icon">&#128300;</span><div class="card-title">Corpos Cadavericos</div></div></div>
+                <div class="card"><div class="card-body"><span class="card-icon">&#127973;</span><div class="card-title">Cirurgias ao Vivo</div></div></div>
+                <div class="card"><div class="card-body"><span class="card-icon">&#127757;</span><div class="card-title">Faculdade Internacional</div></div></div>
             </div>
         </div>
     </section>
 
     <section class="section section-dark" id="programacao">
         <div class="container">
-            <div class="section-header">
-                <div class="section-badge section-badge-accent">Programacao</div>
-                <h2 class="section-title">Cronograma do Evento</h2>
-            </div>
+            <div class="section-header"><div class="section-badge section-badge-accent">Programacao</div><h2 class="section-title">Cronograma</h2></div>
             <div style="display:flex;flex-direction:column;gap:12px">
-                <div class="schedule-item"><div class="schedule-date">05 Out</div><div class="schedule-info"><div class="schedule-day">Segunda</div><div class="schedule-loc">UFPR / Fabrica</div></div><div class="schedule-desc">Abertura, palestras e visita tecnica.</div></div>
-                <div class="schedule-item"><div class="schedule-date">06 Out</div><div class="schedule-info"><div class="schedule-day">Terca</div><div class="schedule-loc">Laboratorio Cadaverico</div></div><div class="schedule-desc">Praticas cirurgicas em corpos cadavericos.</div></div>
-                <div class="schedule-item"><div class="schedule-date">07 Out</div><div class="schedule-info"><div class="schedule-day">Quarta</div><div class="schedule-loc">CHR</div></div><div class="schedule-desc">Cirurgias ao vivo e discussoes de casos clinicos.</div></div>
-                <div class="schedule-item"><div class="schedule-date">08 Out</div><div class="schedule-info"><div class="schedule-day">Quinta</div><div class="schedule-loc">CHC / CHR</div></div><div class="schedule-desc">Cirurgias simultaneas ao vivo.</div></div>
-                <div class="schedule-item"><div class="schedule-date">09 Out</div><div class="schedule-info"><div class="schedule-day">Sexta</div><div class="schedule-loc">CHC / CHR</div></div><div class="schedule-desc">Cirurgias finais e encerramento.</div></div>
+                <div class="schedule-item"><div class="schedule-date">05 Out</div><div class="schedule-info"><div class="schedule-day">Segunda</div></div><div class="schedule-desc">Abertura e palestras.</div></div>
+                <div class="schedule-item"><div class="schedule-date">06 Out</div><div class="schedule-info"><div class="schedule-day">Terca</div></div><div class="schedule-desc">Praticas cirurgicas em corpos cadavericos.</div></div>
+                <div class="schedule-item"><div class="schedule-date">07 Out</div><div class="schedule-info"><div class="schedule-day">Quarta</div></div><div class="schedule-desc">Cirurgias ao vivo - CHR.</div></div>
+                <div class="schedule-item"><div class="schedule-date">08 Out</div><div class="schedule-info"><div class="schedule-day">Quinta</div></div><div class="schedule-desc">Cirurgias simultaneas - CHC e CHR.</div></div>
+                <div class="schedule-item"><div class="schedule-date">09 Out</div><div class="schedule-info"><div class="schedule-day">Sexta</div></div><div class="schedule-desc">Cirurgias finais e encerramento.</div></div>
             </div>
         </div>
     </section>
 
     <section class="section" id="faculdade">
         <div class="container">
-            <div class="section-header">
-                <div class="section-badge section-badge-light">Corpo Docente</div>
-                <h2 class="section-title">Faculdade Internacional</h2>
-            </div>
+            <div class="section-header"><div class="section-badge section-badge-light">Corpo Docente</div><h2 class="section-title">Faculdade Internacional</h2></div>
             <div class="grid-3" id="doctorGrid"></div>
         </div>
     </section>
-
-    <footer class="footer">
-        <div class="footer-inner">
-            <div class="footer-brand">
-                <img src="https://steps2walk-5d8b0.web.app/logo-s2w.png" alt="Logo" onerror="this.style.display='none'">
-                <div><strong>STEPS2WALK CURITIBA 2026</strong><small>Foot and Ankle Training &amp; Surgery</small></div>
-            </div>
-            <div class="footer-info">De 05 a 09 de Outubro de 2026 - Curitiba, PR, Brasil<br>Organizado por Neoortho</div>
-        </div>
-    </footer>
 </div>
 
-<!-- VIEW PLANEJAMENTO (CARREGA O ARQUIVO SEPARADO) -->
+<!-- PLANEJAMENTO VIEW -->
 <div class="view view-iframe-container" id="viewPlanejamento"></div>
 
-<!-- Password Modal -->
+<!-- PACIENTES VIEW -->
+<div class="view" id="viewPacientes">
+    <div class="sub-header">
+        <div class="sub-header-left">
+            <button class="btn btn-ghost btn-sm" onclick="goHome()">&#8592; Voltar</button>
+            <div class="sub-header-sep"></div>
+            <h1>Registro de Pacientes</h1>
+        </div>
+        <!-- BOTÃO CLARO E VÍSIVEL PARA NOVO PACIENTE -->
+        <button class="btn btn-accent" onclick="openModal('modalNewPatient')">+ Cadastrar Paciente</button>
+    </div>
+    <div class="filter-bar">
+        <input type="text" id="patientSearch" placeholder="Buscar paciente..." oninput="renderPatients()">
+        <span class="filter-count" id="patientCount">0</span>
+    </div>
+    <div id="patientList" class="patient-grid"></div>
+</div>
+
+<!-- REUNIOES VIEW -->
+<div class="view" id="viewReunioes">
+    <div class="sub-header blue">
+        <div class="sub-header-left">
+            <button class="btn btn-ghost btn-sm" onclick="goHome()">&#8592; Voltar</button>
+            <div class="sub-header-sep"></div>
+            <h1>Reunioes e Fotos do Evento</h1>
+        </div>
+        <button class="btn btn-accent" onclick="openModal('modalNewMeeting')">+ Nova Reuniao / Foto</button>
+    </div>
+    <div id="meetingList" style="padding:16px"></div>
+</div>
+
+<!-- MODAIS -->
 <div class="modal-overlay" id="modalPassword">
-    <div class="modal">
-        <div class="modal-header"><h2>Acesso</h2><p>Insira a senha para acessar. (Senha padrao: 2026)</p></div>
+    <div class="modal" style="max-width:400px">
+        <div class="modal-header"><h2>Acesso</h2><p>Senha: 2026</p></div>
+        <div class="modal-body"><input type="password" id="pwInput" class="form-input form-input-center" placeholder="Senha" onkeydown="if(event.key==='Enter')checkPassword()"><div class="form-error" id="pwError" style="display:none">Senha incorreta.</div></div>
+        <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalPassword')">Cancelar</button><button class="btn btn-primary" onclick="checkPassword()">Entrar</button></div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalNewPatient">
+    <div class="modal modal-wide">
+        <div class="modal-header"><h2>Cadastrar Novo Paciente</h2><p>Os dados e fotos serão salvos online em tempo real.</p></div>
         <div class="modal-body">
-            <input type="password" id="pwInput" class="form-input form-input-center" placeholder="Digite a senha" onkeydown="if(event.key==='Enter')checkPassword()">
-            <div class="form-error" id="pwError" style="display:none">Senha incorreta.</div>
+            <div class="form-row">
+                <div class="form-group"><label class="form-label">Nome do Paciente *</label><input type="text" class="form-input" id="pName"></div>
+                <div class="form-group"><label class="form-label">Hospital *</label><select class="form-select" id="pHospital"><option>CHC</option><option>CHR</option><option>UFPR</option><option>Outro</option></select></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label class="form-label">Medico Responsavel</label><input type="text" class="form-input" id="pDoctor"></div>
+                <div class="form-group"><label class="form-label">Procedimento</label><input type="text" class="form-input" id="pProcedure"></div>
+            </div>
+            <div class="form-group"><label class="form-label">Observacoes</label><textarea class="form-textarea" id="pComments" rows="2"></textarea></div>
+            
+            <!-- CAMPO DE FOTO RESTAURADO -->
+            <div class="form-group">
+                <label class="form-label">Fotos (Pré/Pós Operatório)</label>
+                <input type="file" class="form-input" id="pPhotos" accept="image/*" multiple>
+                <div style="font-size:10px;color:#bbb;margin-top:3px">Selecione as fotos do paciente. Elas serão salvas no banco de dados.</div>
+            </div>
         </div>
-        <div class="modal-footer">
-            <button class="btn btn-outline" onclick="closeModal('modalPassword')">Cancelar</button>
-            <button class="btn btn-primary" onclick="checkPassword()">Entrar</button>
+        <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalNewPatient')">Cancelar</button><button class="btn btn-primary" onclick="savePatient()">Salvar Paciente</button></div>
+    </div>
+</div>
+
+<!-- MODAL DETALHE PACIENTE -->
+<div class="modal-overlay" id="modalPatientDetail">
+    <div class="modal modal-wide">
+        <div class="modal-header"><h2 id="detailTitle">Detalhes do Paciente</h2></div>
+        <div class="modal-body" id="detailBody"></div>
+        <div class="modal-footer"><button class="btn btn-danger" id="detailDeleteBtn">Excluir Paciente</button><button class="btn btn-outline" onclick="closeModal('modalPatientDetail')">Fechar</button></div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalNewMeeting">
+    <div class="modal modal-wide">
+        <div class="modal-header blue"><h2>Registrar Reuniao / Foto do Evento</h2></div>
+        <div class="modal-body">
+            <div class="form-group"><label class="form-label">Titulo *</label><input type="text" class="form-input" id="mTitle"></div>
+            <div class="form-group"><label class="form-label">Data</label><input type="date" class="form-input" id="mDate"></div>
+            <div class="form-group"><label class="form-label">Descricao</label><textarea class="form-textarea" id="mDesc" rows="2"></textarea></div>
+            <div class="form-group"><label class="form-label">Fotos da Reuniao</label><input type="file" class="form-input" id="mPhotos" accept="image/*" multiple></div>
         </div>
+        <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalNewMeeting')">Cancelar</button><button class="btn btn-secondary" onclick="saveMeeting()">Salvar</button></div>
     </div>
 </div>
 
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD5_-AlE4zSXR0XHZBsyHKXG55x8QodRMs",
+      authDomain: "steps2walk-5d8b0.firebaseapp.com",
+      databaseURL: "https://steps2walk-5d8b0-default-rtdb.firebaseio.com",
+      projectId: "steps2walk-5d8b0",
+      storageBucket: "steps2walk-5d8b0.firebasestorage.app",
+      messagingSenderId: "914390869101",
+      appId: "1:914390869101:web:c2a8bcddce04a839480b64"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    db.ref('.info/connected').on('value', snap => {
+        const el = document.getElementById('mainDbStatus');
+        if (snap.val() === true) { el.className = 'db-status online'; el.innerText = 'Banco Online'; } 
+        else { el.className = 'db-status offline'; el.innerText = 'Banco Offline'; }
+    });
+
+    let patients = [];
+    let meetings = [];
     let currentPasswordTarget = null;
-    const PASSWORD = "2026";
-    const doctors = ["Dr. Hans Müller", "Dr. Carlos Souza", "Dr. João Silva", "Dr. Peter Smith", "Dr. Ana Costa"];
+    const PASSWORD = "2026"; 
+    const doctors = ["Dr. Thomas San Giovannni", "Dr. Panos Symeonides", "Dr. Alexandre Leme", "Dr. Bruno Moura", "Dr. Orides Merino", "Dra. Amanda Damazio", "Dr. Jamil Soni"];
 
     window.addEventListener('scroll', () => { document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50); });
 
     function init() {
         renderDoctors();
+        loadPatientsFromDB();
+        loadMeetingsFromDB();
         createParticles();
     }
 
     function createParticles() {
-        const container = document.getElementById('heroParticles');
-        if(!container) return;
-        for(let i=0; i<15; i++) {
-            const p = document.createElement('div'); p.className = 'hero-particle';
-            p.style.width = p.style.height = Math.random() * 20 + 5 + 'px';
-            p.style.left = Math.random() * 100 + '%'; p.style.top = Math.random() * 100 + '%';
-            p.style.animationDelay = Math.random() * 5 + 's'; container.appendChild(p);
-        }
+        const c = document.getElementById('heroParticles'); if(!c) return;
+        for(let i=0; i<15; i++) { const p = document.createElement('div'); p.className = 'hero-particle'; p.style.width = p.style.height = Math.random() * 20 + 5 + 'px'; p.style.left = Math.random() * 100 + '%'; p.style.top = Math.random() * 100 + '%'; c.appendChild(p); }
     }
 
-    function switchView(id) {
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        window.scrollTo(0, 0);
-        if(id === 'viewPlanejamento') loadPlanningApp();
-    }
-
+    function switchView(id) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo(0, 0); if(id === 'viewPlanejamento') loadPlanningApp(); }
     function goHome() { switchView('viewHome'); }
     function scrollToSection(id) { goHome(); setTimeout(() => { document.getElementById(id).scrollIntoView({ behavior: 'smooth' }); }, 100); }
-
     function openModal(id) { document.getElementById(id).classList.add('active'); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-    document.querySelectorAll('.modal-overlay').forEach(overlay => {
-        overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('active'); });
-    });
+    document.querySelectorAll('.modal-overlay').forEach(o => { o.addEventListener('click', (e) => { if (e.target === o) o.classList.remove('active'); }); });
 
-    function openPassword(target) { currentPasswordTarget = target; document.getElementById('pwError').style.display = 'none'; document.getElementById('pwInput').value = ''; openModal('modalPassword'); setTimeout(() => document.getElementById('pwInput').focus(), 200); }
+    function openPassword(target) { currentPasswordTarget = target; document.getElementById('pwError').style.display = 'none'; document.getElementById('pwInput').value = ''; openModal('modalPassword'); }
     function checkPassword() {
-        if(document.getElementById('pwInput').value === PASSWORD) {
-            closeModal('modalPassword');
-            if(currentPasswordTarget === 'planejamento') switchView('viewPlanejamento');
-        } else { document.getElementById('pwError').style.display = 'block'; }
+        if(document.getElementById('pwInput').value === PASSWORD) { closeModal('modalPassword'); if(currentPasswordTarget === 'pacientes') switchView('viewPacientes'); if(currentPasswordTarget === 'reunioes') switchView('viewReunioes'); if(currentPasswordTarget === 'planejamento') switchView('viewPlanejamento'); } 
+        else { document.getElementById('pwError').style.display = 'block'; }
     }
-
     function showToast(msg, type = 'success') { const c = document.getElementById('toastContainer'); const t = document.createElement('div'); t.className = `toast toast-${type}`; t.textContent = msg; c.appendChild(t); setTimeout(() => t.remove(), 3000); }
+    function renderDoctors() { const g = document.getElementById('doctorGrid'); g.innerHTML = doctors.map(d => { const i = d.split(' ').map(n => n[0]).join('').substring(0,2); return `<div class="doctor-item"><div class="doctor-avatar">${i}</div><div class="doctor-name">${d}</div></div>`; }).join(''); }
 
-    function renderDoctors() {
-        const grid = document.getElementById('doctorGrid');
-        grid.innerHTML = doctors.map(d => { const initials = d.split(' ').map(n => n[0]).join('').substring(0,2); return `<div class="doctor-item"><div class="doctor-avatar">${initials}</div><div class="doctor-name">${d}</div></div>`; }).join('');
+    // --- FUNÇÃO DE COMPRESSÃO DE IMAGEM PARA SALVAR NO BANCO ---
+    function processFiles(files) {
+        return new Promise((resolve) => {
+            let photos = []; let processed = 0;
+            if(files.length === 0) resolve([]);
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 400; // Comprime para no máximo 400px de largura
+                        const scale = MAX_WIDTH / img.width;
+                        canvas.width = MAX_WIDTH; canvas.height = img.height * scale;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        photos.push(canvas.toDataURL('image/jpeg', 0.6)); // Qualidade 60%
+                        processed++;
+                        if(processed === files.length) resolve(photos);
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        });
     }
 
-    // CARREGAMENTO DO IFRAME SEGURO PARA O FIREBASE
-    function loadPlanningApp() {
-        const container = document.getElementById('viewPlanejamento');
-        if(container.querySelector('iframe')) return; 
-        const iframe = document.createElement('iframe');
-        iframe.src = 'planejamento.html'; // Chama o arquivo que criamos no Passo 1
-        container.appendChild(iframe);
+    // --- PACIENTES EM TEMPO REAL ---
+    function loadPatientsFromDB() { db.ref('patientsData').on('value', snapshot => { patients = snapshot.val() ? Object.values(snapshot.val()) : []; renderPatients(); }); }
+
+    async function savePatient() {
+        const name = document.getElementById('pName').value;
+        if(!name) return showToast('Nome do paciente é obrigatório', 'error');
+        
+        showToast('Processando fotos, aguarde...', 'info');
+        const files = document.getElementById('pPhotos').files;
+        const photos = await processFiles(files);
+
+        const newPatient = {
+            id: Date.now(), name,
+            hospital: document.getElementById('pHospital').value,
+            doctor: document.getElementById('pDoctor').value,
+            procedure: document.getElementById('pProcedure').value,
+            comments: document.getElementById('pComments').value,
+            photos: photos
+        };
+
+        db.ref('patientsData/' + newPatient.id).set(newPatient).then(() => {
+            closeModal('modalNewPatient'); showToast('Paciente salvo online!');
+            document.getElementById('pName').value = ''; document.getElementById('pDoctor').value = ''; document.getElementById('pProcedure').value = ''; document.getElementById('pComments').value = '';
+        }).catch(err => showToast('Erro ao salvar', 'error'));
     }
+
+    function deletePatient(id) {
+        if(confirm("Excluir paciente do banco de dados?")) { db.ref('patientsData/' + id).remove(); closeModal('modalPatientDetail'); showToast('Paciente excluído', 'info'); }
+    }
+
+    function openPatientDetail(id) {
+        const p = patients.find(pt => pt.id === id);
+        if(!p) return;
+        document.getElementById('detailTitle').innerText = p.name;
+        
+        let html = `<div style="margin-bottom:10px"><strong>Hospital:</strong> ${p.hospital}</div>`;
+        if(p.doctor) html += `<div style="margin-bottom:10px"><strong>Médico:</strong> ${p.doctor}</div>`;
+        if(p.procedure) html += `<div style="margin-bottom:10px"><strong>Procedimento:</strong> ${p.procedure}</div>`;
+        if(p.comments) html += `<div style="margin-bottom:10px"><strong>Obs:</strong> ${p.comments}</div>`;
+        
+        if(p.photos && p.photos.length > 0) {
+            html += `<div class="form-label" style="margin-top:16px">Fotos Registradas</div><div class="photo-grid">`;
+            p.photos.forEach(src => { html += `<img src="${src}" onclick="window.open('${src}','_blank')">`; });
+            html += `</div>`;
+        } else {
+            html += `<div style="color:#999; font-size:13px; margin-top:10px">Nenhuma foto cadastrada.</div>`;
+        }
+
+        document.getElementById('detailBody').innerHTML = html;
+        document.getElementById('detailDeleteBtn').onclick = () => deletePatient(p.id);
+        openModal('modalPatientDetail');
+    }
+
+    function renderPatients() {
+        const list = document.getElementById('patientList');
+        const search = document.getElementById('patientSearch').value.toLowerCase();
+        let filtered = patients.filter(p => p.name.toLowerCase().includes(search) || (p.doctor || '').toLowerCase().includes(search));
+        document.getElementById('patientCount').textContent = `${filtered.length} pacientes`;
+        if(filtered.length === 0) { list.innerHTML = `<div class="empty-state"><h3>Nenhum paciente</h3><p>Clique em "+ Cadastrar Paciente"</p></div>`; return; }
+        list.innerHTML = filtered.map(p => `
+            <div class="patient-card" onclick="openPatientDetail(${p.id})">
+                <div class="patient-card-top">
+                    <div class="patient-card-name">${p.name}</div>
+                    <div class="patient-card-hospital">${p.hospital}</div>
+                </div>
+                <div class="patient-card-info">${p.procedure || 'Sem procedimento'} ${p.doctor ? '- Dr. '+p.doctor : ''}</div>
+            </div>
+        `).join('');
+    }
+
+    // --- REUNIÕES EM TEMPO REAL ---
+    function loadMeetingsFromDB() { db.ref('meetingsData').on('value', snapshot => { meetings = snapshot.val() ? Object.values(snapshot.val()) : []; renderMeetings(); }); }
+
+    async function saveMeeting() {
+        const title = document.getElementById('mTitle').value;
+        if(!title) return showToast('Título é obrigatório', 'error');
+
+        showToast('Processando fotos...', 'info');
+        const files = document.getElementById('mPhotos').files;
+        const photos = await processFiles(files);
+
+        const newMeeting = { id: Date.now(), title, date: document.getElementById('mDate').value, desc: document.getElementById('mDesc').value, photos: photos };
+        db.ref('meetingsData/' + newMeeting.id).set(newMeeting).then(() => { closeModal('modalNewMeeting'); showToast('Reunião salva online!'); document.getElementById('mTitle').value = ''; document.getElementById('mDate').value = ''; document.getElementById('mDesc').value = ''; });
+    }
+
+    function deleteMeeting(id) { if(confirm("Excluir reunião?")) { db.ref('meetingsData/' + id).remove(); showToast('Reunião excluída', 'info'); } }
+
+    function renderMeetings() {
+        const list = document.getElementById('meetingList');
+        if(meetings.length === 0) { list.innerHTML = `<div class="empty-state"><h3>Nenhuma reunião</h3><p>Clique em "+ Nova Reuniao / Foto"</p></div>`; return; }
+        list.innerHTML = `<div class="meeting-grid">${meetings.map(m => `
+            <div class="meeting-card" onclick="deleteMeeting(${m.id})">
+                <div class="meeting-cover">
+                    ${m.photos && m.photos.length > 0 ? `<img src="${m.photos[0]}" style="width:100%;height:100%;object-fit:cover">` : ''}
+                    <div class="meeting-cover-overlay"></div>
+                    <div class="meeting-cover-badge">${m.photos && m.photos.length > 0 ? '📷 '+m.photos.length+' Fotos' : 'Sem Fotos'}</div>
+                </div>
+                <div class="meeting-card-body">
+                    <div class="meeting-card-title">${m.title}</div>
+                    <div class="meeting-card-date">${m.date || 'Sem data'}</div>
+                    <div class="meeting-card-desc">${m.desc || ''}</div>
+                </div>
+            </div>
+        `).join('')}</div>`;
+    }
+
+    // --- PLANEJAMENTO IFRAME ---
+    function loadPlanningApp() { const c = document.getElementById('viewPlanejamento'); if(c.querySelector('iframe')) return; const i = document.createElement('iframe'); i.src = 'planejamento.html'; c.appendChild(i); }
 
     init();
 </script>
