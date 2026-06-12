@@ -1,3 +1,918 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STEPS2WALK Curitiba 2026 - Neoortho</title>
+    <link rel="icon" href="https://steps2walk-5d8b0.web.app/favicon.ico" type="image/x-icon">
+    <style>
+        :root {
+            --primary: #004d40; --primary-light: #e0f2f1; --secondary: #1a237e;
+            --accent: #c5a003; --accent-hover: #d4b310; --success: #2e7d32;
+            --danger: #c62828; --light: #f5f5f5; --dark: #212121; --white: #ffffff;
+            --gray: #555; --gray-light: #999; --gray-lighter: #ddd;
+            --shadow: 0 2px 8px rgba(0,0,0,0.1); --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+            --radius: 8px; --radius-lg: 12px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--light); color: var(--dark); line-height: 1.6; }
+        a { text-decoration: none; color: inherit; }
+        img { max-width: 100%; }
+        
+        /* NAVBAR */
+        .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: var(--primary); color: var(--white); transition: all 0.3s; }
+        .navbar.scrolled { background: rgba(0,77,64,0.95); backdrop-filter: blur(10px); box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+        .navbar-inner { max-width: 1200px; margin: 0 auto; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; height: 60px; }
+        .navbar-brand { display: flex; align-items: center; gap: 10px; }
+        .navbar-brand img { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--accent); object-fit: cover; }
+        .navbar-brand h1 { font-size: 15px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+        .navbar-brand small { color: var(--accent); font-size: 9px; letter-spacing: 3px; text-transform: uppercase; display: block; }
+        .navbar-actions { display: flex; align-items: center; gap: 6px; }
+        .navbar-links { display: none; }
+        @media(min-width:768px) { .navbar-links { display: flex; gap: 4px; } }
+        .navbar-links a { color: rgba(255,255,255,0.8); font-size: 13px; font-weight: 500; padding: 6px 10px; border-radius: 4px; transition: 0.2s; }
+        .navbar-links a:hover { color: var(--white); background: rgba(255,255,255,0.1); }
+        .nav-sep { width: 1px; height: 20px; background: rgba(255,255,255,0.2); margin: 0 4px; display: none; }
+        @media(min-width:768px) { .nav-sep { display: block; } }
+
+        /* BUTTONS */
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 16px; border: none; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+        .btn-sm { padding: 6px 12px; font-size: 11px; }
+        .btn-lg { padding: 14px 28px; font-size: 15px; }
+        .btn-primary { background: var(--primary); color: var(--white); }
+        .btn-primary:hover { background: #00695c; }
+        .btn-accent { background: var(--accent); color: var(--dark); }
+        .btn-accent:hover { background: var(--accent-hover); }
+        .btn-secondary { background: var(--secondary); color: var(--white); }
+        .btn-secondary:hover { background: #283593; }
+        .btn-white { background: var(--white); color: var(--primary); }
+        .btn-white:hover { background: var(--primary-light); }
+        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
+        .btn-outline:hover { background: var(--primary); color: var(--white); }
+        .btn-danger { background: var(--danger); color: var(--white); }
+        .btn-danger:hover { background: #d32f2f; }
+        .btn-ghost { background: transparent; color: var(--white); }
+        .btn-ghost:hover { background: rgba(255,255,255,0.15); }
+
+        /* VIEWS */
+        .view { display: none; }
+        .view.active { display: block; }
+
+        /* HOME HERO */
+        .hero { position: relative; min-height: 90vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 80px 16px 40px; overflow: hidden; }
+        .hero-bg { position: absolute; inset: 0; background: linear-gradient(135deg, var(--primary), #00695c, var(--secondary)); }
+        .hero-img { position: absolute; inset: 0; opacity: 0.15; background-size: cover; background-position: center; }
+        .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,77,64,0.9), transparent, rgba(0,77,64,0.5)); }
+        .hero-decor1 { position: absolute; top: 80px; right: 40px; width: 280px; height: 280px; background: rgba(197,160,3,0.08); border-radius: 50%; filter: blur(60px); }
+        .hero-decor2 { position: absolute; bottom: 80px; left: 40px; width: 380px; height: 380px; background: rgba(26,35,126,0.08); border-radius: 50%; filter: blur(60px); }
+        .hero-content { position: relative; z-index: 2; max-width: 800px; }
+        .hero-logo { width: 110px; height: 110px; border-radius: 16px; border: 4px solid var(--accent); object-fit: cover; box-shadow: 0 10px 40px rgba(0,0,0,0.3); margin-bottom: 20px; }
+        .hero-badge { display: inline-block; background: var(--accent); color: var(--dark); font-weight: 700; font-size: 13px; padding: 5px 16px; border-radius: 20px; margin-bottom: 20px; }
+        .hero h1 { font-size: clamp(2.5rem, 8vw, 4.5rem); font-weight: 900; color: var(--white); margin-bottom: 8px; letter-spacing: -1px; }
+        .hero h2 { font-size: clamp(1.3rem, 4vw, 2rem); font-weight: 600; color: var(--accent); margin-bottom: 6px; letter-spacing: 2px; }
+        .hero .subtitle { font-size: clamp(1rem, 2.5vw, 1.25rem); color: rgba(255,255,255,0.8); font-weight: 300; margin-bottom: 6px; }
+        .hero .desc { font-size: 15px; color: rgba(255,255,255,0.6); max-width: 600px; margin: 0 auto 30px; }
+        .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+        .scroll-indicator { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); animation: bounce 2s infinite; color: rgba(255,255,255,0.4); }
+        @keyframes bounce { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(10px); } }
+
+        /* SECTIONS */
+        .section { padding: 80px 16px; }
+        .section-dark { background: var(--primary); color: var(--white); }
+        .section-gradient { background: linear-gradient(135deg, var(--secondary), #283593, var(--primary)); color: var(--white); }
+        .section-header { text-align: center; margin-bottom: 50px; }
+        .section-badge { display: inline-block; font-size: 10px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; padding: 4px 14px; border-radius: 20px; margin-bottom: 12px; }
+        .section-badge-light { background: rgba(0,77,64,0.1); color: var(--primary); }
+        .section-badge-accent { background: var(--accent); color: var(--dark); }
+        .section-title { font-size: clamp(1.5rem, 4vw, 2.5rem); font-weight: 700; margin-bottom: 12px; }
+        .section-desc { font-size: 15px; max-width: 700px; margin: 0 auto; opacity: 0.7; }
+        .container { max-width: 1100px; margin: 0 auto; }
+
+        /* CARDS */
+        .card { background: var(--white); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; transition: all 0.3s; }
+        .card:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px); }
+        .card-body { padding: 24px; text-align: center; }
+        .card-icon { font-size: 36px; margin-bottom: 12px; }
+        .card-title { font-weight: 700; color: var(--primary); font-size: 17px; margin-bottom: 8px; }
+        .card-text { font-size: 13px; color: var(--gray); line-height: 1.6; }
+        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+
+        /* SCHEDULE */
+        .schedule-item { background: rgba(255,255,255,0.08); backdrop-filter: blur(4px); border-radius: var(--radius-lg); padding: 20px; border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s; display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+        .schedule-item:hover { background: rgba(255,255,255,0.15); border-color: rgba(197,160,3,0.5); }
+        .schedule-date { background: var(--accent); color: var(--dark); font-weight: 900; font-size: 17px; padding: 8px 16px; border-radius: var(--radius); text-align: center; min-width: 80px; }
+        .schedule-info { flex: 1; min-width: 200px; }
+        .schedule-day { font-weight: 600; font-size: 15px; }
+        .schedule-loc { color: var(--accent); font-size: 13px; font-weight: 500; }
+        .schedule-desc { font-size: 13px; opacity: 0.8; border-left: 1px solid rgba(255,255,255,0.2); padding-left: 16px; flex: 2; min-width: 200px; }
+
+        /* DOCTORS */
+        .doctor-item { display: flex; align-items: center; gap: 10px; background: var(--white); border-radius: var(--radius); padding: 12px 16px; border: 1px solid #eee; transition: all 0.2s; }
+        .doctor-item:hover { box-shadow: var(--shadow); }
+        .doctor-avatar { width: 38px; height: 38px; border-radius: 50%; background: rgba(0,77,64,0.1); color: var(--primary); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .doctor-item:hover .doctor-avatar { background: var(--primary); color: var(--white); }
+        .doctor-name { font-weight: 500; font-size: 13px; }
+
+        /* TOOL CARDS */
+        .tool-card { background: rgba(255,255,255,0.08); backdrop-filter: blur(4px); border-radius: var(--radius-lg); border: 1px solid rgba(255,255,255,0.15); padding: 40px 30px; text-align: center; cursor: pointer; transition: all 0.3s; }
+        .tool-card:hover { border-color: rgba(197,160,3,0.6); transform: translateY(-3px); }
+        .tool-icon { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+        .tool-icon-blue { background: rgba(26,35,126,0.3); }
+        .tool-icon-gold { background: rgba(197,160,3,0.3); }
+        .tool-icon svg { width: 30px; height: 30px; stroke: var(--white); fill: none; stroke-width: 1.5; }
+        .tool-card h3 { font-size: 20px; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+        .tool-card p { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 16px; line-height: 1.6; }
+
+        /* FOOTER */
+        .footer { background: var(--dark); color: rgba(255,255,255,0.6); padding: 30px 16px; }
+        .footer-inner { max-width: 1100px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
+        .footer-brand { display: flex; align-items: center; gap: 10px; }
+        .footer-brand img { width: 30px; height: 30px; border-radius: 50%; border: 1px solid rgba(197,160,3,0.5); }
+        .footer-brand strong { color: var(--white); font-size: 13px; letter-spacing: 1px; }
+        .footer-brand small { font-size: 11px; display: block; }
+        .footer-info { text-align: right; font-size: 12px; }
+
+        /* SUB-PAGE HEADER */
+        .sub-header { background: var(--primary); color: var(--white); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 50; }
+        .sub-header.blue { background: var(--secondary); }
+        .sub-header-left { display: flex; align-items: center; gap: 12px; }
+        .sub-header-sep { width: 1px; height: 22px; background: rgba(255,255,255,0.3); }
+        .sub-header h1 { font-size: clamp(12px, 3vw, 17px); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+        .sub-header-right { font-size: 11px; opacity: 0.8; }
+
+        /* FILTER BAR */
+        .filter-bar { background: var(--white); border-bottom: 1px solid #eee; padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+        .filter-bar input { flex: 1; min-width: 200px; max-width: 400px; padding: 8px 14px; border: 1px solid var(--gray-lighter); border-radius: 6px; font-size: 13px; }
+        .filter-btns { display: flex; gap: 4px; flex-wrap: wrap; }
+        .filter-btn { padding: 6px 14px; border: 1px solid var(--primary); border-radius: 6px; background: transparent; color: var(--primary); font-size: 11px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .filter-btn.active, .filter-btn:hover { background: var(--primary); color: var(--white); }
+        .filter-count { font-size: 11px; color: var(--gray-light); background: #f0f0f0; padding: 4px 10px; border-radius: 20px; }
+
+        /* PATIENT CARDS */
+        .patient-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; padding: 16px; }
+        .patient-card { background: var(--white); border-radius: var(--radius); border-left: 4px solid var(--primary); padding: 16px; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+        .patient-card:hover { box-shadow: var(--shadow); }
+        .patient-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+        .patient-card-name { font-weight: 700; font-size: 14px; color: var(--dark); }
+        .patient-card-hospital { background: rgba(0,77,64,0.1); color: var(--primary); font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
+        .patient-card-info { font-size: 11px; color: var(--gray); margin-bottom: 6px; }
+        .patient-card-meta { display: flex; gap: 10px; font-size: 10px; color: var(--gray-light); align-items: center; }
+        .patient-card-meta svg { width: 12px; height: 12px; }
+
+        /* MEETING CARDS */
+        .meeting-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; padding: 16px; }
+        .meeting-card { background: var(--white); border-radius: var(--radius-lg); overflow: hidden; cursor: pointer; transition: all 0.3s; box-shadow: var(--shadow); }
+        .meeting-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px); }
+        .meeting-cover { position: relative; height: 180px; overflow: hidden; }
+        .meeting-cover img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+        .meeting-card:hover .meeting-cover img { transform: scale(1.05); }
+        .meeting-cover-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent); }
+        .meeting-cover-badge { position: absolute; bottom: 10px; left: 10px; background: var(--accent); color: var(--dark); font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 10px; }
+        .meeting-card-body { padding: 16px; }
+        .meeting-card-title { font-weight: 700; font-size: 16px; margin-bottom: 4px; }
+        .meeting-card-date { font-size: 12px; color: var(--gray-light); margin-bottom: 6px; }
+        .meeting-card-desc { font-size: 13px; color: var(--gray); }
+
+        /* EMPTY STATE */
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--gray-light); }
+        .empty-state svg { width: 64px; height: 64px; margin-bottom: 12px; stroke: #ddd; fill: none; stroke-width: 1; }
+        .empty-state h3 { font-size: 17px; color: var(--gray); margin-bottom: 4px; }
+        .empty-state p { font-size: 13px; }
+
+        /* MODAL */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; padding: 16px; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: var(--white); border-radius: var(--radius-lg); width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+        .modal-header { padding: 20px 24px 0; }
+        .modal-header h2 { font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 4px; }
+        .modal-header.blue h2 { color: var(--secondary); }
+        .modal-header p { font-size: 13px; color: var(--gray-light); }
+        .modal-body { padding: 16px 24px; }
+        .modal-footer { padding: 0 24px 20px; display: flex; gap: 8px; justify-content: flex-end; }
+        .modal-wide { max-width: 680px; }
+
+        /* FORM */
+        .form-group { margin-bottom: 14px; }
+        .form-label { display: block; font-size: 11px; font-weight: 600; color: var(--gray-light); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .form-input, .form-select, .form-textarea { width: 100%; padding: 9px 14px; border: 1px solid var(--gray-lighter); border-radius: 6px; font-size: 13px; font-family: inherit; }
+        .form-textarea { resize: vertical; min-height: 70px; }
+        .form-input-center { text-align: center; font-size: 18px; letter-spacing: 6px; }
+        .form-hint { font-size: 10px; color: #bbb; margin-top: 3px; }
+        .form-error { color: var(--danger); font-size: 12px; text-align: center; font-weight: 600; margin-top: 6px; }
+
+        /* MATERIAL ROWS */
+        .material-rows { display: flex; flex-direction: column; gap: 8px; }
+        .material-row { display: grid; grid-template-columns: 1fr 100px 36px; gap: 8px; align-items: center; }
+        .material-row .form-input { padding: 7px 10px; }
+        .material-row .form-input[name="matQty"] { text-align: center; }
+        .material-remove-btn { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--danger); background: transparent; color: var(--danger); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; line-height: 1; padding: 0; }
+        .material-remove-btn:hover { background: var(--danger); color: var(--white); }
+        .material-remove-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .material-remove-btn:disabled:hover { background: transparent; color: var(--danger); }
+
+        /* MATERIALS TABLE */
+        .materials-table { width: 100%; border-collapse: collapse; font-size: 13px; border-radius: var(--radius); overflow: hidden; border: 1px solid #eee; }
+        .materials-table thead th { background: var(--primary); color: var(--white); padding: 8px 12px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+        .materials-table thead th:last-child { text-align: center; width: 100px; }
+        .materials-table tbody td { padding: 7px 12px; border-bottom: 1px solid #f0f0f0; }
+        .materials-table tbody td:last-child { text-align: center; font-weight: 600; }
+        .materials-table tbody tr:nth-child(even) { background: #fafafa; }
+        .materials-table tbody tr:hover { background: var(--primary-light); }
+
+        /* LINKED PATIENTS */
+        .linked-patients-section { margin-top: 16px; }
+        .linked-patient-card { display: flex; align-items: center; gap: 10px; background: #f8f9fa; border: 1px solid #e9ecef; border-radius: var(--radius); padding: 10px 14px; margin-bottom: 8px; transition: 0.2s; }
+        .linked-patient-card:hover { border-color: var(--primary); background: var(--primary-light); }
+        .linked-patient-info { flex: 1; }
+        .linked-patient-name { font-weight: 600; font-size: 13px; color: var(--dark); }
+        .linked-patient-procedure { font-size: 11px; color: var(--gray-light); }
+        .meeting-patient-badge { display: inline-block; background: rgba(0,77,64,0.1); color: var(--primary); font-size: 9px; font-weight: 600; padding: 2px 8px; border-radius: 10px; margin-right: 4px; margin-top: 2px; }
+        .meeting-card-patients { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+        .unlink-btn { width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--danger); background: transparent; color: var(--danger); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; line-height: 1; padding: 0; flex-shrink: 0; }
+        .unlink-btn:hover { background: var(--danger); color: var(--white); }
+
+        /* PATIENT SEARCH */
+        .patient-search-input { width: 100%; padding: 9px 14px; border: 1px solid var(--gray-lighter); border-radius: 6px; font-size: 13px; margin-bottom: 10px; }
+        .patient-search-list { max-height: 250px; overflow-y: auto; }
+        .patient-search-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: var(--radius); cursor: pointer; transition: 0.2s; border: 1px solid transparent; }
+        .patient-search-item:hover { background: var(--primary-light); border-color: var(--primary); }
+        .patient-search-item-name { font-weight: 600; font-size: 13px; }
+        .patient-search-item-hospital { font-size: 10px; color: var(--gray-light); }
+
+        /* PHOTO LIMIT */
+        .photo-limit-msg { color: var(--danger); font-size: 11px; font-weight: 600; margin-top: 4px; }
+
+        /* PHOTO GRID */
+        .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+        .photo-grid a { display: block; aspect-ratio: 1; border-radius: var(--radius); overflow: hidden; border: 1px solid #eee; transition: 0.2s; }
+        .photo-grid a:hover { box-shadow: var(--shadow); }
+        .photo-grid img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* DETAIL PHOTOS */
+        .detail-section-title { font-weight: 700; font-size: 14px; color: var(--dark); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+        .photo-empty { text-align: center; padding: 30px; background: #fafafa; border-radius: var(--radius); border: 2px dashed #eee; color: #bbb; font-size: 13px; }
+        .comment-box { background: #fafafa; border-radius: var(--radius); padding: 12px; font-size: 13px; white-space: pre-wrap; border: 1px solid #eee; }
+
+        /* LIGHTBOX */
+        .lightbox { display: none; position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,0.92); align-items: center; justify-content: center; padding: 20px; cursor: pointer; }
+        .lightbox.active { display: flex; }
+        .lightbox img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: var(--radius); }
+        .lightbox-close { position: absolute; top: 16px; right: 20px; color: rgba(255,255,255,0.8); font-size: 32px; font-weight: 300; cursor: pointer; z-index: 10; }
+
+        /* LOADING */
+        .spinner { width: 36px; height: 36px; border: 4px solid var(--primary); border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-state { text-align: center; padding: 60px 20px; color: var(--primary); }
+
+        /* RESPONSIVE */
+        @media(max-width: 600px) {
+            .hero h1 { font-size: 2.2rem; }
+            .form-row { grid-template-columns: 1fr; }
+            .material-row { grid-template-columns: 1fr 70px 30px; }
+            .schedule-item { flex-direction: column; align-items: flex-start; }
+            .schedule-desc { border-left: none; padding-left: 0; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; }
+            .navbar-actions .btn span { display: none; }
+        }
+
+        /* IFRAME CONTAINER */
+        .iframe-wrap { width: 100%; height: calc(100vh - 56px); border: 0; }
+
+        /* SPINNER BTN */
+        .btn-spinner { width: 16px; height: 16px; border: 2px solid currentColor; border-top-color: transparent; border-radius: 50%; animation: spin 0.7s linear infinite; }
+    </style>
+</head>
+<body>
+
+<!-- ==================== NAVBAR ==================== -->
+<nav class="navbar" id="navbar">
+    <div class="navbar-inner">
+        <div class="navbar-brand">
+            <img src="https://steps2walk-5d8b0.web.app/logo-s2w.png" alt="Logo" onerror="this.style.display='none'">
+            <div>
+                <h1>STEPS2WALK&reg;</h1>
+                <small>Curitiba 2026</small>
+            </div>
+        </div>
+        <div class="navbar-actions">
+            <div class="navbar-links">
+                <a href="#sobre" onclick="scrollToSection('sobre')" data-i18n="nav_about">Sobre</a>
+                <a href="#programacao" onclick="scrollToSection('programacao')" data-i18n="nav_schedule">Programa&ccedil;&atilde;o</a>
+                <a href="#faculdade" onclick="scrollToSection('faculdade')" data-i18n="nav_faculty">Faculdade</a>
+            </div>
+            <div class="nav-sep"></div>
+            <button class="btn btn-ghost btn-sm" onclick="toggleLanguage()" id="langToggle" title="Toggle language">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                <span id="langToggleText">EN</span>
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="openPassword('pacientes')">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                <span data-i18n="nav_patients">Pacientes</span>
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="openPassword('reunioes')">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg>
+                <span data-i18n="nav_meetings">Reuni&otilde;es</span>
+            </button>
+            <button class="btn btn-accent btn-sm" onclick="openPassword('planejamento')">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                <span data-i18n="nav_planning">Planejamento</span>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<!-- ==================== HOME VIEW ==================== -->
+<div class="view active" id="viewHome">
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-img" style="background-image:url(https://steps2walk-5d8b0.web.app/hero-image.png)"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-decor1"></div>
+        <div class="hero-decor2"></div>
+        <div class="hero-content">
+            <img src="https://steps2walk-5d8b0.web.app/logo-s2w.png" alt="Logo" class="hero-logo" onerror="this.style.display='none'">
+            <div class="hero-badge" data-i18n="hero_date">05 a 09 de Outubro de 2026</div>
+            <h1>STEPS2WALK&reg;</h1>
+            <h2>CURITIBA 2026</h2>
+            <p class="subtitle">Foot and Ankle Training &amp; Surgery</p>
+            <p class="desc" data-i18n="hero_desc">Programa completo de treinamento te&oacute;rico e pr&aacute;tico em cirurgia do p&eacute; e tornozelo, com corpo docente internacional e cirurgias ao vivo.</p>
+            <div class="hero-actions">
+                <a href="#sobre" onclick="scrollToSection('sobre')"><button class="btn btn-white btn-lg" data-i18n="hero_cta_event">Conhe&ccedil;a o Evento</button></a>
+                <button class="btn btn-secondary btn-lg" onclick="openPassword('pacientes')">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <span data-i18n="hero_cta_patients">Pacientes</span>
+                </button>
+                <button class="btn btn-accent btn-lg" onclick="openPassword('planejamento')" data-i18n="hero_cta_planning">Acessar Planejamento</button>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+        </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="section" id="sobre">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-badge section-badge-light" data-i18n="about_badge">Sobre o Evento</div>
+                <h2 class="section-title" data-i18n="about_title">Excel&ecirc;ncia em Cirurgia do P&eacute; e Tornozelo</h2>
+                <p class="section-desc" style="color:var(--gray)" data-i18n="about_desc">O STEPS2WALK&reg; Curitiba 2026 &eacute; um evento de alta especializa&ccedil;&atilde;o que re&uacute;ne os melhores cirurgi&otilde;es do p&eacute; e tornozelo do Brasil e do mundo. Em cinco dias intensivos, os participantes ter&atilde;o acesso a treinamento te&oacute;rico avan&ccedil;ado, pr&aacute;ticas em laborat&oacute;rio cadav&eacute;rico e cirurgias ao vivo transmitidas em tempo real dos principais hospitais de Curitiba.</p>
+            </div>
+            <div class="grid-4">
+                <div class="card"><div class="card-body"><div class="card-icon">&#129462;</div><div class="card-title" data-i18n="highlight_training">Training &amp; Surgery</div><div class="card-text" data-i18n="highlight_training_desc">Programa intensivo de treinamento te&oacute;rico e pr&aacute;tico, com foco em t&eacute;cnicas avan&ccedil;adas e procedimentos minimamente invasivos.</div></div></div>
+                <div class="card"><div class="card-body"><div class="card-icon">&#128300;</div><div class="card-title" data-i18n="highlight_cadaver">Corpos Cadav&eacute;ricos</div><div class="card-text" data-i18n="highlight_cadaver_desc">Sess&otilde;es pr&aacute;ticas em laborat&oacute;rio de anatomia com corpos cadav&eacute;ricos e supervis&atilde;o de cirurgi&otilde;es internacionais.</div></div></div>
+                <div class="card"><div class="card-body"><div class="card-icon">&#127973;</div><div class="card-title" data-i18n="highlight_live">Cirurgias ao Vivo</div><div class="card-text" data-i18n="highlight_live_desc">Transmiss&atilde;o ao vivo de cirurgias realizadas nos hospitais CHC e CHR, com intera&ccedil;&atilde;o em tempo real.</div></div></div>
+                <div class="card"><div class="card-body"><div class="card-icon">&#127757;</div><div class="card-title" data-i18n="highlight_faculty">Faculdade Internacional</div><div class="card-text" data-i18n="highlight_faculty_desc">Corpo docente composto por renomados cirurgi&otilde;es internacionais e especialistas brasileiros.</div></div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TOOLS -->
+    <section class="section section-gradient">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-badge section-badge-accent" data-i18n="tools_badge">&Aacute;reas do Evento</div>
+                <h2 class="section-title" data-i18n="tools_title">Ferramentas para a Equipe</h2>
+                <p class="section-desc" data-i18n="tools_desc">Acesse o registro de pacientes com fotos e coment&aacute;rios, e a galeria de reuni&otilde;es do evento. Todas as &aacute;reas s&atilde;o protegidas por senha e compartilham o mesmo banco de dados.</p>
+            </div>
+            <div class="grid-2">
+                <div class="tool-card" onclick="openPassword('pacientes')">
+                    <div class="tool-icon tool-icon-blue"><svg viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg></div>
+                    <h3 data-i18n="tools_patients_title">Registro de Pacientes</h3>
+                    <p data-i18n="tools_patients_desc">Cadastre pacientes com nome, hospital, m&eacute;dico respons&aacute;vel, procedimento, fotos (pr&eacute;/intra/p&oacute;s-operat&oacute;rio) e observa&ccedil;&otilde;es cl&iacute;nicas.</p>
+                    <button class="btn btn-white" data-i18n="tools_patients_btn">Acessar Pacientes</button>
+                </div>
+                <div class="tool-card" onclick="openPassword('reunioes')">
+                    <div class="tool-icon tool-icon-gold"><svg viewBox="0 0 24 24"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><circle cx="12" cy="13" r="3"/></svg></div>
+                    <h3 data-i18n="tools_meetings_title">Reuni&otilde;es do Evento</h3>
+                    <p data-i18n="tools_meetings_desc">Registre fotos dos encontros, reuni&otilde;es de planejamento e momentos do evento para documenta&ccedil;&atilde;o completa.</p>
+                    <button class="btn btn-accent" data-i18n="tools_meetings_btn">Acessar Reuni&otilde;es</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SCHEDULE -->
+    <section class="section section-dark" id="programacao">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-badge section-badge-accent" data-i18n="schedule_badge">Programa&ccedil;&atilde;o</div>
+                <h2 class="section-title" data-i18n="schedule_title">Cronograma do Evento</h2>
+                <p class="section-desc" data-i18n="schedule_desc">Cinco dias de imers&atilde;o completa em cirurgia do p&eacute; e tornozelo, com atividades distribuídas entre laborat&oacute;rio cadav&eacute;rico e hospitais parceiros.</p>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+                <div class="schedule-item"><div class="schedule-date">05 Out</div><div class="schedule-info"><div class="schedule-day" data-i18n="schedule_day1">Segunda</div><div class="schedule-loc" data-i18n="schedule_loc1">UFPR / F&aacute;brica</div></div><div class="schedule-desc" data-i18n="schedule_desc1">Abertura, palestras te&oacute;ricas e visita t&eacute;cnica &agrave; f&aacute;brica de implantes.</div></div>
+                <div class="schedule-item"><div class="schedule-date">06 Out</div><div class="schedule-info"><div class="schedule-day" data-i18n="schedule_day2">Ter&ccedil;a</div><div class="schedule-loc" data-i18n="schedule_loc2">Laborat&oacute;rio Cadav&eacute;rico</div></div><div class="schedule-desc" data-i18n="schedule_desc2">Pr&aacute;ticas cir&uacute;rgicas em corpos cadav&eacute;ricos com t&eacute;cnicas de fixa&ccedil;&atilde;o e osteoss&iacute;ntese.</div></div>
+                <div class="schedule-item"><div class="schedule-date">07 Out</div><div class="schedule-info"><div class="schedule-day" data-i18n="schedule_day3">Quarta</div><div class="schedule-loc" data-i18n="schedule_loc3">CHR</div></div><div class="schedule-desc" data-i18n="schedule_desc3">Cirurgias ao vivo e discuss&otilde;es de casos cl&iacute;nicos complexos no Hospital CHR.</div></div>
+                <div class="schedule-item"><div class="schedule-date">08 Out</div><div class="schedule-info"><div class="schedule-day" data-i18n="schedule_day4">Quinta</div><div class="schedule-loc" data-i18n="schedule_loc4">CHC / CHR</div></div><div class="schedule-desc" data-i18n="schedule_desc4">Cirurgias simult&acirc;neas ao vivo nos hospitais CHC e CHR com diferentes t&eacute;cnicas.</div></div>
+                <div class="schedule-item"><div class="schedule-date">09 Out</div><div class="schedule-info"><div class="schedule-day" data-i18n="schedule_day5">Sexta</div><div class="schedule-loc" data-i18n="schedule_loc5">CHC / CHR</div></div><div class="schedule-desc" data-i18n="schedule_desc5">Cirurgias finais, encerramento e entrega de certificados de participa&ccedil;&atilde;o.</div></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FACULTY -->
+    <section class="section" id="faculdade">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-badge section-badge-light" data-i18n="faculty_badge">Corpo Docente</div>
+                <h2 class="section-title" data-i18n="faculty_title">Faculdade Internacional</h2>
+                <p class="section-desc" style="color:var(--gray)" data-i18n="faculty_desc">Renomados cirurgi&otilde;es internacionais e especialistas brasileiros formam o corpo docente do STEPS2WALK&reg; Curitiba 2026.</p>
+            </div>
+            <div class="grid-3" id="doctorGrid"></div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="section section-gradient">
+        <div class="container" style="text-align:center">
+            <h2 class="section-title" data-i18n="cta_title">Acesse as &Aacute;reas Administrativas</h2>
+            <p class="section-desc" style="margin-bottom:30px" data-i18n="cta_desc">Planejamento cir&uacute;rgico, registro de pacientes e galeria de reuni&otilde;es &mdash; tudo centralizado no mesmo banco de dados.</p>
+            <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center">
+                <button class="btn btn-accent btn-lg" onclick="openPassword('planejamento')" data-i18n="cta_planning">Planejamento</button>
+                <button class="btn btn-white btn-lg" onclick="openPassword('pacientes')" data-i18n="cta_patients">Pacientes</button>
+                <button class="btn btn-secondary btn-lg" onclick="openPassword('reunioes')" data-i18n="cta_meetings">Reuni&otilde;es</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <img src="https://steps2walk-5d8b0.web.app/logo-s2w.png" alt="Logo" onerror="this.style.display='none'">
+                <div><strong>STEPS2WALK&reg; CURITIBA 2026</strong><small>Foot and Ankle Training &amp; Surgery</small></div>
+            </div>
+            <div class="footer-info" data-i18n="footer_date">De 05 &agrave; 09 de Outubro de 2026 &mdash; Curitiba, PR, Brasil<br>Organizado por Neoortho</div>
+        </div>
+    </footer>
+</div>
+
+<!-- ==================== PLANEJAMENTO VIEW ==================== -->
+<div class="view" id="viewPlanejamento">
+    <div class="sub-header" style="border-bottom:4px solid var(--accent)">
+        <div class="sub-header-left">
+            <button class="btn btn-ghost" onclick="goHome()" data-i18n="planning_back">&#8592; Voltar ao In&iacute;cio</button>
+            <div class="sub-header-sep"></div>
+            <h1>STEPS2WALK&reg; CURITIBA 2026</h1>
+        </div>
+        <span class="sub-header-right" data-i18n="planning_date">De 05 &agrave; 09 de outubro de 2026</span>
+    </div>
+    <iframe class="iframe-wrap" id="planejamentoFrame" title="Planejamento"></iframe>
+</div>
+
+<!-- ==================== PACIENTES VIEW ==================== -->
+<div class="view" id="viewPacientes">
+    <div class="sub-header">
+        <div class="sub-header-left">
+            <button class="btn btn-ghost" onclick="goHome()" data-i18n="patients_back">&#8592; Voltar</button>
+            <div class="sub-header-sep"></div>
+            <h1 data-i18n="patients_title">Registro de Pacientes</h1>
+        </div>
+        <button class="btn btn-accent" onclick="openModal('modalNewPatient')">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
+            <span data-i18n="patients_new">Novo Paciente</span>
+        </button>
+    </div>
+    <div class="filter-bar">
+        <input type="text" id="patientSearch" data-i18n-placeholder="patients_search" placeholder="Buscar por nome, m&eacute;dico ou procedimento..." oninput="renderPatients()">
+        <div class="filter-btns">
+            <button class="filter-btn active" onclick="filterHospital(this,'')" data-i18n="patients_filter_all">Todos</button>
+            <button class="filter-btn" onclick="filterHospital(this,'CHC')">CHC</button>
+            <button class="filter-btn" onclick="filterHospital(this,'CHR')">CHR</button>
+            <button class="filter-btn" onclick="filterHospital(this,'UFPR')">UFPR</button>
+            <button class="filter-btn" onclick="filterHospital(this,'Outro')" data-i18n="patients_filter_other">Outro</button>
+        </div>
+        <span class="filter-count" id="patientCount">0 pacientes</span>
+    </div>
+    <div id="patientList"></div>
+</div>
+
+<!-- ==================== REUNIOES VIEW ==================== -->
+<div class="view" id="viewReunioes">
+    <div class="sub-header blue" style="border-bottom:4px solid var(--accent)">
+        <div class="sub-header-left">
+            <button class="btn btn-ghost" onclick="goHome()" data-i18n="meetings_back">&#8592; Voltar</button>
+            <div class="sub-header-sep"></div>
+            <h1 data-i18n="meetings_title">Reuni&otilde;es do Evento</h1>
+        </div>
+        <button class="btn btn-accent" onclick="openModal('modalNewMeeting')">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
+            <span data-i18n="meetings_new">Nova Reuni&atilde;o</span>
+        </button>
+    </div>
+    <div id="meetingList" style="padding:16px"></div>
+</div>
+
+<!-- ==================== MODALS ==================== -->
+
+<!-- Password Modal -->
+<div class="modal-overlay" id="modalPassword">
+    <div class="modal" style="max-width:420px">
+        <div class="modal-header">
+            <h2 id="pwTitle" data-i18n="pw_title">Acesso</h2>
+            <p id="pwDesc" data-i18n="pw_desc">Insira a senha para acessar.</p>
+        </div>
+        <div class="modal-body">
+            <input type="password" id="pwInput" class="form-input form-input-center" data-i18n-placeholder="pw_placeholder" placeholder="Digite a senha" onkeydown="if(event.key==='Enter')checkPassword()">
+            <div class="form-error" id="pwError" style="display:none" data-i18n="pw_error">Senha incorreta. Tente novamente.</div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('modalPassword')" data-i18n="pw_cancel">Cancelar</button>
+            <button class="btn btn-primary" onclick="checkPassword()" data-i18n="pw_enter">Entrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- New Patient Modal -->
+<div class="modal-overlay" id="modalNewPatient">
+    <div class="modal modal-wide">
+        <div class="modal-header">
+            <h2 data-i18n="patient_form_title">Cadastrar Novo Paciente</h2>
+            <p data-i18n="patient_form_desc">Preencha os dados do paciente e adicione fotos e observa&ccedil;&otilde;es.</p>
+        </div>
+        <div class="modal-body">
+            <div class="form-row">
+                <div class="form-group"><label class="form-label" data-i18n="patient_form_name">Nome do Paciente *</label><input type="text" class="form-input" id="pName" data-i18n-placeholder="patient_form_name_ph" placeholder="Nome completo"></div>
+                <div class="form-group"><label class="form-label" data-i18n="patient_form_hospital">Hospital *</label><select class="form-select" id="pHospital"><option>CHC</option><option>CHR</option><option>UFPR</option><option>Outro</option></select></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label class="form-label" data-i18n="patient_form_doctor">M&eacute;dico Respons&aacute;vel</label><input type="text" class="form-input" id="pDoctor" data-i18n-placeholder="patient_form_doctor_ph" placeholder="Nome do m&eacute;dico"></div>
+                <div class="form-group"><label class="form-label" data-i18n="patient_form_procedure">Procedimento</label><input type="text" class="form-input" id="pProcedure" data-i18n-placeholder="patient_form_procedure_ph" placeholder="Ex: Artrodese do tornozelo"></div>
+            </div>
+            <div class="form-group"><label class="form-label" data-i18n="patient_form_comments">Observa&ccedil;&otilde;es / Coment&aacute;rios</label><textarea class="form-textarea" id="pComments" data-i18n-placeholder="patient_form_comments_ph" placeholder="Notas sobre o paciente, procedimento, acompanhamento..." rows="3"></textarea></div>
+
+            <!-- Materials / Components Section -->
+            <div class="form-group">
+                <label class="form-label" data-i18n="materials_title">Materiais / Componentes</label>
+                <div class="material-rows" id="materialRows">
+                    <div class="material-row">
+                        <input type="text" class="form-input" name="matName" data-i18n-placeholder="material_name_ph" placeholder="Nome do material">
+                        <input type="number" class="form-input" name="matQty" data-i18n-placeholder="material_qty_ph" placeholder="Qtd" min="1">
+                        <button type="button" class="material-remove-btn" disabled title="Remover">&times;</button>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-outline btn-sm" style="margin-top:8px" onclick="addMaterialRow()" data-i18n="add_material">+ Adicionar Material</button>
+            </div>
+
+            <div class="form-group"><label class="form-label" data-i18n="patient_form_photos">Fotos (pr&eacute;/intra/p&oacute;s-operat&oacute;rio)</label><input type="file" class="form-input" id="pPhotos" accept="image/*" multiple><div class="form-hint" data-i18n="photosHint">M&aacute;ximo 5 fotos. Formatos: JPG, PNG, etc.</div></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('modalNewPatient')" data-i18n="patient_form_cancel">Cancelar</button>
+            <button class="btn btn-primary" id="btnSavePatient" onclick="savePatient()" data-i18n="patient_form_save">Cadastrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Patient Detail Modal -->
+<div class="modal-overlay" id="modalPatientDetail">
+    <div class="modal modal-wide">
+        <div class="modal-header" id="patientDetailHeader"></div>
+        <div class="modal-body" id="patientDetailBody"></div>
+        <div class="modal-footer" id="patientDetailFooter"></div>
+    </div>
+</div>
+
+<!-- Add Patient Photo Modal -->
+<div class="modal-overlay" id="modalAddPhoto">
+    <div class="modal" style="max-width:420px">
+        <div class="modal-header"><h2 data-i18n="add_photo_title">Adicionar Fotos</h2><p id="addPhotoDesc"></p></div>
+        <div class="modal-body">
+            <input type="file" class="form-input" id="addPhotoFile" accept="image/*" multiple>
+            <div id="addPhotoLimitMsg" class="photo-limit-msg" style="display:none"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('modalAddPhoto')" data-i18n="patient_form_cancel">Cancelar</button>
+            <button class="btn btn-primary" id="btnAddPhoto" onclick="addPatientPhotos()" data-i18n="add_photo_btn">Enviar Fotos</button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Patient Comment Modal -->
+<div class="modal-overlay" id="modalAddComment">
+    <div class="modal" style="max-width:420px">
+        <div class="modal-header"><h2 data-i18n="add_comment_title">Adicionar Observa&ccedil;&atilde;o</h2><p id="addCommentDesc"></p></div>
+        <div class="modal-body"><textarea class="form-textarea" id="addCommentText" data-i18n-placeholder="add_comment_ph" placeholder="Digite sua observa&ccedil;&atilde;o..." rows="4"></textarea></div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('modalAddComment')" data-i18n="patient_form_cancel">Cancelar</button>
+            <button class="btn btn-primary" onclick="addPatientComment()" data-i18n="add_comment_save">Salvar</button>
+        </div>
+    </div>
+</div>
+
+<!-- New Meeting Modal -->
+<div class="modal-overlay" id="modalNewMeeting">
+    <div class="modal modal-wide">
+        <div class="modal-header blue">
+            <h2 data-i18n="meeting_form_title">Registrar Reuni&atilde;o</h2>
+            <p data-i18n="meeting_form_desc">Registre os momentos das reuni&otilde;es e encontros do evento.</p>
+        </div>
+        <div class="modal-body">
+            <div class="form-group"><label class="form-label" data-i18n="meeting_form_name">T&iacute;tulo da Reuni&atilde;o *</label><input type="text" class="form-input" id="mTitle" data-i18n-placeholder="meeting_form_name_ph" placeholder="Ex: Reuni&atilde;o de planejamento - Dia 1"></div>
+            <div class="form-group"><label class="form-label" data-i18n="meeting_form_date">Data</label><input type="date" class="form-input" id="mDate"></div>
+            <div class="form-group"><label class="form-label" data-i18n="meeting_form_desc_label">Descri&ccedil;&atilde;o</label><textarea class="form-textarea" id="mDesc" data-i18n-placeholder="meeting_form_desc_ph" placeholder="Descreva a reuni&atilde;o, participantes, assuntos discutidos..." rows="3"></textarea></div>
+            <div class="form-group"><label class="form-label" data-i18n="meeting_form_photos">Fotos da Reuni&atilde;o</label><input type="file" class="form-input" id="mPhotos" accept="image/*" multiple><div class="form-hint" data-i18n="meeting_form_photos_hint">Selecione uma ou mais fotos da reuni&atilde;o.</div></div>
+
+            <!-- Linked Patients Section -->
+            <div class="form-group">
+                <label class="form-label" data-i18n="linked_patients">Pacientes na Cirurgia</label>
+                <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+                    <select class="form-select" id="mPatientSelect" style="flex:1"></select>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="addPatientToNewMeeting()" data-i18n="link_patient">Vincular</button>
+                </div>
+                <div id="mLinkedPatientsList"></div>
+                <div id="mNoPatientsMsg" class="photo-empty" style="padding:12px;font-size:12px" data-i18n="no_patients_linked">Nenhum paciente vinculado</div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('modalNewMeeting')" data-i18n="patient_form_cancel">Cancelar</button>
+            <button class="btn btn-secondary" id="btnSaveMeeting" onclick="saveMeeting()" data-i18n="meeting_form_save">Salvar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Meeting Detail Modal -->
+<div class="modal-overlay" id="modalMeetingDetail">
+    <div class="modal modal-wide">
+        <div class="modal-header blue" id="meetingDetailHeader"></div>
+        <div class="modal-body" id="meetingDetailBody"></div>
+        <div class="modal-footer" id="meetingDetailFooter"></div>
+    </div>
+</div>
+
+<!-- Add Meeting Photo Modal -->
+<div class="modal-overlay" id="modalAddMeetingPhoto">
+    <div class="modal" style="max-width:420px">
+        <div class="modal-header blue"><h2 data-i18n="add_photo_title">Adicionar Fotos</h2><p id="addMeetingPhotoDesc"></p></div>
+        <div class="modal-body"><input type="file" class="form-input" id="addMeetingPhotoFile" accept="image/*" multiple></div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('modalAddMeetingPhoto')" data-i18n="patient_form_cancel">Cancelar</button>
+            <button class="btn btn-secondary" id="btnAddMeetingPhoto" onclick="addMeetingPhotos()" data-i18n="add_photo_btn">Enviar Fotos</button>
+        </div>
+    </div>
+</div>
+
+<!-- Patient Search Modal (for linking patients to meetings) -->
+<div class="modal-overlay" id="modalPatientSearch">
+    <div class="modal" style="max-width:500px">
+        <div class="modal-header">
+            <h2 data-i18n="link_patient">Vincular Paciente</h2>
+            <p data-i18n="search_patient">Buscar paciente pelo nome</p>
+        </div>
+        <div class="modal-body">
+            <input type="text" class="patient-search-input" id="patientSearchInput" data-i18n-placeholder="patients_search" placeholder="Buscar por nome, m&eacute;dico ou procedimento..." oninput="renderPatientSearchList()">
+            <div class="patient-search-list" id="patientSearchList"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('modalPatientSearch')" data-i18n="patient_form_cancel">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <span class="lightbox-close">&times;</span>
+    <img id="lightboxImg" src="" alt="Foto ampliada" onclick="event.stopPropagation()">
+</div>
+
+<!-- ==================== SCRIPTS ==================== -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+<script>
+// ===== CONSTANTS =====
+const MAX_PHOTOS = 5;
+
+// ===== I18N =====
+let currentLang = 'pt';
+
+const translations = {
+    pt: {
+        nav_about: 'Sobre',
+        nav_schedule: 'Programa\u00e7\u00e3o',
+        nav_faculty: 'Faculdade',
+        nav_patients: 'Pacientes',
+        nav_meetings: 'Reuni\u00f5es',
+        nav_planning: 'Planejamento',
+        hero_date: '05 a 09 de Outubro de 2026',
+        hero_desc: 'Programa completo de treinamento te\u00f3rico e pr\u00e1tico em cirurgia do p\u00e9 e tornozelo, com corpo docente internacional e cirurgias ao vivo.',
+        hero_cta_event: 'Conhe\u00e7a o Evento',
+        hero_cta_patients: 'Pacientes',
+        hero_cta_planning: 'Acessar Planejamento',
+        about_badge: 'Sobre o Evento',
+        about_title: 'Excel\u00eancia em Cirurgia do P\u00e9 e Tornozelo',
+        about_desc: 'O STEPS2WALK\u00ae Curitiba 2026 \u00e9 um evento de alta especializa\u00e7\u00e3o que re\u00fane os melhores cirurgi\u00f5es do p\u00e9 e tornozelo do Brasil e do mundo. Em cinco dias intensivos, os participantes ter\u00e3o acesso a treinamento te\u00f3rico avan\u00e7ado, pr\u00e1ticas em laborat\u00f3rio cadav\u00e9rico e cirurgias ao vivo transmitidas em tempo real dos principais hospitais de Curitiba.',
+        highlight_training: 'Training & Surgery',
+        highlight_training_desc: 'Programa intensivo de treinamento te\u00f3rico e pr\u00e1tico, com foco em t\u00e9cnicas avan\u00e7adas e procedimentos minimamente invasivos.',
+        highlight_cadaver: 'Corpos Cadav\u00e9ricos',
+        highlight_cadaver_desc: 'Sess\u00f5es pr\u00e1ticas em laborat\u00f3rio de anatomia com corpos cadav\u00e9ricos e supervis\u00e3o de cirurgi\u00f5es internacionais.',
+        highlight_live: 'Cirurgias ao Vivo',
+        highlight_live_desc: 'Transmiss\u00e3o ao vivo de cirurgias realizadas nos hospitais CHC e CHR, com intera\u00e7\u00e3o em tempo real.',
+        highlight_faculty: 'Faculdade Internacional',
+        highlight_faculty_desc: 'Corpo docente composto por renomados cirurgi\u00f5es internacionais e especialistas brasileiros.',
+        tools_badge: '\u00c1reas do Evento',
+        tools_title: 'Ferramentas para a Equipe',
+        tools_desc: 'Acesse o registro de pacientes com fotos e coment\u00e1rios, e a galeria de reuni\u00f5es do evento. Todas as \u00e1reas s\u00e3o protegidas por senha e compartilham o mesmo banco de dados.',
+        tools_patients_title: 'Registro de Pacientes',
+        tools_patients_desc: 'Cadastre pacientes com nome, hospital, m\u00e9dico respons\u00e1vel, procedimento, fotos (pr\u00e9/intra/p\u00f3s-operat\u00f3rio) e observa\u00e7\u00f5es cl\u00ednicas.',
+        tools_patients_btn: 'Acessar Pacientes',
+        tools_meetings_title: 'Reuni\u00f5es do Evento',
+        tools_meetings_desc: 'Registre fotos dos encontros, reuni\u00f5es de planejamento e momentos do evento para documenta\u00e7\u00e3o completa.',
+        tools_meetings_btn: 'Acessar Reuni\u00f5es',
+        schedule_badge: 'Programa\u00e7\u00e3o',
+        schedule_title: 'Cronograma do Evento',
+        schedule_desc: 'Cinco dias de imers\u00e3o completa em cirurgia do p\u00e9 e tornozelo, com atividades distribu\u00eddas entre laborat\u00f3rio cadav\u00e9rico e hospitais parceiros.',
+        schedule_day1: 'Segunda',
+        schedule_loc1: 'UFPR / F\u00e1brica',
+        schedule_desc1: 'Abertura, palestras te\u00f3ricas e visita t\u00e9cnica \u00e0 f\u00e1brica de implantes.',
+        schedule_day2: 'Ter\u00e7a',
+        schedule_loc2: 'Laborat\u00f3rio Cadav\u00e9rico',
+        schedule_desc2: 'Pr\u00e1ticas cir\u00fargicas em corpos cadav\u00e9ricos com t\u00e9cnicas de fixa\u00e7\u00e3o e osteoss\u00edntese.',
+        schedule_day3: 'Quarta',
+        schedule_loc3: 'CHR',
+        schedule_desc3: 'Cirurgias ao vivo e discuss\u00f5es de casos cl\u00ednicos complexos no Hospital CHR.',
+        schedule_day4: 'Quinta',
+        schedule_loc4: 'CHC / CHR',
+        schedule_desc4: 'Cirurgias simult\u00e2neas ao vivo nos hospitais CHC e CHR com diferentes t\u00e9cnicas.',
+        schedule_day5: 'Sexta',
+        schedule_loc5: 'CHC / CHR',
+        schedule_desc5: 'Cirurgias finais, encerramento e entrega de certificados de participa\u00e7\u00e3o.',
+        faculty_badge: 'Corpo Docente',
+        faculty_title: 'Faculdade Internacional',
+        faculty_desc: 'Renomados cirurgi\u00f5es internacionais e especialistas brasileiros formam o corpo docente do STEPS2WALK\u00ae Curitiba 2026.',
+        cta_title: 'Acesse as \u00c1reas Administrativas',
+        cta_desc: 'Planejamento cir\u00fargico, registro de pacientes e galeria de reuni\u00f5es \u2014 tudo centralizado no mesmo banco de dados.',
+        cta_planning: 'Planejamento',
+        cta_patients: 'Pacientes',
+        cta_meetings: 'Reuni\u00f5es',
+        footer_date: 'De 05 \u00e0 09 de Outubro de 2026 \u2014 Curitiba, PR, Brasil',
+        footer_org: 'Organizado por Neoortho',
+        planning_back: '\u2190 Voltar ao In\u00edcio',
+        planning_date: 'De 05 \u00e0 09 de outubro de 2026',
+        patients_back: '\u2190 Voltar',
+        patients_title: 'Registro de Pacientes',
+        patients_new: 'Novo Paciente',
+        patients_search: 'Buscar por nome, m\u00e9dico ou procedimento...',
+        patients_filter_all: 'Todos',
+        patients_filter_other: 'Outro',
+        patients_count_singular: 'paciente',
+        patients_count_plural: 'pacientes',
+        patients_empty_title: 'Nenhum paciente cadastrado',
+        patients_empty_desc: 'Clique em "Novo Paciente" para come\u00e7ar',
+        patient_form_title: 'Cadastrar Novo Paciente',
+        patient_form_desc: 'Preencha os dados do paciente e adicione fotos e observa\u00e7\u00f5es.',
+        patient_form_name: 'Nome do Paciente *',
+        patient_form_name_ph: 'Nome completo',
+        patient_form_hospital: 'Hospital *',
+        patient_form_doctor: 'M\u00e9dico Respons\u00e1vel',
+        patient_form_doctor_ph: 'Nome do m\u00e9dico',
+        patient_form_procedure: 'Procedimento',
+        patient_form_procedure_ph: 'Ex: Artrodese do tornozelo',
+        patient_form_comments: 'Observa\u00e7\u00f5es / Coment\u00e1rios',
+        patient_form_comments_ph: 'Notas sobre o paciente, procedimento, acompanhamento...',
+        patient_form_photos: 'Fotos (pr\u00e9/intra/p\u00f3s-operat\u00f3rio)',
+        patient_form_photos_hint: 'Selecione uma ou mais fotos. Formatos: JPG, PNG, etc.',
+        patient_form_save: 'Cadastrar',
+        patient_form_cancel: 'Cancelar',
+        patient_detail_doctor: 'Dr(a):',
+        patient_detail_not_informed: 'N\u00e3o informado',
+        patient_detail_procedure: 'Procedimento:',
+        patient_detail_photos: 'Fotos',
+        patient_detail_add_photo: 'Adicionar Foto',
+        patient_detail_no_photos: 'Nenhuma foto cadastrada',
+        patient_detail_observations: 'Observa\u00e7\u00f5es',
+        patient_detail_add_note: 'Adicionar Nota',
+        patient_detail_no_observations: 'Nenhuma observa\u00e7\u00e3o registrada',
+        patient_detail_registered: 'Cadastrado em:',
+        patient_detail_delete: 'Excluir Paciente',
+        patient_detail_close: 'Fechar',
+        add_photo_title: 'Adicionar Fotos',
+        add_photo_btn: 'Enviar Fotos',
+        add_comment_title: 'Adicionar Observa\u00e7\u00e3o',
+        add_comment_ph: 'Digite sua observa\u00e7\u00e3o...',
+        add_comment_save: 'Salvar',
+        meetings_back: '\u2190 Voltar',
+        meetings_title: 'Reuni\u00f5es do Evento',
+        meetings_new: 'Nova Reuni\u00e3o',
+        meetings_empty_title: 'Nenhuma reuni\u00e3o registrada',
+        meetings_empty_desc: 'Clique em "Nova Reuni\u00e3o" para registrar os momentos do evento',
+        meeting_form_title: 'Registrar Reuni\u00e3o',
+        meeting_form_desc: 'Registre os momentos das reuni\u00f5es e encontros do evento.',
+        meeting_form_name: 'T\u00edtulo da Reuni\u00e3o *',
+        meeting_form_name_ph: 'Ex: Reuni\u00e3o de planejamento - Dia 1',
+        meeting_form_date: 'Data',
+        meeting_form_desc_label: 'Descri\u00e7\u00e3o',
+        meeting_form_desc_ph: 'Descreva a reuni\u00e3o, participantes, assuntos discutidos...',
+        meeting_form_photos: 'Fotos da Reuni\u00e3o',
+        meeting_form_photos_hint: 'Selecione uma ou mais fotos da reuni\u00e3o.',
+        meeting_form_save: 'Salvar',
+        meeting_detail_photos: 'Fotos',
+        meeting_detail_add_photos: 'Adicionar Fotos',
+        meeting_detail_no_photos: 'Nenhuma foto cadastrada',
+        meeting_detail_delete: 'Excluir Reuni\u00e3o',
+        pw_title: 'Acesso',
+        pw_desc: 'Insira a senha para acessar.',
+        pw_title_patients: 'Acesso ao Registro de Pacientes',
+        pw_desc_patients: 'Insira a senha para acessar o registro de pacientes.',
+        pw_title_meetings: 'Acesso \u00e0s Reuni\u00f5es',
+        pw_desc_meetings: 'Insira a senha para acessar o registro de reuni\u00f5es.',
+        pw_title_planning: 'Acesso ao Planejamento',
+        pw_desc_planning: 'Insira a senha para acessar a \u00e1rea de planejamento.',
+        pw_placeholder: 'Digite a senha',
+        pw_error: 'Senha incorreta. Tente novamente.',
+        pw_cancel: 'Cancelar',
+        pw_enter: 'Entrar',
+        confirm_delete_patient: 'Deseja realmente excluir este paciente?',
+        confirm_delete_meeting: 'Deseja realmente excluir esta reuni\u00e3o?',
+        alert_name_required: 'Nome \u00e9 obrigat\u00f3rio!',
+        alert_title_required: 'T\u00edtulo \u00e9 obrigat\u00f3rio!',
+        alert_saving: 'Enviando...',
+        alert_error: 'Erro ao salvar: ',
+        photo_count_singular: 'foto',
+        photo_count_plural: 'fotos',
+        notes: 'Notas',
+        // NEW KEYS
+        materials_title: 'Materiais / Componentes',
+        material_name: 'Material',
+        material_name_ph: 'Nome do material',
+        material_qty: 'Qtd',
+        material_qty_ph: 'Qtd',
+        add_material: '+ Adicionar Material',
+        remove_material: 'Remover',
+        materials_extract: 'Extrato de Materiais',
+        material_item: 'Item',
+        material_quantity: 'Quantidade',
+        no_materials: 'Nenhum material registrado',
+        linked_patients: 'Pacientes na Cirurgia',
+        link_patient: 'Vincular Paciente',
+        select_patient: 'Selecione um paciente',
+        no_patients_linked: 'Nenhum paciente vinculado',
+        search_patient: 'Buscar paciente pelo nome',
+        unlink: 'Desvincular',
+        no_patients_available: 'Nenhum paciente dispon\u00edvel',
+        patient_materials: 'Materiais do Paciente',
+        photosLimit: 'M\u00e1ximo 5 fotos atingido',
+        photosHint: 'M\u00e1ximo 5 fotos. Formatos: JPG, PNG, etc.'
+    },
+    en: {
+        nav_about: 'About',
+        nav_schedule: 'Schedule',
+        nav_faculty: 'Faculty',
+        nav_patients: 'Patients',
+        nav_meetings: 'Meetings',
+        nav_planning: 'Planning',
+        hero_date: 'October 5th to 9th, 2026',
+        hero_desc: 'Complete theoretical and practical training program in foot and ankle surgery, with international faculty and live surgeries.',
+        hero_cta_event: 'Learn More',
+        hero_cta_patients: 'Patients',
+        hero_cta_planning: 'Access Planning',
+        about_badge: 'About the Event',
+        about_title: 'Excellence in Foot & Ankle Surgery',
+        about_desc: 'STEPS2WALK\u00ae Curitiba 2026 is a highly specialized event that brings together the best foot and ankle surgeons from Brazil and the world. Over five intensive days, participants will have access to advanced theoretical training, cadaveric lab practices, and live surgeries broadcast in real time from major hospitals in Curitiba.',
+        highlight_training: 'Training & Surgery',
+        highlight_training_desc: 'Intensive theoretical and practical training program, focused on advanced techniques and minimally invasive procedures.',
+        highlight_cadaver: 'Cadaveric Lab',
+        highlight_cadaver_desc: 'Practical sessions in the anatomy lab with cadaveric specimens and supervision by international surgeons.',
+        highlight_live: 'Live Surgeries',
+        highlight_live_desc: 'Live broadcast of surgeries performed at CHC and CHR hospitals, with real-time interaction.',
+        highlight_faculty: 'International Faculty',
+        highlight_faculty_desc: 'Faculty composed of renowned international surgeons and Brazilian specialists.',
+        tools_badge: 'Event Areas',
+        tools_title: 'Team Tools',
+        tools_desc: 'Access the patient registry with photos and comments, and the event meetings gallery. All areas are password-protected and share the same database.',
+        tools_patients_title: 'Patient Registry',
+        tools_patients_desc: 'Register patients with name, hospital, attending physician, procedure, photos (pre/intra/post-operative) and clinical observations.',
+        tools_patients_btn: 'Access Patients',
+        tools_meetings_title: 'Event Meetings',
+        tools_meetings_desc: 'Record photos of meetings, planning sessions, and event moments for complete documentation.',
+        tools_meetings_btn: 'Access Meetings',
+        schedule_badge: 'Schedule',
+        schedule_title: 'Event Schedule',
+        schedule_desc: 'Five days of complete immersion in foot and ankle surgery, with activities distributed between the cadaveric lab and partner hospitals.',
+        schedule_day1: 'Monday',
+        schedule_loc1: 'UFPR / Factory',
+        schedule_desc1: 'Opening, theoretical lectures, and technical visit to the implant factory.',
+        schedule_day2: 'Tuesday',
+        schedule_loc2: 'Cadaveric Lab',
+        schedule_desc2: 'Surgical practices on cadaveric specimens with fixation and osteosynthesis techniques.',
+        schedule_day3: 'Wednesday',
+        schedule_loc3: 'CHR',
+        schedule_desc3: 'Live surgeries and discussions of complex clinical cases at CHR Hospital.',
+        schedule_day4: 'Thursday',
+        schedule_loc4: 'CHC / CHR',
+        schedule_desc4: 'Simultaneous live surgeries at CHC and CHR hospitals with different techniques.',
+        schedule_day5: 'Friday',
+        schedule_loc5: 'CHC / CHR',
+        schedule_desc5: 'Final surgeries, closing ceremony, and participation certificates.',
+        faculty_badge: 'Faculty',
+        faculty_title: 'International Faculty',
+        faculty_desc: 'Renowned international surgeons and Brazilian specialists form the faculty of STEPS2WALK\u00ae Curitiba 2026.',
+        cta_title: 'Access Administrative Areas',
+        cta_desc: 'Surgical planning, patient registry, and meetings gallery \u2014 all centralized in the same database.',
+        cta_planning: 'Planning',
+        cta_patients: 'Patients',
         cta_meetings: 'Meetings',
         footer_date: 'October 5th to 9th, 2026 \u2014 Curitiba, PR, Brazil',
         footer_org: 'Organized by Neoortho',
