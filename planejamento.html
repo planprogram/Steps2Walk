@@ -80,7 +80,12 @@
         .btn-remove { background: var(--danger); color: var(--white); font-size: 10px; padding: 3px 6px; height: auto; }
         .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); font-size: 10px; padding: 3px 6px; cursor: pointer; border-radius: 4px;}
         .list-item { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid #eee; font-size: 12px; }
-        .estoque-input { width: 40px; padding: 2px; text-align: center; }
+        
+        .estoque-input { padding: 4px 2px; text-align: center; font-size: 12px; }
+        .estoque-input::-webkit-inner-spin-button,
+        .estoque-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        .estoque-input[type=number] { -moz-appearance: textfield; }
+
         .alert { color: var(--danger); font-size: 11px; font-weight: bold; }
         .checkbox-label { display: flex; align-items: center; gap: 5px; font-size: 12px; justify-content: center; }
         label { font-size: 10px; color: #777; display: block; margin-bottom: 2px; }
@@ -100,6 +105,7 @@
         <button class="btn-header" onclick="toggleSidebar()">☰ Cadastro</button>
         <div class="conn-status" id="connStatus"><div class="status-dot offline" id="connDot"></div><span id="connText">Conectando...</span></div>
         <button class="btn-header save-btn" onclick="forceSave()">☁️ Salvar Agora</button>
+        <button class="btn-header" onclick="showTab('AGENDA')">📋 Extrair Agenda</button>
         <div class="save-status" id="saveStatus"><div class="status-dot" id="saveDot"></div><span id="saveText">Tudo salvo</span></div>
         <button class="btn-header" onclick="exportData()">💾 Backup</button>
         <button class="btn-header import-btn" onclick="document.getElementById('importFile').click()">📂 Importar</button>
@@ -114,7 +120,7 @@
         <button class="tab-btn" onclick="showTab('CHR_08')">08 Out - CHR</button>
         <button class="tab-btn" onclick="showTab('CHC_09')">09 Out - CHC</button>
         <button class="tab-btn" onclick="showTab('CHR_09')">09 Out - CHR</button>
-        <button class="tab-btn report-tab" onclick="showTab('REPORT')">📊 Relatório</button>
+        <button class="tab-btn report-tab" onclick="showTab('REPORT')">📦 Materiais</button>
     </div>
 </div>
 
@@ -123,7 +129,12 @@
         <div class="section-box"><div class="section-title">Médicos</div><div class="inline-form"><input type="text" id="newMedico" placeholder="Nome do Médico"><button class="btn btn-add" onclick="addMedico()">+</button></div><div id="listaMedicos" style="max-height: 120px; overflow-y: auto;"></div></div>
         <div class="section-box"><div class="section-title">Instrumentadores</div><div class="inline-form"><input type="text" id="newInstrumentador" placeholder="Nome"><button class="btn btn-add" onclick="addCad('instrumentadores', 'newInstrumentador')">+</button></div><div id="listaInstrumentadores" style="max-height: 80px; overflow-y: auto;"></div></div>
         <div class="section-box"><div class="section-title">Resp. Neoortho</div><div class="inline-form"><input type="text" id="newNeoortho" placeholder="Nome"><button class="btn btn-add" onclick="addCad('neoorthos', 'newNeoortho')">+</button></div><div id="listaNeoorthos" style="max-height: 80px; overflow-y: auto;"></div></div>
-        <div class="section-box"><div class="section-title">Estoque e Composição</div><div style="display: grid; grid-template-columns: 1fr 35px 125px auto auto; gap: 4px; font-size: 10px; font-weight: bold; margin-bottom: 5px; color:#555;"><span>Material</span><span>CHC</span><span>CHR</span><span></span><span></span></div><div id="listaMateriais" style="max-height: 350px; overflow-y: auto;"></div><div class="inline-form" style="margin-top: 10px;"><input type="text" id="newMatNome" placeholder="Novo Material"><button class="btn btn-add" onclick="addMaterial()">+</button></div></div>
+        <div class="section-box">
+            <div class="section-title">Estoque e Composição</div>
+            <div style="display: grid; grid-template-columns: 1fr 50px 50px 30px 30px; gap: 4px; font-size: 10px; font-weight: bold; margin-bottom: 5px; color:#555;"><span>Material</span><span>CHC</span><span>CHR</span><span></span><span></span></div>
+            <div id="listaMateriais" style="max-height: 350px; overflow-y: auto;"></div>
+            <div class="inline-form" style="margin-top: 10px;"><input type="text" id="newMatNome" placeholder="Novo Material"><button class="btn btn-add" onclick="addMaterial()">+</button></div>
+        </div>
     </div>
     <div class="main">
         <div id="scheduleContainer"></div>
@@ -232,9 +243,169 @@
     function formatBRL(value) { return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
 
     function renderSponsorSummary() { const summary = {}; let totalGeral = 0; ['EVENT_05', 'EVENT_06', 'EVENT_07'].forEach(day => { if (scheduleData[day]) { scheduleData[day].forEach(task => { const sponsorName = task.sponsor.trim() || "Sem Patrocinador"; const cost = parseFloat(task.price) || 0; if (cost > 0) { if (!summary[sponsorName]) summary[sponsorName] = 0; summary[sponsorName] += cost; totalGeral += cost; } }); } }); let html = `<div class="summary-box"><div class="summary-title">📊 Resumo de Custos</div><div class="summary-grid">`; const sponsors = Object.keys(summary).sort(); if (sponsors.length === 0) html += `<p style="color:#777; font-size:12px;">Nenhum custo.</p>`; else sponsors.forEach(spon => html += `<div class="sponsor-card"><div class="sponsor-name">${spon}</div><div class="sponsor-value">${formatBRL(summary[spon])}</div></div>`); html += `</div><div class="total-geral">Total Geral: ${formatBRL(totalGeral)}</div></div>`; return html; }
-    function showTab(tabKey) { document.querySelectorAll('.tab-btn').forEach(btn => { btn.classList.remove('active'); if (btn.getAttribute('onclick') === `showTab('${tabKey}')`) btn.classList.add('active'); }); if (tabKey.startsWith("EVENT_")) renderEvento(tabKey); else if (tabKey === "REPORT") renderReport(); else renderCirurgias(tabKey); }
+
+    function renderSurgeryMaterialsSummary() {
+        let usedMaterials = {};
+        const surgeryTabs = ['CHC_08', 'CHC_09', 'CHR_08', 'CHR_09'];
+
+        surgeryTabs.forEach(tab => {
+            if (!scheduleData[tab]) return;
+            for (let sala in scheduleData[tab]) {
+                for (let time in scheduleData[tab][sala]) {
+                    let mat = scheduleData[tab][sala][time].material;
+                    if (mat) {
+                        usedMaterials[mat] = (usedMaterials[mat] || 0) + 1;
+                    }
+                }
+            }
+        });
+
+        let html = `<div class="summary-box"><div class="summary-title">📦 Previsão de Materiais e Componentes (Cirurgias)</div><div class="summary-grid">`;
+        const usedMatsKeys = Object.keys(usedMaterials).sort();
+
+        if (usedMatsKeys.length === 0) {
+            html += `<p style="color:#777; font-size:12px;">Nenhum material alocado nas cirurgias ainda.</p>`;
+        } else {
+            usedMatsKeys.forEach(mat => {
+                const qty = usedMaterials[mat];
+                html += `<div class="sponsor-card">
+                    <div class="sponsor-name">${mat} <span style="color: var(--danger); font-size: 12px;">(${qty}x)</span></div>
+                    <div style="margin-top: 5px; font-size: 12px; color: #333;">`;
+                
+                const m = materiais[mat];
+                if (m && m.components && Object.keys(m.components).length > 0) {
+                    for (let comp in m.components) {
+                        const totalCompQty = m.components[comp] * qty; 
+                        html += `<div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #ccc; padding: 2px 0;">
+                                    <span>${comp}</span>
+                                    <span style="font-weight: bold; color: var(--primary);">Qtd: ${totalCompQty}</span>
+                                 </div>`;
+                    }
+                } else {
+                    html += `<div style="color:#777; font-style: italic; font-size: 11px;">Sem componentes cadastrados</div>`;
+                }
+                
+                html += `</div></div>`;
+            });
+        }
+
+        html += `</div></div>`;
+        return html;
+    }
+
+    function showTab(tabKey) { document.querySelectorAll('.tab-btn').forEach(btn => { btn.classList.remove('active'); if (btn.getAttribute('onclick') === `showTab('${tabKey}')`) btn.classList.add('active'); }); if (tabKey.startsWith("EVENT_")) renderEvento(tabKey); else if (tabKey === "REPORT") renderReport(); else if (tabKey === "AGENDA") renderAgenda(); else renderCirurgias(tabKey); }
     
-    function renderReport() { const container = document.getElementById('scheduleContainer'); let kitUsage = { CHC: {}, CHR: {} }; ['CHC_08', 'CHC_09', 'CHR_08', 'CHR_09'].forEach(tab => { const hosp = tab.split('_')[0]; if (!scheduleData[tab]) return; for (let sala in scheduleData[tab]) { for (let time in scheduleData[tab][sala]) { let mat = scheduleData[tab][sala][time].material; if (mat) kitUsage[hosp][mat] = (kitUsage[hosp][mat] || 0) + 1; } } }); let html = `<h2 style="color:var(--primary);">Relatório</h2><table><thead><tr><th>Kit</th><th>CHC</th><th>CHR</th><th>Total</th></tr></thead><tbody>`; let allKits = new Set([...Object.keys(kitUsage.CHC), ...Object.keys(kitUsage.CHR)]); allKits.forEach(kit => { const c = kitUsage.CHC[kit] || 0; const h = kitUsage.CHR[kit] || 0; html += `<tr><td class="left-text"><strong>${kit}</strong></td><td>${c}</td><td>${h}</td><td><strong>${c+h}</strong></td></tr>`; }); html += `</tbody></table>`; container.innerHTML = html; }
+    function renderReport() { 
+        const container = document.getElementById('scheduleContainer'); 
+        let kitUsage = { CHC: {}, CHR: {} }; 
+        
+        ['CHC_08', 'CHC_09', 'CHR_08', 'CHR_09'].forEach(tab => { 
+            const hosp = tab.split('_')[0]; 
+            if (!scheduleData[tab]) return; 
+            for (let sala in scheduleData[tab]) { 
+                for (let time in scheduleData[tab][sala]) { 
+                    let mat = scheduleData[tab][sala][time].material; 
+                    if (mat) kitUsage[hosp][mat] = (kitUsage[hosp][mat] || 0) + 1; 
+                } 
+            } 
+        }); 
+        
+        let html = `<h2 style="color:var(--primary);">📦 Relatório de Materiais</h2>`;
+        
+        html += `<table><thead><tr><th>Kit</th><th>CHC</th><th>CHR</th><th>Total</th></tr></thead><tbody>`; 
+        let allKits = new Set([...Object.keys(kitUsage.CHC), ...Object.keys(kitUsage.CHR)]); 
+        allKits.forEach(kit => { 
+            const c = kitUsage.CHC[kit] || 0; 
+            const h = kitUsage.CHR[kit] || 0; 
+            html += `<tr><td class="left-text"><strong>${kit}</strong></td><td>${c}</td><td>${h}</td><td><strong>${c+h}</strong></td></tr>`; 
+        }); 
+        html += `</tbody></table>`; 
+        
+        html += renderSurgeryMaterialsSummary();
+        
+        container.innerHTML = html; 
+    }
+
+    function renderAgenda() {
+        const container = document.getElementById('scheduleContainer');
+        let agendaItems = [];
+
+        // Processar Eventos (05, 06, 07)
+        ['EVENT_05', 'EVENT_06', 'EVENT_07'].forEach(dayKey => {
+            if (!scheduleData[dayKey]) return;
+            const day = parseInt(dayKey.split('_')[1]);
+            const dateStr = `${String(day).padStart(2, '0')}/10/2026`;
+            const dateObj = new Date(2026, 9, day); 
+            
+            scheduleData[dayKey].forEach(evt => {
+                agendaItems.push({
+                    dateObj: dateObj,
+                    dateStr: dateStr,
+                    time: evt.time || '-',
+                    desc: evt.title || 'Evento sem título',
+                    resp: evt.resp || '-'
+                });
+            });
+        });
+
+        // Processar Cirurgias (CHC_08, CHR_08, CHC_09, CHR_09)
+        ['CHC_08', 'CHR_08', 'CHC_09', 'CHR_09'].forEach(dayKey => {
+            if (!scheduleData[dayKey]) return;
+            const day = parseInt(dayKey.split('_')[1]);
+            const hosp = dayKey.split('_')[0];
+            const dateStr = `${String(day).padStart(2, '0')}/10/2026 (${hosp})`;
+            const dateObj = new Date(2026, 9, day);
+            
+            for (let sala in scheduleData[dayKey]) {
+                for (let time in scheduleData[dayKey][sala]) {
+                    const slot = scheduleData[dayKey][sala][time];
+                    if (slot.medico || slot.paciente) { // Apenas adiciona à agenda se tiver médico ou paciente
+                        agendaItems.push({
+                            dateObj: dateObj,
+                            dateStr: dateStr,
+                            time: time,
+                            desc: `Cirurgia - Sala ${sala}`,
+                            resp: `Médico: ${slot.medico || 'N/A'} | Paciente: ${slot.paciente || 'N/A'}`
+                        });
+                    }
+                }
+            }
+        });
+
+        // Ordenar cronologicamente
+        agendaItems.sort((a, b) => {
+            if (a.dateObj - b.dateObj !== 0) return a.dateObj - b.dateObj;
+            // Padronizar string de tempo para ordenação (ex: "7:00" -> "07:00")
+            let timeA = a.time.split(' - ')[0];
+            if(timeA.length === 4) timeA = '0' + timeA;
+            let timeB = b.time.split(' - ')[0];
+            if(timeB.length === 4) timeB = '0' + timeB;
+            
+            if (timeA < timeB) return -1;
+            if (timeA > timeB) return 1;
+            return 0;
+        });
+
+        // Renderizar HTML
+        let html = `<h2 style="color:var(--primary);">📋 Agenda Cronológica Completa</h2>`;
+        html += `<table><thead><tr><th>Data</th><th>Horário</th><th>Descrição</th><th>Responsável</th></tr></thead><tbody>`;
+        
+        if (agendaItems.length === 0) {
+            html += `<tr><td colspan="4">Nenhum agendamento encontrado nas cirurgias ou eventos.</td></tr>`;
+        } else {
+            agendaItems.forEach(item => {
+                html += `<tr>
+                    <td><strong>${item.dateStr}</strong></td>
+                    <td>${item.time}</td>
+                    <td class="left-text">${item.desc}</td>
+                    <td class="left-text">${item.resp}</td>
+                </tr>`;
+            });
+        }
+        
+        html += `</tbody></table>`;
+        container.innerHTML = html;
+    }
 
     function renderEvento(tabKey) { const container = document.getElementById('scheduleContainer'); const events = scheduleData[tabKey] || []; let html = renderSponsorSummary(); html += `<div class="timeline-header"><h3 style="margin:0; color:var(--secondary);">Programação</h3><button class="btn btn-add" onclick="addTask('${tabKey}')">+ Tarefa</button></div><div class="timeline" id="timeline-${tabKey}">`; if(events.length === 0) html += `<p style="color:#777;">Nenhuma tarefa.</p>`; events.forEach((evt, index) => { html += `<div class="timeline-item" draggable="true" data-tab-key="${tabKey}" data-index="${index}" ondragstart="onDragStart(event, '${tabKey}', ${index})" ondragend="onDragEnd(event)" ondragover="onDragOver(event)" ondragenter="onDragEnter(event, this)" ondragleave="onDragLeave(event, this)" ondrop="onDrop(event, '${tabKey}', ${index})"><div class="timeline-title-row"><div class="drag-handle"><div class="drag-handle-dots">⠿</div></div><div style="flex:1; margin-right:10px;"><label>Horário</label><input type="text" value="${evt.time}" onchange="updateEvento('${tabKey}', ${index}, 'time', this.value)"></div><div style="flex:3; margin-right:10px;"><label>Título</label><input type="text" value="${evt.title}" onchange="updateEvento('${tabKey}', ${index}, 'title', this.value)"></div><div class="move-btns"><button class="move-btn" onclick="moveTask('${tabKey}', ${index}, -1)" ${index === 0 ? 'disabled' : ''}>▲</button><button class="move-btn" onclick="moveTask('${tabKey}', ${index}, 1)" ${index === events.length - 1 ? 'disabled' : ''}>▼</button></div><button class="btn btn-remove" onclick="deleteTask('${tabKey}', ${index})">X</button></div><div style="margin-bottom:8px;"><label>Descrição</label><input type="text" value="${evt.desc}" onchange="updateEvento('${tabKey}', ${index}, 'desc', this.value)"></div><div class="timeline-form"><div><label>Resp:</label><input type="text" value="${evt.resp}" onchange="updateEvento('${tabKey}', ${index}, 'resp', this.value)"></div><div><label>Patrocinador:</label><input type="text" value="${evt.sponsor}" onchange="updateEvento('${tabKey}', ${index}, 'sponsor', this.value)"></div><div><label>Custo (R$):</label><input type="number" step="0.01" value="${evt.price}" onchange="updateEvento('${tabKey}', ${index}, 'price', this.value)"></div></div><div style="margin-top:8px;"><label>Comentários:</label><textarea onchange="updateEvento('${tabKey}', ${index}, 'comments', this.value)">${evt.comments}</textarea></div></div>`; }); html += `</div>`; container.innerHTML = html; }
 
@@ -259,7 +430,7 @@
     function addMedico() { const input = document.getElementById('newMedico'); if (input.value.trim()) { medicos.push(input.value.trim()); input.value = ''; renderCadastros(); triggerAutoSave(); } }
     function addCad(type, inputId) { const input = document.getElementById(inputId); const arr = type === 'instrumentadores' ? instrumentadores : neoorthos; if (input.value.trim()) { arr.push(input.value.trim()); input.value = ''; renderCadastros(); triggerAutoSave(); } }
     function removeCad(type, index) { const arr = type === 'medicos' ? medicos : (type === 'instrumentadores' ? instrumentadores : neoorthos); arr.splice(index, 1); renderCadastros(); triggerAutoSave(); }
-    function renderMateriais() { const container = document.getElementById('listaMateriais'); let html = ''; for (let mat in materiais) { const m = materiais[mat]; const isExpanded = expandedMaterials[mat]; html += `<div style="border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 5px;"><div style="display: grid; grid-template-columns: 1fr 35px 125px auto auto; gap: 4px; align-items: center; font-size: 12px;"><span>${mat}</span><input type="number" class="estoque-input" value="${m.chc}" onchange="updateEstoque('${mat}','CHC',this.value)"><input type="number" class="estoque-input" value="${m.chr}" onchange="updateEstoque('${mat}','CHR',this.value)"><button class="btn-outline" onclick="toggleMaterialDetails('${mat}')">${isExpanded ? '▼' : '►'}</button><button class="btn btn-remove" onclick="removeMaterial('${mat}')">X</button></div>${isExpanded ? `<div class="mat-comp-box"><div style="display:flex; justify-content:space-between; margin-bottom:5px; font-weight:bold; font-size:11px;"><span>Componente</span><span>Qtd</span></div>${m.components ? Object.keys(m.components).map(comp => `<div class="comp-item"><span>${comp}</span><div><span>${m.components[comp]}</span> <button class="btn btn-remove" onclick="removeComponent('${mat}','${comp}')">X</button></div></div>`).join('') : ''}<button class="btn btn-add" style="margin-top:5px; width:100%;" onclick="addComponent('${mat}')">+ Componente</button></div>` : ''}</div>`; } container.innerHTML = html; }
+    function renderMateriais() { const container = document.getElementById('listaMateriais'); let html = ''; for (let mat in materiais) { const m = materiais[mat]; const isExpanded = expandedMaterials[mat]; html += `<div style="border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 5px;"><div style="display: grid; grid-template-columns: 1fr 50px 50px 30px 30px; gap: 4px; align-items: center; font-size: 12px;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${mat}">${mat}</span><input type="number" class="estoque-input" value="${m.chc}" onchange="updateEstoque('${mat}','CHC',this.value)"><input type="number" class="estoque-input" value="${m.chr}" onchange="updateEstoque('${mat}','CHR',this.value)"><button class="btn-outline" onclick="toggleMaterialDetails('${mat}')">${isExpanded ? '▼' : '►'}</button><button class="btn btn-remove" onclick="removeMaterial('${mat}')">X</button></div>${isExpanded ? `<div class="mat-comp-box"><div style="display:flex; justify-content:space-between; margin-bottom:5px; font-weight:bold; font-size:11px;"><span>Componente</span><span>Qtd</span></div>${m.components ? Object.keys(m.components).map(comp => `<div class="comp-item"><span>${comp}</span><div><span>${m.components[comp]}</span> <button class="btn btn-remove" onclick="removeComponent('${mat}','${comp}')">X</button></div></div>`).join('') : ''}<button class="btn btn-add" style="margin-top:5px; width:100%;" onclick="addComponent('${mat}')">+ Componente</button></div>` : ''}</div>`; } container.innerHTML = html; }
 
     loadDataFromCloud();
 </script>
