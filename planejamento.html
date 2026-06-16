@@ -81,6 +81,10 @@
         .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); font-size: 10px; padding: 3px 6px; cursor: pointer; border-radius: 4px;}
         .list-item { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid #eee; font-size: 12px; }
         
+        .mat-tag { background: var(--secondary); color: white; padding: 2px 8px; border-radius: 12px; font-size: 10px; display: inline-flex; align-items: center; margin-right: 3px; margin-bottom: 3px; cursor: pointer; user-select: none; white-space: nowrap; }
+        .mat-tag:hover { background: var(--danger); }
+        .mat-tag span { margin-left: 4px; font-weight: bold; }
+
         .estoque-input { padding: 4px 2px; text-align: center; font-size: 12px; }
         .estoque-input::-webkit-inner-spin-button,
         .estoque-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
@@ -92,6 +96,8 @@
         .mat-comp-box { background: var(--light); padding: 8px; border-radius: 4px; margin-top: 5px; border: 1px solid #ddd; }
         .comp-item { display: flex; justify-content: space-between; font-size: 11px; padding: 2px 0; border-bottom: 1px dashed #ccc; }
         #loadingScreen { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; z-index: 9999; }
+        .paciente-group-title { font-size: 11px; font-weight: bold; color: var(--accent); margin-top: 8px; margin-bottom: 4px; text-transform: uppercase; }
+        .paciente-item { font-size: 12px; padding: 2px 0; color: var(--dark); }
     </style>
 </head>
 <body>
@@ -126,14 +132,48 @@
 
 <div class="container">
     <div class="sidebar" id="sidebar">
-        <div class="section-box"><div class="section-title">Médicos</div><div class="inline-form"><input type="text" id="newMedico" placeholder="Nome do Médico"><button class="btn btn-add" onclick="addMedico()">+</button></div><div id="listaMedicos" style="max-height: 120px; overflow-y: auto;"></div></div>
-        <div class="section-box"><div class="section-title">Instrumentadores</div><div class="inline-form"><input type="text" id="newInstrumentador" placeholder="Nome"><button class="btn btn-add" onclick="addCad('instrumentadores', 'newInstrumentador')">+</button></div><div id="listaInstrumentadores" style="max-height: 80px; overflow-y: auto;"></div></div>
-        <div class="section-box"><div class="section-title">Resp. Neoortho</div><div class="inline-form"><input type="text" id="newNeoortho" placeholder="Nome"><button class="btn btn-add" onclick="addCad('neoorthos', 'newNeoortho')">+</button></div><div id="listaNeoorthos" style="max-height: 80px; overflow-y: auto;"></div></div>
+        <div class="section-box">
+            <div class="section-title">Médicos</div>
+            <div class="inline-form">
+                <input type="text" id="newMedico" placeholder="Nome do Médico">
+                <button class="btn btn-add" onclick="addMedico()">+</button>
+            </div>
+            <div id="listaMedicos" style="max-height: 120px; overflow-y: auto;"></div>
+        </div>
+        
+        <div class="section-box">
+            <div class="section-title">Pacientes (Carregados do DB)</div>
+            <div id="listaPacientes" style="max-height: 200px; overflow-y: auto;"></div>
+        </div>
+
+        <div class="section-box">
+            <div class="section-title">Instrumentadores</div>
+            <div class="inline-form">
+                <input type="text" id="newInstrumentador" placeholder="Nome">
+                <button class="btn btn-add" onclick="addCad('instrumentadores', 'newInstrumentador')">+</button>
+            </div>
+            <div id="listaInstrumentadores" style="max-height: 80px; overflow-y: auto;"></div>
+        </div>
+        
+        <div class="section-box">
+            <div class="section-title">Resp. Neoortho</div>
+            <div class="inline-form">
+                <input type="text" id="newNeoortho" placeholder="Nome">
+                <button class="btn btn-add" onclick="addCad('neoorthos', 'newNeoortho')">+</button>
+            </div>
+            <div id="listaNeoorthos" style="max-height: 80px; overflow-y: auto;"></div>
+        </div>
+        
         <div class="section-box">
             <div class="section-title">Estoque e Composição</div>
-            <div style="display: grid; grid-template-columns: 1fr 50px 50px 30px 30px; gap: 4px; font-size: 10px; font-weight: bold; margin-bottom: 5px; color:#555;"><span>Material</span><span>CHC</span><span>CHR</span><span></span><span></span></div>
+            <div style="display: grid; grid-template-columns: 1fr 50px 50px 30px 30px; gap: 4px; font-size: 10px; font-weight: bold; margin-bottom: 5px; color:#555;">
+                <span>Material</span><span>CHC</span><span>CHR</span><span></span><span></span>
+            </div>
             <div id="listaMateriais" style="max-height: 350px; overflow-y: auto;"></div>
-            <div class="inline-form" style="margin-top: 10px;"><input type="text" id="newMatNome" placeholder="Novo Material"><button class="btn btn-add" onclick="addMaterial()">+</button></div>
+            <div class="inline-form" style="margin-top: 10px;">
+                <input type="text" id="newMatNome" placeholder="Novo Material">
+                <button class="btn btn-add" onclick="addMaterial()">+</button>
+            </div>
         </div>
     </div>
     <div class="main">
@@ -197,17 +237,17 @@
       "instrumentadores": [],
       "neoorthos": [ "Vladimir", "Natacha", "Gustavo", "Maycon" ],
       "scheduleData": {
-        "CHC_08": { "Sala 1": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }, "Sala 2": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }, "Sala 3": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }, "Sala 4": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }, "Sala 5": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } } },
-        "CHC_09": { "Sala 1": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }, "Sala 2": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }, "Sala 3": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }, "Sala 4": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }, "Sala 5": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } } },
-        "CHR_08": { "Sala 1": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }, "Sala 2": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }, "Sala 3": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }, "Sala 4": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" } }, "Sala 5": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": true, "neoortho": "" } } },
-        "CHR_09": { "Sala 1": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }, "Sala 2": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "Vladimir" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }, "Sala 3": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }, "Sala 4": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } }, "Sala 5": { "07:00 - 10:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "10:00 - 13:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" }, "14:00 - 17:00": { "medico": "", "material": "", "paciente": "", "instrumentador": "", "motor": false, "neoortho": "" } } },
+        "CHC_08": { "Sala 1": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } }, "Sala 2": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } }, "Sala 3": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } }, "Sala 4": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } }, "Sala 5": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } } },
+        "CHC_09": { "Sala 1": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": true, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": true, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } }, "Sala 2": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": true, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": true, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } }, "Sala 3": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": true, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": true, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } }, "Sala 4": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": true, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": true, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } }, "Sala 5": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": true, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": true, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } } },
+        "CHR_08": { "Sala 1": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } }, "Sala 2": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } }, "Sala 3": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } }, "Sala 4": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } }, "Sala 5": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": true, "neoortho": "", "observacao": "" } } },
+        "CHR_09": { "Sala 1": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } }, "Sala 2": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "Vladimir", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } }, "Sala 3": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } }, "Sala 4": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } }, "Sala 5": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } } },
         "EVENT_05": [ { "time": "7:00", "title": "Fotografos e Equipe", "desc": "", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 10000, "comments": "" }, { "time": "7:00", "title": "Entrega dos Crachás", "desc": "", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 2000, "comments": "Crachás divididos em cores diferentes:\nProfessores (25 Unid.);\nStaffs (25 Unid.);\nInscritos (40 Unid.);\nObservadores (40 Unid.):" } ],
         "EVENT_06": [ { "time": "07:30 - 08:00", "title": "Entrega de Scrubs", "desc": "", "resp": "Heloise", "sponsor": "NeoOrtho", "price": 141000, "comments": "" } ],
         "EVENT_07": [ { "time": "08:00 - 09:20", "title": "Aula", "desc": "", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 3000, "comments": "" } ]
       }
     };
 
-    let medicos = [], materiais = {}, instrumentadores = [], neoorthos = [], scheduleData = {}, expandedMaterials = {}, dragState = { tabKey: null, dragIndex: null };
+    let medicos = [], materiais = {}, instrumentadores = [], neoorthos = [], scheduleData = {}, expandedMaterials = {}, dragState = { tabKey: null, dragIndex: null }, patientsDB = {};
     const regrasMedicos = { "Dr. Bruno A. B. Moura": "CHR", "Dr. Luiz Fernando Bonaroski": "CHR", "Dr. João Luiz Vieira da Silva": "CHC" };
     const times = ["07:00 - 10:00", "10:00 - 13:00", "14:00 - 17:00"];
     const salas = ["Sala 1", "Sala 2", "Sala 3", "Sala 4", "Sala 5"];
@@ -218,18 +258,84 @@
     function triggerAutoSave() { clearTimeout(autoSaveTimer); updateSaveStatus('alterado'); autoSaveTimer = setTimeout(() => { saveDataToCloud(); }, 3000); }
     function updateSaveStatus(status) { const dot = document.getElementById('saveDot'); const text = document.getElementById('saveText'); if (status === 'alterado') { dot.className = 'status-dot'; text.innerText = 'Alterações pendentes...'; } else if (status === 'salvando') { dot.className = 'status-dot saving'; text.innerText = 'Salvando...'; } else if (status === 'salvo') { dot.className = 'status-dot saved'; text.innerText = 'Tudo salvo'; } else if (status === 'erro') { dot.className = 'status-dot error'; text.innerText = 'Erro ao salvar!'; } }
 
+    function addMedico() {
+        const input = document.getElementById('newMedico');
+        const val = input.value.trim();
+        if (val) {
+            medicos.push(val);
+            input.value = '';
+            renderCadastros();
+            triggerAutoSave();
+        }
+    }
+
+    function addCad(arrName, inputId) {
+        const input = document.getElementById(inputId);
+        const val = input.value.trim();
+        if (val) {
+            if(arrName === 'instrumentadores') instrumentadores.push(val);
+            if(arrName === 'neoorthos') neoorthos.push(val);
+            input.value = '';
+            renderCadastros();
+            triggerAutoSave();
+        }
+    }
+
     function loadDataFromCloud() {
         db.ref('eventData').once('value').then(snapshot => {
             const data = snapshot.val();
             if (data) {
                 const originalData = desanitizeFirebaseKeys(data);
-                medicos = originalData.medicos || []; materiais = originalData.materiais || {}; instrumentadores = originalData.instrumentadores || []; neoorthos = originalData.neoorthos || []; scheduleData = originalData.scheduleData || {};
+                medicos = originalData.medicos || []; 
+                materiais = originalData.materiais || {}; 
+                instrumentadores = originalData.instrumentadores || []; 
+                neoorthos = originalData.neoorthos || []; 
+                scheduleData = originalData.scheduleData || {};
             } else {
-                medicos = [...defaultDatabaseState.medicos]; materiais = JSON.parse(JSON.stringify(defaultDatabaseState.materiais)); instrumentadores = [...defaultDatabaseState.instrumentadores]; neoorthos = [...defaultDatabaseState.neoorthos]; scheduleData = JSON.parse(JSON.stringify(defaultDatabaseState.scheduleData));
+                medicos = [...defaultDatabaseState.medicos]; 
+                materiais = JSON.parse(JSON.stringify(defaultDatabaseState.materiais)); 
+                instrumentadores = [...defaultDatabaseState.instrumentadores]; 
+                neoorthos = [...defaultDatabaseState.neoorthos]; 
+                scheduleData = JSON.parse(JSON.stringify(defaultDatabaseState.scheduleData));
             }
-            ["CHC_08", "CHC_09", "CHR_08", "CHR_09"].forEach(tab => { if (!scheduleData[tab]) scheduleData[tab] = {}; salas.forEach(sala => { if (!scheduleData[tab][sala]) scheduleData[tab][sala] = {}; times.forEach(time => { if (!scheduleData[tab][sala][time]) scheduleData[tab][sala][time] = { medico: "", material: "", paciente: "", instrumentador: "", motor: false, neoortho: "" }; }); }); });
-            document.getElementById('loadingScreen').style.display = 'none'; updateSaveStatus('salvo'); initUI();
+
+            ["CHC_08", "CHC_09", "CHR_08", "CHR_09"].forEach(tab => {
+                if(!scheduleData[tab]) scheduleData[tab] = {};
+                salas.forEach(sala => {
+                    if(!scheduleData[tab][sala]) scheduleData[tab][sala] = {};
+                    times.forEach(time => {
+                        if(!scheduleData[tab][sala][time]) {
+                             scheduleData[tab][sala][time] = { medico: "", materiais: [], paciente: "", instrumentador: "", motor: false, neoortho: "", observacao: "" };
+                        } else {
+                            const slot = scheduleData[tab][sala][time];
+                            if(slot.material && typeof slot.material === 'string' && slot.material !== "") {
+                                slot.materiais = [slot.material];
+                                delete slot.material;
+                            }
+                            if(!slot.materiais) slot.materiais = [];
+                            if(slot.observacao === undefined) slot.observacao = "";
+                        }
+                    });
+                });
+            });
+
+            document.getElementById('loadingScreen').style.display = 'none'; 
+            updateSaveStatus('salvo'); 
+            initUI();
         }).catch(error => { console.error("Erro CRÍTICO:", error); document.getElementById('loadingScreen').innerHTML = "<h2>Erro ao conectar ao Banco</h2>"; });
+
+        db.ref('patients').on('value', snap => {
+            const data = snap.val();
+            patientsDB = data || {};
+            renderPacientesSidebar();
+            const activeTab = document.querySelector('.tab-btn.active');
+            if(activeTab) {
+                const tabKey = activeTab.getAttribute('onclick').match(/'(.*?)'/)[1];
+                if(!tabKey.startsWith('EVENT_') && tabKey !== 'REPORT' && tabKey !== 'AGENDA') {
+                    renderCirurgias(tabKey);
+                }
+            }
+        });
     }
 
     function saveDataToCloud() { updateSaveStatus('salvando'); const dataToSave = { medicos, materiais, instrumentadores, neoorthos, scheduleData }; db.ref('eventData').set(sanitizeFirebaseKeys(dataToSave)).then(() => { updateSaveStatus('salvo'); }).catch(error => { updateSaveStatus('erro'); }); }
@@ -237,6 +343,103 @@
     function initUI() { renderCadastros(); renderMateriais(); showTab('EVENT_05'); }
     function exportData() { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ medicos, materiais, instrumentadores, neoorthos, scheduleData }, null, 2)); const dlAnchorElem = document.createElement('a'); dlAnchorElem.setAttribute("href", dataStr); dlAnchorElem.setAttribute("download", "steps2walk_backup.json"); dlAnchorElem.click(); }
     function importData(event) { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(e) { try { const data = JSON.parse(e.target.result); if (data.medicos) medicos = data.medicos; if (data.materiais) materiais = data.materiais; if (data.instrumentadores) instrumentadores = data.instrumentadores; if (data.neoorthos) neoorthos = data.neoorthos; if (data.scheduleData) scheduleData = data.scheduleData; initUI(); triggerAutoSave(); alert("Dados importados!"); } catch (error) { alert("Erro."); } }; reader.readAsText(file); event.target.value = ""; }
+
+    function renderCadastros() {
+        const listMedicos = document.getElementById('listaMedicos');
+        listMedicos.innerHTML = medicos.map((m, i) => `<div class="list-item"><span>${m}</span><button class="btn btn-remove" onclick="remItem('medicos', ${i})">x</button></div>`).join('');
+        renderPacientesSidebar();
+        const listInstrumentadores = document.getElementById('listaInstrumentadores');
+        listInstrumentadores.innerHTML = instrumentadores.map((m, i) => `<div class="list-item"><span>${m}</span><button class="btn btn-remove" onclick="remItem('instrumentadores', ${i})">x</button></div>`).join('');
+        const listNeoorthos = document.getElementById('listaNeoorthos');
+        listNeoorthos.innerHTML = neoorthos.map((m, i) => `<div class="list-item"><span>${m}</span><button class="btn btn-remove" onclick="remItem('neoorthos', ${i})">x</button></div>`).join('');
+    }
+
+    function renderPacientesSidebar() {
+        const container = document.getElementById('listaPacientes');
+        let html = '';
+        if(Object.keys(patientsDB).length === 0) { container.innerHTML = '<p style="color:#999; font-size:11px;">Nenhum paciente encontrado no DB.</p>'; return; }
+        const groups = { 'CHC': [], 'CHR': [], 'OUTRO': [] };
+        Object.keys(patientsDB).forEach(key => {
+            const p = patientsDB[key];
+            if (p.hospital === 'CHC') groups.CHC.push(p);
+            else if (p.hospital === 'CHR') groups.CHR.push(p);
+            else groups.OUTRO.push(p);
+        });
+        if(groups.CHC.length > 0) { html += `<div class="paciente-group-title">Hospital CHC (${groups.CHC.length})</div>`; groups.CHC.forEach(p => { html += `<div class="paciente-item">• ${p.name || 'Sem Nome'}</div>`; }); }
+        if(groups.CHR.length > 0) { html += `<div class="paciente-group-title">Hospital CHR (${groups.CHR.length})</div>`; groups.CHR.forEach(p => { html += `<div class="paciente-item">• ${p.name || 'Sem Nome'}</div>`; }); }
+        if(groups.OUTRO.length > 0) { html += `<div class="paciente-group-title">Outros Locais (${groups.OUTRO.length})</div>`; groups.OUTRO.forEach(p => { html += `<div class="paciente-item">• ${p.name || 'Sem Nome'}</div>`; }); }
+        container.innerHTML = html;
+    }
+
+    function remItem(arr, idx) {
+        if(confirm('Remover item?')) {
+            if(arr === 'medicos') medicos.splice(idx, 1);
+            if(arr === 'instrumentadores') instrumentadores.splice(idx, 1);
+            if(arr === 'neoorthos') neoorthos.splice(idx, 1);
+            renderCadastros();
+            triggerAutoSave();
+        }
+    }
+
+    function renderMateriais() {
+        const container = document.getElementById('listaMateriais');
+        container.innerHTML = '';
+        Object.keys(materiais).forEach(mat => {
+            const m = materiais[mat];
+            const isExpanded = expandedMaterials[mat];
+            let html = `<div class="list-item" style="align-items:flex-start; flex-direction:column;">
+                <div style="display:flex; width:100%; justify-content:space-between; align-items:center;">
+                    <div style="flex:1; display:grid; grid-template-columns: 1fr 50px 50px 30px 30px; gap:4px; align-items:center;">
+                        <span style="font-size:12px;">${mat}</span>
+                        <input type="number" class="estoque-input" value="${m.chc}" onchange="updateMaterialStock('${mat}', 'chc', this.value)">
+                        <input type="number" class="estoque-input" value="${m.chr}" onchange="updateMaterialStock('${mat}', 'chr', this.value)">
+                        <button class="btn btn-outline" onclick="toggleMaterialDetails('${mat}')">⚙️</button>
+                        <button class="btn btn-remove" style="padding:0 5px;" onclick="deleteMaterial('${mat}')">x</button>
+                    </div>
+                </div>`;
+            if (isExpanded) {
+                html += `<div class="mat-comp-box">`;
+                html += `<div style="display:flex; gap:5px; margin-bottom:5px;">
+                            <input type="text" id="newComp-${mat}" placeholder="Novo Componente" style="font-size:11px;">
+                            <button class="btn btn-add" style="height:25px;" onclick="addComponent('${mat}')">+</button>
+                         </div>`;
+                if (m.components && Object.keys(m.components).length > 0) {
+                    Object.keys(m.components).forEach(comp => {
+                        html += `<div class="comp-item">
+                                    <span>${comp}</span>
+                                    <input type="number" value="${m.components[comp]}" style="width:50px; text-align:center; font-size:11px;" onchange="updateComponent('${mat}', '${comp}', this.value)">
+                                 </div>`;
+                    });
+                } else { html += `<div style="font-size:10px; color:#999; font-style:italic;">Sem componentes</div>`; }
+                html += `</div>`;
+            }
+            html += `</div>`;
+            container.innerHTML += html;
+        });
+    }
+    function addMaterial() {
+        const nome = document.getElementById('newMatNome').value.trim();
+        if (!nome) return;
+        if (!materiais[nome]) {
+            materiais[nome] = { chc: 0, chr: 0, components: {} };
+            document.getElementById('newMatNome').value = '';
+            renderMateriais();
+            triggerAutoSave();
+        } else { alert('Material já existe!'); }
+    }
+    function updateMaterialStock(mat, hospital, val) { if (materiais[mat]) { materiais[mat][hospital] = parseInt(val) || 0; triggerAutoSave(); } }
+    function deleteMaterial(mat) { if(confirm(`Excluir material ${mat}?`)) { delete materiais[mat]; renderMateriais(); triggerAutoSave(); } }
+    function toggleMaterialDetails(matName) { expandedMaterials[matName] = !expandedMaterials[matName]; renderMateriais(); }
+    function addComponent(mat) {
+        const input = document.getElementById(`newComp-${mat}`);
+        const compName = input.value.trim();
+        if(compName && materiais[mat]) {
+            materiais[mat].components[compName] = 1;
+            renderMateriais();
+            triggerAutoSave();
+        }
+    }
+    function updateComponent(mat, compName, val) { if(materiais[mat] && materiais[mat].components[compName] !== undefined) { materiais[mat].components[compName] = parseInt(val) || 0; triggerAutoSave(); } }
 
     function getUsedResourcesSameHospitalTime(tabPrefix, date, time, excludeSala) { const tabKey = `${tabPrefix}_${date}`; const used = { medicos: [], instrumentadores: [], motores: 0 }; if (scheduleData[tabKey]) { salas.forEach(sala => { if (sala === excludeSala) return; const slot = scheduleData[tabKey][sala]?.[time]; if (slot) { if (slot.medico) used.medicos.push(slot.medico); if (slot.instrumentador) used.instrumentadores.push(slot.instrumentador); if (slot.motor) used.motores++; } }); } return used; }
     function isUsedInOtherHospitalDay(resourceType, resourceName, currentHospital, date) { const otherHospital = currentHospital === "CHC" ? "CHR" : "CHC"; const otherTabKey = `${otherHospital}_${date}`; if (!scheduleData[otherTabKey]) return false; for (let sala in scheduleData[otherTabKey]) { for (let time in scheduleData[otherTabKey][sala]) { const slot = scheduleData[otherTabKey][sala][time]; if (resourceType === 'medico' && slot.medico === resourceName) return true; if (resourceType === 'neoortho' && slot.neoortho === resourceName) return true; } } return false; }
@@ -247,31 +450,24 @@
     function renderSurgeryMaterialsSummary() {
         let usedMaterials = {};
         const surgeryTabs = ['CHC_08', 'CHC_09', 'CHR_08', 'CHR_09'];
-
         surgeryTabs.forEach(tab => {
             if (!scheduleData[tab]) return;
             for (let sala in scheduleData[tab]) {
                 for (let time in scheduleData[tab][sala]) {
-                    let mat = scheduleData[tab][sala][time].material;
-                    if (mat) {
-                        usedMaterials[mat] = (usedMaterials[mat] || 0) + 1;
-                    }
+                    const slotMats = scheduleData[tab][sala][time].materiais || [];
+                    slotMats.forEach(m => { if(m) usedMaterials[m] = (usedMaterials[m] || 0) + 1; });
                 }
             }
         });
-
         let html = `<div class="summary-box"><div class="summary-title">📦 Previsão de Materiais e Componentes (Cirurgias)</div><div class="summary-grid">`;
         const usedMatsKeys = Object.keys(usedMaterials).sort();
-
-        if (usedMatsKeys.length === 0) {
-            html += `<p style="color:#777; font-size:12px;">Nenhum material alocado nas cirurgias ainda.</p>`;
-        } else {
+        if (usedMatsKeys.length === 0) { html += `<p style="color:#777; font-size:12px;">Nenhum material alocado nas cirurgias ainda.</p>`; } 
+        else {
             usedMatsKeys.forEach(mat => {
                 const qty = usedMaterials[mat];
                 html += `<div class="sponsor-card">
                     <div class="sponsor-name">${mat} <span style="color: var(--danger); font-size: 12px;">(${qty}x)</span></div>
                     <div style="margin-top: 5px; font-size: 12px; color: #333;">`;
-                
                 const m = materiais[mat];
                 if (m && m.components && Object.keys(m.components).length > 0) {
                     for (let comp in m.components) {
@@ -281,14 +477,10 @@
                                     <span style="font-weight: bold; color: var(--primary);">Qtd: ${totalCompQty}</span>
                                  </div>`;
                     }
-                } else {
-                    html += `<div style="color:#777; font-style: italic; font-size: 11px;">Sem componentes cadastrados</div>`;
-                }
-                
+                } else { html += `<div style="color:#777; font-style: italic; font-size: 11px;">Sem componentes cadastrados</div>`; }
                 html += `</div></div>`;
             });
         }
-
         html += `</div></div>`;
         return html;
     }
@@ -298,20 +490,17 @@
     function renderReport() { 
         const container = document.getElementById('scheduleContainer'); 
         let kitUsage = { CHC: {}, CHR: {} }; 
-        
         ['CHC_08', 'CHC_09', 'CHR_08', 'CHR_09'].forEach(tab => { 
             const hosp = tab.split('_')[0]; 
             if (!scheduleData[tab]) return; 
             for (let sala in scheduleData[tab]) { 
                 for (let time in scheduleData[tab][sala]) { 
-                    let mat = scheduleData[tab][sala][time].material; 
-                    if (mat) kitUsage[hosp][mat] = (kitUsage[hosp][mat] || 0) + 1; 
+                    const slotMats = scheduleData[tab][sala][time].materiais || [];
+                    slotMats.forEach(m => { if(m) kitUsage[hosp][m] = (kitUsage[hosp][m] || 0) + 1; });
                 } 
             } 
         }); 
-        
         let html = `<h2 style="color:var(--primary);">📦 Relatório de Materiais</h2>`;
-        
         html += `<table><thead><tr><th>Kit</th><th>CHC</th><th>CHR</th><th>Total</th></tr></thead><tbody>`; 
         let allKits = new Set([...Object.keys(kitUsage.CHC), ...Object.keys(kitUsage.CHR)]); 
         allKits.forEach(kit => { 
@@ -320,23 +509,18 @@
             html += `<tr><td class="left-text"><strong>${kit}</strong></td><td>${c}</td><td>${h}</td><td><strong>${c+h}</strong></td></tr>`; 
         }); 
         html += `</tbody></table>`; 
-        
         html += renderSurgeryMaterialsSummary();
-        
         container.innerHTML = html; 
     }
 
     function renderAgenda() {
         const container = document.getElementById('scheduleContainer');
         let agendaItems = [];
-
-        // Processar Eventos (05, 06, 07)
         ['EVENT_05', 'EVENT_06', 'EVENT_07'].forEach(dayKey => {
             if (!scheduleData[dayKey]) return;
             const day = parseInt(dayKey.split('_')[1]);
             const dateStr = `${String(day).padStart(2, '0')}/10/2026`;
             const dateObj = new Date(2026, 9, day); 
-            
             scheduleData[dayKey].forEach(evt => {
                 agendaItems.push({
                     dateObj: dateObj,
@@ -347,19 +531,16 @@
                 });
             });
         });
-
-        // Processar Cirurgias (CHC_08, CHR_08, CHC_09, CHR_09)
         ['CHC_08', 'CHR_08', 'CHC_09', 'CHR_09'].forEach(dayKey => {
             if (!scheduleData[dayKey]) return;
             const day = parseInt(dayKey.split('_')[1]);
             const hosp = dayKey.split('_')[0];
             const dateStr = `${String(day).padStart(2, '0')}/10/2026 (${hosp})`;
             const dateObj = new Date(2026, 9, day);
-            
             for (let sala in scheduleData[dayKey]) {
                 for (let time in scheduleData[dayKey][sala]) {
                     const slot = scheduleData[dayKey][sala][time];
-                    if (slot.medico || slot.paciente) { // Apenas adiciona à agenda se tiver médico ou paciente
+                    if (slot.medico || slot.paciente) {
                         agendaItems.push({
                             dateObj: dateObj,
                             dateStr: dateStr,
@@ -371,38 +552,24 @@
                 }
             }
         });
-
-        // Ordenar cronologicamente
         agendaItems.sort((a, b) => {
             if (a.dateObj - b.dateObj !== 0) return a.dateObj - b.dateObj;
-            // Padronizar string de tempo para ordenação (ex: "7:00" -> "07:00")
             let timeA = a.time.split(' - ')[0];
             if(timeA.length === 4) timeA = '0' + timeA;
             let timeB = b.time.split(' - ')[0];
             if(timeB.length === 4) timeB = '0' + timeB;
-            
             if (timeA < timeB) return -1;
             if (timeA > timeB) return 1;
             return 0;
         });
-
-        // Renderizar HTML
         let html = `<h2 style="color:var(--primary);">📋 Agenda Cronológica Completa</h2>`;
         html += `<table><thead><tr><th>Data</th><th>Horário</th><th>Descrição</th><th>Responsável</th></tr></thead><tbody>`;
-        
-        if (agendaItems.length === 0) {
-            html += `<tr><td colspan="4">Nenhum agendamento encontrado nas cirurgias ou eventos.</td></tr>`;
-        } else {
+        if (agendaItems.length === 0) { html += `<tr><td colspan="4">Nenhum agendamento encontrado nas cirurgias ou eventos.</td></tr>`; } 
+        else {
             agendaItems.forEach(item => {
-                html += `<tr>
-                    <td><strong>${item.dateStr}</strong></td>
-                    <td>${item.time}</td>
-                    <td class="left-text">${item.desc}</td>
-                    <td class="left-text">${item.resp}</td>
-                </tr>`;
+                html += `<tr><td><strong>${item.dateStr}</strong></td><td>${item.time}</td><td class="left-text">${item.desc}</td><td class="left-text">${item.resp}</td></tr>`;
             });
         }
-        
         html += `</tbody></table>`;
         container.innerHTML = html;
     }
@@ -411,28 +578,156 @@
 
     function onDragStart(e, tabKey, index) { dragState.tabKey = tabKey; dragState.dragIndex = index; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', index.toString()); requestAnimationFrame(() => e.target.classList.add('dragging')); } function onDragEnd(e) { e.target.classList.remove('dragging'); document.querySelectorAll('.drag-over-top, .drag-over-bottom').forEach(el => el.classList.remove('drag-over-top', 'drag-over-bottom')); dragState.tabKey = null; dragState.dragIndex = null; } function onDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; } function onDragEnter(e, element) { e.preventDefault(); document.querySelectorAll('.drag-over-top, .drag-over-bottom').forEach(el => el.classList.remove('drag-over-top', 'drag-over-bottom')); const rect = element.getBoundingClientRect(); if (e.clientY < rect.top + rect.height / 2) { element.classList.add('drag-over-top'); element.classList.remove('drag-over-bottom'); } else { element.classList.add('drag-over-bottom'); element.classList.remove('drag-over-top'); } } function onDragLeave(e, element) { if (!element.contains(e.relatedTarget)) element.classList.remove('drag-over-top', 'drag-over-bottom'); } function onDrop(e, tabKey, dropIndex) { e.preventDefault(); document.querySelectorAll('.drag-over-top, .drag-over-bottom').forEach(el => el.classList.remove('drag-over-top', 'drag-over-bottom')); const dragIndex = dragState.dragIndex; if (dragIndex === null || dragIndex === dropIndex || dragState.tabKey !== tabKey) return; const events = scheduleData[tabKey]; const draggedItem = events[dragIndex]; const rect = e.currentTarget.getBoundingClientRect(); const insertBefore = e.clientY < rect.top + rect.height / 2; events.splice(dragIndex, 1); let newIndex = dropIndex; if (dragIndex < dropIndex) newIndex = insertBefore ? dropIndex - 1 : dropIndex; else newIndex = insertBefore ? dropIndex : dropIndex + 1; events.splice(newIndex, 0, draggedItem); renderEvento(tabKey); triggerAutoSave(); }
     function moveTask(tabKey, index, direction) { const events = scheduleData[tabKey]; const newIndex = index + direction; if (newIndex < 0 || newIndex >= events.length) return; const temp = events[index]; events[index] = events[newIndex]; events[newIndex] = temp; renderEvento(tabKey); triggerAutoSave(); }
-
     function updateEvento(tabKey, index, field, value) { if(field === 'price') value = parseFloat(value) || 0; scheduleData[tabKey][index][field] = value; triggerAutoSave(); }
     function addTask(tabKey) { if (!scheduleData[tabKey]) scheduleData[tabKey] = []; scheduleData[tabKey].push({ time: "-", title: "Nova Tarefa", desc: "", resp: "", sponsor: "", price: 0, comments: "" }); renderEvento(tabKey); triggerAutoSave(); }
     function deleteTask(tabKey, index) { if(confirm("Excluir tarefa?")) { scheduleData[tabKey].splice(index, 1); renderEvento(tabKey); triggerAutoSave(); } }
 
-    function renderCirurgias(tabKey) { const container = document.getElementById('scheduleContainer'); const [hospital, date] = tabKey.split('_'); const hKey = hospital.toLowerCase(); const matOptions = Object.keys(materiais).filter(m => materiais[m][hKey] > 0); const medFilter = medicos.filter(m => { if (regrasMedicos[m] && regrasMedicos[m] !== hospital) return false; return true; }).sort(); let html = `<table><thead><tr><th>Horário</th>${salas.map(s => `<th>${s}</th>`).join('')}</tr></thead><tbody>`; times.forEach((time, timeIdx) => { const separatorClass = timeIdx < times.length - 1 ? 'time-separator' : ''; html += `<tr><td class="time-col ${separatorClass}">${time}</td>`; salas.forEach(sala => { const slot = scheduleData[tabKey][sala][time]; const usedSameTime = getUsedResourcesSameHospitalTime(hospital, date, time, sala); let medOpt = `<option value="">Selecione...</option>`; medFilter.forEach(m => { if (usedSameTime.medicos.includes(m) && slot.medico !== m) return; if (isUsedInOtherHospitalDay('medico', m, hospital, date) && slot.medico !== m) return; medOpt += `<option value="${m}" ${slot.medico === m ? 'selected' : ''}>${m}</option>`; }); let matOpt = `<option value="">Selecione...</option>`; matOptions.forEach(m => { let usedQty = 0; Object.keys(scheduleData).filter(t => t.startsWith(hospital)).forEach(tk => { salas.forEach(s => times.forEach(t => { if(scheduleData[tk][s][t].material === m) usedQty++; })); }); const restante = materiais[m][hKey] - usedQty; if (restante <= 0 && slot.material !== m) return; matOpt += `<option value="${m}" ${slot.material === m ? 'selected' : ''}>${m} (Disp: ${restante})</option>`; }); let instOpt = `<option value="">Selecione...</option>`; instrumentadores.forEach(i => { if (usedSameTime.instrumentadores.includes(i) && slot.instrumentador !== i) return; instOpt += `<option value="${i}" ${slot.instrumentador === i ? 'selected' : ''}>${i}</option>`; }); let neoOpt = `<option value="">Selecione...</option>`; neoorthos.forEach(n => { if (isUsedInOtherHospitalDay('neoortho', n, hospital, date) && slot.neoortho !== n) return; neoOpt += `<option value="${n}" ${slot.neoortho === n ? 'selected' : ''}>${n}</option>`; }); const motorDisabled = (usedSameTime.motores >= maxMotorsPerHospital && !slot.motor) ? 'disabled' : ''; const motorAlert = (motorDisabled === 'disabled') ? `<span class="alert">Esgotado</span>` : ''; html += `<td class="${separatorClass}"><div style="margin-bottom:3px;"><b>Médico:</b><select onchange="updateSlot('${tabKey}','${sala}','${time}','medico',this.value)">${medOpt}</select></div><div style="margin-bottom:3px;"><b>Paciente:</b><input type="text" value="${slot.paciente}" onchange="updateSlot('${tabKey}','${sala}','${time}','paciente',this.value)"></div><div style="margin-bottom:3px;"><b>Material:</b><select onchange="updateSlot('${tabKey}','${sala}','${time}','material',this.value)">${matOpt}</select></div><div style="margin-bottom:3px;"><b>Instrumentador:</b><select onchange="updateSlot('${tabKey}','${sala}','${time}','instrumentador',this.value)">${instOpt}</select></div><div class="checkbox-label" style="margin-bottom:3px;"><b>Motor:</b><input type="checkbox" ${slot.motor ? 'checked' : ''} ${motorDisabled} onchange="updateSlot('${tabKey}','${sala}','${time}','motor',this.checked)"> ${motorAlert}</div><div><b>Neoortho:</b><select onchange="updateSlot('${tabKey}','${sala}','${time}','neoortho',this.value)">${neoOpt}</select></div></td>`; }); html += `</tr>`; }); html += `</tbody></table>`; container.innerHTML = html; }
+    function updateSlot(tabKey, sala, time, field, value) {
+        scheduleData[tabKey][sala][time][field] = value;
+        triggerAutoSave();
+        renderCirurgias(tabKey); 
+    }
 
-    function updateSlot(tabKey, sala, time, field, value) { const [hospital, date] = tabKey.split('_'); if (field === "medico" || field === "instrumentador") { const usedSameTime = getUsedResourcesSameHospitalTime(hospital, date, time, sala); const listType = field === "medico" ? "medicos" : "instrumentadores"; if (value && usedSameTime[listType].includes(value)) { alert(`Conflito! ${value} já alocado.`); showTab(tabKey); return; } } if (field === "medico" && value) { if (isUsedInOtherHospitalDay('medico', value, hospital, date)) { alert(`Conflito!`); showTab(tabKey); return; } } if (field === "neoortho" && value) { if (isUsedInOtherHospitalDay('neoortho', value, hospital, date)) { alert(`Conflito!`); showTab(tabKey); return; } } if (field === "motor" && value === true) { const usedSameTime = getUsedResourcesSameHospitalTime(hospital, date, time, sala); if (usedSameTime.motores >= maxMotorsPerHospital) { alert(`Limite atingido!`); showTab(tabKey); return; } } scheduleData[tabKey][sala][time][field] = value; triggerAutoSave(); showTab(tabKey); }
+    // --- FUNÇÃO CORRIGIDA: AGORA PERMITE DUPLICATAS ---
+    function addMaterialToSlot(tabKey, sala, time, selectId) {
+        const select = document.getElementById(selectId);
+        const matName = select.value;
+        
+        // Se não selecionou nada, sai
+        if(!matName) return;
 
-    function toggleMaterialDetails(matName) { expandedMaterials[matName] = !expandedMaterials[matName]; renderMateriais(); }
-    function addMaterial() { const nome = document.getElementById('newMatNome').value.trim(); if (!nome) return; if (!materiais[nome]) { materiais[nome] = { chc: 0, chr: 0, components: {} }; document.getElementById('newMatNome').value = ''; renderMateriais(); triggerAutoSave(); } else { alert("Material já existe!"); } }
-    function removeMaterial(matName) { if(confirm("Excluir material?")) { delete materiais[matName]; renderMateriais(); triggerAutoSave(); } }
-    function updateEstoque(matName, hospital, value) { materiais[matName][hospital.toLowerCase()] = parseInt(value) || 0; triggerAutoSave(); }
-    function addComponent(matName) { const compName = prompt("Nome do componente:"); if (compName && compName.trim() !== "") { const compQty = prompt("Quantidade:", "1"); if (!materiais[matName].components) materiais[matName].components = {}; materiais[matName].components[compName.trim()] = parseInt(compQty) || 1; renderMateriais(); triggerAutoSave(); } }
-    function removeComponent(matName, compName) { if (materiais[matName].components) { delete materiais[matName].components[compName]; renderMateriais(); triggerAutoSave(); } }
-    function renderCadastros() { const renderList = (arr, type) => arr.map((item, i) => `<div class="list-item"><span>${item}</span><button class="btn btn-remove" onclick="removeCad('${type}', ${i})">X</button></div>`).join(''); document.getElementById('listaMedicos').innerHTML = renderList(medicos, 'medicos'); document.getElementById('listaInstrumentadores').innerHTML = renderList(instrumentadores, 'instrumentadores'); document.getElementById('listaNeoorthos').innerHTML = renderList(neoorthos, 'neoorthos'); }
-    function addMedico() { const input = document.getElementById('newMedico'); if (input.value.trim()) { medicos.push(input.value.trim()); input.value = ''; renderCadastros(); triggerAutoSave(); } }
-    function addCad(type, inputId) { const input = document.getElementById(inputId); const arr = type === 'instrumentadores' ? instrumentadores : neoorthos; if (input.value.trim()) { arr.push(input.value.trim()); input.value = ''; renderCadastros(); triggerAutoSave(); } }
-    function removeCad(type, index) { const arr = type === 'medicos' ? medicos : (type === 'instrumentadores' ? instrumentadores : neoorthos); arr.splice(index, 1); renderCadastros(); triggerAutoSave(); }
-    function renderMateriais() { const container = document.getElementById('listaMateriais'); let html = ''; for (let mat in materiais) { const m = materiais[mat]; const isExpanded = expandedMaterials[mat]; html += `<div style="border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 5px;"><div style="display: grid; grid-template-columns: 1fr 50px 50px 30px 30px; gap: 4px; align-items: center; font-size: 12px;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${mat}">${mat}</span><input type="number" class="estoque-input" value="${m.chc}" onchange="updateEstoque('${mat}','CHC',this.value)"><input type="number" class="estoque-input" value="${m.chr}" onchange="updateEstoque('${mat}','CHR',this.value)"><button class="btn-outline" onclick="toggleMaterialDetails('${mat}')">${isExpanded ? '▼' : '►'}</button><button class="btn btn-remove" onclick="removeMaterial('${mat}')">X</button></div>${isExpanded ? `<div class="mat-comp-box"><div style="display:flex; justify-content:space-between; margin-bottom:5px; font-weight:bold; font-size:11px;"><span>Componente</span><span>Qtd</span></div>${m.components ? Object.keys(m.components).map(comp => `<div class="comp-item"><span>${comp}</span><div><span>${m.components[comp]}</span> <button class="btn btn-remove" onclick="removeComponent('${mat}','${comp}')">X</button></div></div>`).join('') : ''}<button class="btn btn-add" style="margin-top:5px; width:100%;" onclick="addComponent('${mat}')">+ Componente</button></div>` : ''}</div>`; } container.innerHTML = html; }
+        const slot = scheduleData[tabKey][sala][time];
+        
+        // REMOVIDA A VERIFICAÇÃO DE DUPLICATIA: if(!slot.materiais.includes(matName))
+        // Agora adiciona sempre, pois o estoque já foi validado no dropdown.
+        slot.materiais.push(matName);
+        
+        triggerAutoSave();
+        renderCirurgias(tabKey); 
+    }
+
+    function removeMaterialFromSlot(tabKey, sala, time, index) {
+        const slot = scheduleData[tabKey][sala][time];
+        slot.materiais.splice(index, 1);
+        triggerAutoSave();
+        renderCirurgias(tabKey);
+    }
+
+    function getAllUsedPatients() {
+        let used = new Set();
+        if(scheduleData) {
+            Object.keys(scheduleData).forEach(tab => {
+                if(tab.startsWith('CHC') || tab.startsWith('CHR')) {
+                    Object.keys(scheduleData[tab]).forEach(sala => {
+                        Object.keys(scheduleData[tab][sala]).forEach(time => {
+                            const p = scheduleData[tab][sala][time].paciente;
+                            if(p) used.add(p);
+                        });
+                    });
+                }
+            });
+        }
+        return used;
+    }
+
+    function renderCirurgias(tabKey) { 
+        const container = document.getElementById('scheduleContainer'); 
+        const [hospital, date] = tabKey.split('_'); 
+        const hKey = hospital.toLowerCase(); 
+        const medFilter = medicos.filter(m => { if (regrasMedicos[m] && regrasMedicos[m] !== hospital) return false; return true; }).sort(); 
+        const globallyUsedPatients = getAllUsedPatients();
+
+        let html = `<table><thead><tr><th>Horário</th>${salas.map(s => `<th>${s}</th>`).join('')}</tr></thead><tbody>`; 
+        
+        times.forEach((time, timeIdx) => { 
+            const separatorClass = timeIdx < times.length - 1 ? 'time-separator' : ''; 
+            html += `<tr><td class="time-col ${separatorClass}">${time}</td>`; 
+            
+            salas.forEach(sala => { 
+                const slot = scheduleData[tabKey][sala][time]; 
+                const usedSameTime = getUsedResourcesSameHospitalTime(hospital, date, time, sala); 
+                
+                let medOpt = `<option value="">Selecione...</option>`; 
+                medFilter.forEach(m => { 
+                    if (usedSameTime.medicos.includes(m) && slot.medico !== m) return; 
+                    if (isUsedInOtherHospitalDay('medico', m, hospital, date) && slot.medico !== m) return; 
+                    medOpt += `<option value="${m}" ${slot.medico === m ? 'selected' : ''}>${m}</option>`; 
+                }); 
+                
+                let instOpt = `<option value="">Selecione...</option>`; 
+                instrumentadores.forEach(i => { 
+                    if (usedSameTime.instrumentadores.includes(i) && slot.instrumentador !== i) return; 
+                    instOpt += `<option value="${i}" ${slot.instrumentador === i ? 'selected' : ''}>${i}</option>`; 
+                }); 
+                
+                let neoOpt = `<option value="">Selecione...</option>`; 
+                neoorthos.forEach(n => { 
+                    if (isUsedInOtherHospitalDay('neoortho', n, hospital, date) && slot.neoortho !== n) return; 
+                    neoOpt += `<option value="${n}" ${slot.neoortho === n ? 'selected' : ''}>${n}</option>`; 
+                }); 
+
+                let pacOpt = `<option value="">Selecione...</option>`;
+                if(patientsDB) {
+                    Object.values(patientsDB).forEach(p => {
+                        if(p.hospital && p.hospital !== hospital) return;
+                        if(globallyUsedPatients.has(p.name) && slot.paciente !== p.name) return;
+                        pacOpt += `<option value="${p.name}" ${slot.paciente === p.name ? 'selected' : ''}>${p.name}</option>`;
+                    });
+                }
+
+                // Logic Dropdown Material (Stock Check)
+                let currentHospitalMatUsage = {};
+                Object.keys(scheduleData).filter(t => t.startsWith(hospital)).forEach(tk => {
+                    salas.forEach(s => times.forEach(t => {
+                        const m = scheduleData[tk][s][t].materiais || [];
+                        m.forEach(matName => {
+                            currentHospitalMatUsage[matName] = (currentHospitalMatUsage[matName] || 0) + 1;
+                        });
+                    }));
+                });
+
+                let matOpt = `<option value="">Adicionar Material...</option>`;
+                Object.keys(materiais).forEach(m => { 
+                    const stock = materiais[m][hKey];
+                    const used = currentHospitalMatUsage[m] || 0;
+                    const remaining = stock - used;
+                    if (remaining > 0) {
+                         matOpt += `<option value="${m}">${m} (Disp: ${remaining})</option>`; 
+                    }
+                }); 
+
+                const motorDisabled = (usedSameTime.motores >= maxMotorsPerHospital && !slot.motor) ? 'disabled' : ''; 
+                const motorAlert = (motorDisabled === 'disabled') ? `<span class="alert">Esgotado</span>` : ''; 
+                
+                let tagsHtml = '';
+                (slot.materiais || []).forEach((m, idx) => {
+                    tagsHtml += `<div class="mat-tag" onclick="removeMaterialFromSlot('${tabKey}','${sala}','${time}',${idx})">${m} <span>✕</span></div>`;
+                });
+
+                html += `<td class="${separatorClass}">
+                    <div style="margin-bottom:3px;"><b>Médico:</b><select onchange="updateSlot('${tabKey}','${sala}','${time}','medico',this.value)">${medOpt}</select></div>
+                    <div style="margin-bottom:3px;"><b>Paciente:</b><select onchange="updateSlot('${tabKey}','${sala}','${time}','paciente',this.value)">${pacOpt}</select></div>
+                    <div style="margin-bottom:3px;"><b>Materiais:</b>
+                        <div style="min-height:20px; margin-bottom:2px;">${tagsHtml}</div>
+                        <div style="display:flex; gap:2px;">
+                            <select id="mat-add-${sala}-${time}" style="flex:1;">${matOpt}</select>
+                            <button class="btn btn-add" style="width:30px;" onclick="addMaterialToSlot('${tabKey}','${sala}','${time}','mat-add-${sala}-${time}')">+</button>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:3px;"><b>Instrumentador:</b><select onchange="updateSlot('${tabKey}','${sala}','${time}','instrumentador',this.value)">${instOpt}</select></div>
+                    <div style="margin-bottom:3px;"><b>Motor:</b> <input type="checkbox" onchange="updateSlot('${tabKey}','${sala}','${time}','motor',this.checked)" ${slot.motor ? 'checked' : ''} ${motorDisabled}> ${motorAlert}</div>
+                    <div style="margin-bottom:0px;"><b>Resp. Neo:</b><select onchange="updateSlot('${tabKey}','${sala}','${time}','neoortho',this.value)">${neoOpt}</select></div>
+                    <div style="margin-top:3px; margin-bottom:0px;"><b>Obs:</b><input type="text" value="${slot.observacao || ''}" placeholder="Observações..." onchange="updateSlot('${tabKey}','${sala}','${time}','observacao',this.value)"></div>
+                </td>`; 
+            }); 
+            html += `</tr>`; 
+        }); 
+        html += `</tbody></table>`; 
+        container.innerHTML = html; 
+    }
 
     loadDataFromCloud();
+
 </script>
 </body>
 </html>
