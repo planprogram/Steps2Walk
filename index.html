@@ -421,7 +421,7 @@
 <div class="modal-overlay" id="modalNewPatient">
     <div class="modal modal-wide">
         <div class="modal-header">
-            <h2 data-i18n="mod_newpat">＋ Cadastrar Novo Paciente</h2>
+            <h2 id="patientModalTitle" data-i18n="mod_newpat">＋ Cadastrar Novo Paciente</h2>
             <p data-i18n="mod_newpatdesc">Preencha os dados e adicione até 5 fotos do paciente.</p>
         </div>
         <div class="modal-body">
@@ -472,6 +472,7 @@
         <div class="modal-header"><h2 id="detailTitle">Detalhes do Paciente</h2></div>
         <div class="modal-body" id="detailBody"></div>
         <div class="modal-footer">
+            <button class="btn btn-primary" onclick="editPatient()" data-i18n="btn_edit">Editar Paciente</button>
             <button class="btn btn-danger" id="detailDeleteBtn" data-i18n="btn_delete">Excluir Paciente</button>
             <button class="btn btn-outline" onclick="closeModal('modalPatientDetail')" data-i18n="btn_close">Fechar</button>
         </div>
@@ -481,7 +482,7 @@
 <div class="modal-overlay" id="modalNewMeeting">
     <div class="modal modal-wide">
         <div class="modal-header blue">
-            <h2 data-i18n="mod_newmeet">＋ Criar Novo Evento</h2>
+            <h2 id="meetingModalTitle" data-i18n="mod_newmeet">＋ Criar Novo Evento</h2>
             <p data-i18n="mod_newmeetdesc">Registre um evento ou reunião com fotos e descrição.</p>
         </div>
         <div class="modal-body">
@@ -518,6 +519,7 @@
         <div class="modal-header blue"><h2 id="meetingDetailTitle" data-i18n="mod_meetdetail">Detalhes do Evento</h2></div>
         <div class="modal-body" id="meetingDetailBody"></div>
         <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="editMeeting()" data-i18n="btn_edit">Editar Evento</button>
             <button class="btn btn-danger" id="meetingDeleteBtn" data-i18n="btn_delete">Excluir Evento</button>
             <button class="btn btn-outline" onclick="closeModal('modalMeetingDetail')" data-i18n="btn_close">Fechar</button>
         </div>
@@ -588,13 +590,15 @@
         'mod_restricted': { pt: 'Acesso Restrito', en: 'Restricted Access' },
         'mod_pwinstructions': { pt: 'Digite a senha para acessar', en: 'Enter the password to access' },
         'mod_pwwrong': { pt: 'Senha incorreta.', en: 'Incorrect password.' },
-        'btn_cancel': { pt: 'Cancelar', en: 'Cancel' }, 'btn_enter': { pt: 'Entrar', en: 'Enter' }, 'btn_close': { pt: 'Fechar', en: 'Close' }, 'btn_delete': { pt: 'Excluir', en: 'Delete' },
+        'btn_cancel': { pt: 'Cancelar', en: 'Cancel' }, 'btn_enter': { pt: 'Entrar', en: 'Enter' }, 'btn_close': { pt: 'Fechar', en: 'Close' }, 'btn_delete': { pt: 'Excluir', en: 'Delete' }, 'btn_edit': { pt: 'Editar', en: 'Edit' },
         'mod_newpat': { pt: '＋ Cadastrar Novo Paciente', en: '＋ Register New Patient' },
+        'mod_editpat': { pt: '✏️ Editar Paciente', en: '✏️ Edit Patient' },
         'mod_newpatdesc': { pt: 'Preencha os dados e adicione até 5 fotos do paciente.', en: 'Fill in the details and add up to 5 photos of the patient.' },
         'lbl_patname': { pt: 'Nome do Paciente *', en: 'Patient Name *' }, 'lbl_pathosp': { pt: 'Hospital *', en: 'Hospital *' }, 'lbl_patdoc': { pt: 'Médico Responsável', en: 'Responsible Doctor' }, 'lbl_patproc': { pt: 'Procedimento', en: 'Procedure' }, 'lbl_patobs': { pt: 'Descrição / Observações', en: 'Description / Notes' }, 'lbl_patphotos': { pt: 'Fotos do Paciente', en: 'Patient Photos' },
         'hint_photos': { pt: 'Selecione até 5 fotos (pré-operatório, pós-operatório, radiografias)', en: 'Select up to 5 photos (pre-op, post-op, x-rays)' },
         'btn_savepat': { pt: 'Salvar Paciente', en: 'Save Patient' },
         'mod_newmeet': { pt: '＋ Criar Novo Evento', en: '＋ Create New Event' },
+        'mod_editmeet': { pt: '✏️ Editar Evento', en: '✏️ Edit Event' },
         'mod_newmeetdesc': { pt: 'Registre um evento ou reunião com fotos e descrição.', en: 'Register an event or meeting with photos and description.' },
         'lbl_meettitle': { pt: 'Título do Evento *', en: 'Event Title *' }, 'lbl_meetdate': { pt: 'Data', en: 'Date' }, 'lbl_meetdesc': { pt: 'Descrição', en: 'Description' }, 'lbl_meetphotos': { pt: 'Fotos do Evento', en: 'Event Photos' },
         'hint_addphotos': { pt: 'Adicione fotos do evento', en: 'Add event photos' },
@@ -638,6 +642,12 @@
     let lightboxImages = [];
     let lightboxIndex = 0;
 
+    // Variáveis de Edição
+    let editingPatientId = null;
+    let editingMeetingId = null;
+    let currentDetailPatientId = null;
+    let currentDetailMeetingId = null;
+
     // URL do planejamento no GitHub Pages
     const PLANEJAMENTO_URL = 'https://planprogram.github.io/Steps2Walk/planejamento.html';
 
@@ -661,87 +671,76 @@
             p.style.width = p.style.height = Math.random() * 20 + 5 + 'px';
             p.style.left = Math.random() * 100 + '%';
             p.style.top = Math.random() * 100 + '%';
-            p.style.animationDelay = Math.random() * 5 + 's';
+            p.style.animationDuration = (Math.random() * 4 + 4) + 's';
+            p.style.animationDelay = (Math.random() * 2) + 's';
             c.appendChild(p);
         }
     }
 
-    // ==================== NAVEGACAO ====================
-    function switchView(id) {
-        // Esconde todas as views
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        window.scrollTo(0, 0);
-
-        // Controle dos FABs
-        document.getElementById('fabHome').style.display = 
-            (id === 'viewPlanejamento') ? 'flex' : 'none';
-        document.getElementById('fabAddPatient').style.display = 
-            (id === 'viewPacientes') ? 'flex' : 'none';
-        document.getElementById('fabAddMeeting').style.display = 
-            (id === 'viewReunioes') ? 'flex' : 'none';
-
-        // ✅ CARREGA O IFRAME DO PLANEJAMENTO
-        if (id === 'viewPlanejamento') {
-            const iframe = document.getElementById('planejamentoIframe');
-            const loading = document.getElementById('iframeLoading');
-            // Mostra loading e carrega iframe
-            loading.style.display = 'flex';
-            iframe.style.display = 'none';
-            // Só carrega se ainda não foi carregado ou se o src está vazio
-            if (!iframe.src || !iframe.src.includes('planejamento.html')) {
-                iframe.src = PLANEJAMENTO_URL;
-            } else {
-                // Já carregado, só mostra
-                iframe.style.display = 'block';
-                loading.style.display = 'none';
-            }
-        }
-
-        // Esconde a navbar quando estiver no planejamento (iframe full-screen)
-        document.getElementById('navbar').style.display = 
-            (id === 'viewPlanejamento') ? 'none' : '';
+    function renderDoctors() {
+        const grid = document.getElementById('doctorGrid');
+        grid.innerHTML = '';
+        doctors.forEach(name => {
+            const initials = name.replace(/Dr\.|Dra\./g, '').trim().split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+            const div = document.createElement('div');
+            div.className = 'doctor-item-enhanced';
+            div.innerHTML = `<div class="doctor-avatar-enhanced">${initials}</div><div class="doctor-name-enhanced">${name}</div>`;
+            grid.appendChild(div);
+        });
     }
 
+    // ==================== NAVEGAÇÃO ====================
     function goHome() {
-        switchView('viewHome');
-        document.getElementById('navbar').style.display = '';
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById('viewHome').classList.add('active');
+        document.getElementById('fabHome').style.display = 'none';
+        document.getElementById('fabAddPatient').style.display = 'none';
+        document.getElementById('fabAddMeeting').style.display = 'none';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function scrollToSection(id) {
-        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
     }
 
-    // ==================== SENHA ====================
+    function showView(viewId) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById(viewId).classList.add('active');
+        document.getElementById('fabHome').style.display = 'flex';
+
+        document.getElementById('fabAddPatient').style.display = 'none';
+        document.getElementById('fabAddMeeting').style.display = 'none';
+
+        if (viewId === 'viewPacientes') {
+            document.getElementById('fabAddPatient').style.display = 'flex';
+        } else if (viewId === 'viewReunioes') {
+            document.getElementById('fabAddMeeting').style.display = 'flex';
+        } else if (viewId === 'viewPlanejamento') {
+            const iframe = document.getElementById('planejamentoIframe');
+            if (!iframe.src) {
+                document.getElementById('iframeLoading').style.display = 'flex';
+                iframe.src = PLANEJAMENTO_URL;
+            }
+        }
+    }
+
     function openPassword(target) {
         currentPasswordTarget = target;
         document.getElementById('pwInput').value = '';
         document.getElementById('pwError').style.display = 'none';
         openModal('modalPassword');
-        setTimeout(() => document.getElementById('pwInput').focus(), 200);
+        setTimeout(() => document.getElementById('pwInput').focus(), 100);
     }
 
     function checkPassword() {
-        const input = document.getElementById('pwInput');
-        const error = document.getElementById('pwError');
-        
-        if (input.value === PASSWORD) {
+        const pw = document.getElementById('pwInput').value;
+        if (pw === PASSWORD) {
             closeModal('modalPassword');
-            input.value = '';
-            error.style.display = 'none';
-            
-            if (currentPasswordTarget === 'pacientes') {
-                switchView('viewPacientes');
-            } else if (currentPasswordTarget === 'reunioes') {
-                switchView('viewReunioes');
-            } else if (currentPasswordTarget === 'planejamento') {
-                switchView('viewPlanejamento');
-            }
-            currentPasswordTarget = null;
+            if (currentPasswordTarget === 'pacientes') showView('viewPacientes');
+            else if (currentPasswordTarget === 'reunioes') showView('viewReunioes');
+            else if (currentPasswordTarget === 'planejamento') showView('viewPlanejamento');
         } else {
-            error.style.display = 'block';
-            input.value = '';
-            input.focus();
+            document.getElementById('pwError').style.display = 'block';
         }
     }
 
@@ -749,26 +748,26 @@
     function openModal(id) {
         document.getElementById(id).classList.add('active');
     }
+
     function closeModal(id) {
         document.getElementById(id).classList.remove('active');
     }
 
-    // ==================== DOCTORS ====================
-    function renderDoctors() {
-        const grid = document.getElementById('doctorGrid');
-        grid.innerHTML = doctors.map(d => {
-            const parts = d.replace(/^(Dr|Dra)\.\s*/, '').split(' ');
-            const initials = parts.length >= 2 
-                ? (parts[0][0] + parts[parts.length-1][0]).toUpperCase() 
-                : parts[0].substring(0,2).toUpperCase();
-            return `<div class="doctor-item-enhanced">
-                <div class="doctor-avatar-enhanced">${initials}</div>
-                <div class="doctor-name-enhanced">${d}</div>
-            </div>`;
-        }).join('');
+    // ==================== TOAST ====================
+    function showToast(msg, type = 'info') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerText = msg;
+        container.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(20px)';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
     }
 
-    // ==================== PATIENTS ====================
+    // ==================== FIREBASE LISTENERS ====================
     function loadPatientsFromDB() {
         db.ref('patients').on('value', snap => {
             patients = [];
@@ -779,170 +778,6 @@
         });
     }
 
-    function renderPatients() {
-        const search = (document.getElementById('patientSearch')?.value || '').toLowerCase();
-        const filtered = patients.filter(p => 
-            p.name?.toLowerCase().includes(search) || 
-            p.doctor?.toLowerCase().includes(search)
-        );
-        
-        const list = document.getElementById('patientList');
-        const count = document.getElementById('patientCount');
-        count.innerText = `${filtered.length} paciente${filtered.length !== 1 ? 's' : ''}`;
-        
-        if (filtered.length === 0) {
-            list.innerHTML = `<div class="empty-state"><h3>Nenhum paciente encontrado</h3><p>Utilize o botão para cadastrar</p></div>`;
-            return;
-        }
-        
-        list.innerHTML = filtered.map(p => `
-            <div class="patient-card" onclick="openPatientDetail('${p.id}')">
-                <div class="patient-card-top">
-                    <div class="patient-card-name">${p.name || 'Sem nome'}</div>
-                    <div class="patient-card-hospital">${p.hospital || ''}</div>
-                </div>
-                <div class="patient-card-info">Médico: ${p.doctor || '-'}</div>
-                <div class="patient-card-info">Procedimento: ${p.procedure || '-'}</div>
-                <div class="patient-card-photos">${p.photos ? p.photos.length + ' foto(s)' : ''}</div>
-            </div>
-        `).join('');
-    }
-
-    function handlePatientPhotoSelect(input) {
-        const files = Array.from(input.files);
-        const maxPhotos = 5;
-        const available = maxPhotos - tempPatientPhotos.length;
-        const toProcess = files.slice(0, available);
-        
-        toProcess.forEach(file => {
-            const reader = new FileReader();
-            reader.onload = e => {
-                compressImage(e.target.result, 800, 0.7, dataUrl => {
-                    tempPatientPhotos.push(dataUrl);
-                    renderPatientPhotoPreview();
-                });
-            };
-            reader.readAsDataURL(file);
-        });
-    }
-
-    function compressImage(src, maxW, quality, callback) {
-        const img = new Image();
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            let w = img.width, h = img.height;
-            if (w > maxW) { h = (maxW / w) * h; w = maxW; }
-            canvas.width = w; canvas.height = h;
-            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-            callback(canvas.toDataURL('image/jpeg', quality));
-        };
-        img.src = src;
-    }
-
-    function renderPatientPhotoPreview() {
-        const container = document.getElementById('pPhotoPreview');
-        const counter = document.getElementById('pPhotoCounter');
-        counter.innerText = `${tempPatientPhotos.length} / 5 fotos`;
-        counter.className = 'form-counter ' + (tempPatientPhotos.length >= 5 ? 'limit' : tempPatientPhotos.length >= 4 ? 'warn' : 'ok');
-        
-        container.innerHTML = tempPatientPhotos.map((photo, i) => `
-            <div class="photo-preview-item">
-                <img src="${photo}" alt="Foto ${i+1}">
-                <button class="remove-photo" onclick="removePatientPhoto(${i})">&#10005;</button>
-            </div>
-        `).join('');
-    }
-
-    function removePatientPhoto(index) {
-        tempPatientPhotos.splice(index, 1);
-        renderPatientPhotoPreview();
-    }
-
-    function clearPatientForm() {
-        document.getElementById('pName').value = '';
-        document.getElementById('pHospital').value = '';
-        document.getElementById('pDoctor').value = '';
-        document.getElementById('pProcedure').value = '';
-        document.getElementById('pComments').value = '';
-        document.getElementById('pPhotos').value = '';
-        tempPatientPhotos = [];
-        renderPatientPhotoPreview();
-    }
-
-    function savePatient() {
-        const name = document.getElementById('pName').value.trim();
-        const hospital = document.getElementById('pHospital').value;
-        if (!name || !hospital) { showToast('Preencha nome e hospital', 'error'); return; }
-        
-        const patientData = {
-            name,
-            hospital,
-            doctor: document.getElementById('pDoctor').value.trim(),
-            procedure: document.getElementById('pProcedure').value.trim(),
-            comments: document.getElementById('pComments').value.trim(),
-            photos: tempPatientPhotos,
-            createdAt: new Date().toISOString()
-        };
-        
-        db.ref('patients').push(patientData).then(() => {
-            showToast('Paciente cadastrado com sucesso!', 'success');
-            closeModal('modalNewPatient');
-            clearPatientForm();
-        }).catch(err => {
-            showToast('Erro ao salvar: ' + err.message, 'error');
-        });
-    }
-
-    function openPatientDetail(id) {
-        const p = patients.find(pt => pt.id === id);
-        if (!p) return;
-        
-        document.getElementById('detailTitle').innerText = p.name || 'Paciente';
-        
-        let html = `
-            <div style="margin-bottom:12px">
-                <div style="font-size:12px;color:var(--gray-light);margin-bottom:4px">Hospital</div>
-                <div style="font-weight:600">${p.hospital || '-'}</div>
-            </div>
-            <div style="margin-bottom:12px">
-                <div style="font-size:12px;color:var(--gray-light);margin-bottom:4px">Médico</div>
-                <div style="font-weight:600">${p.doctor || '-'}</div>
-            </div>
-            <div style="margin-bottom:12px">
-                <div style="font-size:12px;color:var(--gray-light);margin-bottom:4px">Procedimento</div>
-                <div style="font-weight:600">${p.procedure || '-'}</div>
-            </div>
-            <div style="margin-bottom:12px">
-                <div style="font-size:12px;color:var(--gray-light);margin-bottom:4px">Observações</div>
-                <div>${p.comments || '-'}</div>
-            </div>
-        `;
-        
-        if (p.photos && p.photos.length > 0) {
-            html += `<div style="font-size:12px;color:var(--gray-light);margin-bottom:8px">Fotos</div>`;
-            html += `<div class="photo-grid">`;
-            p.photos.forEach((photo, i) => {
-                html += `<img src="${photo}" alt="Foto ${i+1}" onclick="openLightbox(${JSON.stringify(p.photos).replace(/"/g, '&quot;')}, ${i})">`;
-            });
-            html += `</div>`;
-        }
-        
-        document.getElementById('detailBody').innerHTML = html;
-        
-        const deleteBtn = document.getElementById('detailDeleteBtn');
-        deleteBtn.onclick = () => {
-            if (confirm('Excluir este paciente?')) {
-                db.ref('patients/' + id).remove().then(() => {
-                    showToast('Paciente excluído', 'info');
-                    closeModal('modalPatientDetail');
-                });
-            }
-        };
-        
-        openModal('modalPatientDetail');
-    }
-
-    // ==================== MEETINGS ====================
     function loadMeetingsFromDB() {
         db.ref('meetings').on('value', snap => {
             meetings = [];
@@ -953,33 +788,270 @@
         });
     }
 
-    function renderMeetings() {
-        const list = document.getElementById('meetingList');
-        
-        if (meetings.length === 0) {
-            list.innerHTML = `<div class="empty-state"><h3>Nenhum evento cadastrado</h3><p>Utilize o botão para criar</p></div>`;
+    // ==================== PATIENTS ====================
+    function renderPatients() {
+        const list = document.getElementById('patientList');
+        const search = document.getElementById('patientSearch').value.toLowerCase();
+        list.innerHTML = '';
+
+        const filtered = patients.filter(p => 
+            !search || (p.name && p.name.toLowerCase().includes(search)) || (p.doctor && p.doctor.toLowerCase().includes(search))
+        );
+
+        document.getElementById('patientCount').innerText = `${filtered.length} pacientes`;
+
+        if (filtered.length === 0) {
+            list.innerHTML = `<div class="empty-state"><h3>Nenhum paciente encontrado</h3><p>Clique em + para cadastrar.</p></div>`;
             return;
         }
+
+        filtered.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'patient-card';
+            card.onclick = () => openPatientDetail(p.id);
+            card.innerHTML = `
+                <div class="patient-card-top">
+                    <div class="patient-card-name">${p.name || 'Sem Nome'}</div>
+                    <div class="patient-card-hospital">${p.hospital || ''}</div>
+                </div>
+                <div class="patient-card-info">👤 ${p.doctor || 'Não informado'}</div>
+                <div class="patient-card-info">⚕️ ${p.procedure || 'Não informado'}</div>
+                ${p.photos && p.photos.length > 0 ? `<div class="patient-card-photos">📷 ${p.photos.length} fotos</div>` : ''}
+            `;
+            list.appendChild(card);
+        });
+    }
+
+    function openPatientDetail(id) {
+        currentDetailPatientId = id; // Salva ID para edição
+        const patient = patients.find(p => p.id === id);
+        if (!patient) return;
+
+        document.getElementById('detailTitle').innerText = patient.name || 'Detalhes';
         
-        list.innerHTML = `<div class="meeting-grid">${meetings.map(m => {
-            const coverPhoto = m.photos && m.photos.length > 0 ? m.photos[0] : '';
-            const dateStr = m.date ? new Date(m.date + 'T12:00:00').toLocaleDateString('pt-BR') : '';
-            return `
-                <div class="meeting-card" onclick="openMeetingDetail('${m.id}')">
-                    <div class="meeting-cover">
-                        ${coverPhoto ? `<img src="${coverPhoto}" alt="${m.title}">` : ''}
-                        <div class="meeting-cover-overlay"></div>
-                        ${dateStr ? `<div class="meeting-cover-badge">${dateStr}</div>` : ''}
-                        <button class="meeting-cover-delete" onclick="event.stopPropagation(); deleteMeeting('${m.id}')" title="Excluir">&#10005;</button>
-                    </div>
-                    <div class="meeting-card-body">
-                        <div class="meeting-card-title">${m.title || 'Sem título'}</div>
-                        ${dateStr ? `<div class="meeting-card-date">${dateStr}</div>` : ''}
-                        <div class="meeting-card-desc">${m.description || ''}</div>
-                    </div>
+        let photosHtml = '';
+        if (patient.photos && patient.photos.length > 0) {
+            photosHtml = `<div class="photo-grid">${patient.photos.map((src, i) => `<img src="${src}" onclick="openLightbox(${JSON.stringify(patient.photos).replace(/"/g, '&quot;')}, ${i})">`).join('')}</div>`;
+        }
+
+        document.getElementById('detailBody').innerHTML = `
+            <p style="margin-bottom:8px"><strong>Hospital:</strong> ${patient.hospital || 'Não informado'}</p>
+            <p style="margin-bottom:8px"><strong>Médico:</strong> ${patient.doctor || 'Não informado'}</p>
+            <p style="margin-bottom:8px"><strong>Procedimento:</strong> ${patient.procedure || 'Não informado'}</p>
+            <p style="margin-bottom:12px"><strong>Observações:</strong><br>${patient.comments || 'Sem observações'}</p>
+            ${photosHtml}
+        `;
+
+        document.getElementById('detailDeleteBtn').onclick = () => deletePatient(id);
+        openModal('modalPatientDetail');
+    }
+
+    function deletePatient(id) {
+        if (confirm("Tem certeza que deseja excluir este paciente?")) {
+            db.ref('patients/' + id).remove()
+                .then(() => {
+                    showToast('Paciente excluído!', 'success');
+                    closeModal('modalPatientDetail');
+                })
+                .catch(err => showToast('Erro ao excluir: ' + err.message, 'error'));
+        }
+    }
+
+    function handlePatientPhotoSelect(input) {
+        const files = Array.from(input.files);
+        const remainingSlots = 5 - tempPatientPhotos.length;
+        
+        if (files.length > remainingSlots) {
+            showToast(`Você só pode adicionar mais ${remainingSlots} fotos.`, 'error');
+            return;
+        }
+
+        files.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = e => {
+                tempPatientPhotos.push(e.target.result);
+                renderPatientPhotoPreview();
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function removePatientPhoto(index) {
+        tempPatientPhotos.splice(index, 1);
+        renderPatientPhotoPreview();
+    }
+
+    function renderPatientPhotoPreview() {
+        const preview = document.getElementById('pPhotoPreview');
+        preview.innerHTML = '';
+        document.getElementById('pPhotoCounter').innerText = `${tempPatientPhotos.length} / 5 fotos`;
+        tempPatientPhotos.forEach((src, index) => {
+            const item = document.createElement('div');
+            item.className = 'photo-preview-item';
+            item.innerHTML = `<img src="${src}" alt="Preview"><button class="remove-photo" onclick="removePatientPhoto(${index})">×</button>`;
+            preview.appendChild(item);
+        });
+    }
+
+    function clearPatientForm() {
+        editingPatientId = null; // Reseta modo edição
+        
+        const titleEl = document.getElementById('patientModalTitle');
+        titleEl.setAttribute('data-i18n', 'mod_newpat');
+        titleEl.innerText = currentLang === 'pt' ? '＋ Cadastrar Novo Paciente' : '＋ Register New Patient';
+
+        document.getElementById('pName').value = '';
+        document.getElementById('pHospital').value = '';
+        document.getElementById('pDoctor').value = '';
+        document.getElementById('pProcedure').value = '';
+        document.getElementById('pComments').value = '';
+        document.getElementById('pPhotos').value = '';
+        tempPatientPhotos = [];
+        document.getElementById('pPhotoPreview').innerHTML = '';
+        document.getElementById('pPhotoCounter').innerText = '0 / 5 fotos';
+    }
+
+    function editPatient() {
+        if (!currentDetailPatientId) return;
+        const patient = patients.find(p => p.id === currentDetailPatientId);
+        if (!patient) return;
+
+        closeModal('modalPatientDetail');
+        
+        const titleEl = document.getElementById('patientModalTitle');
+        titleEl.removeAttribute('data-i18n');
+        titleEl.innerText = currentLang === 'pt' ? '✏️ Editar Paciente' : '✏️ Edit Patient';
+
+        document.getElementById('pName').value = patient.name || '';
+        document.getElementById('pHospital').value = patient.hospital || '';
+        document.getElementById('pDoctor').value = patient.doctor || '';
+        document.getElementById('pProcedure').value = patient.procedure || '';
+        document.getElementById('pComments').value = patient.comments || '';
+        
+        tempPatientPhotos = patient.photos ? [...patient.photos] : [];
+        renderPatientPhotoPreview();
+        document.getElementById('pPhotos').value = '';
+
+        editingPatientId = patient.id;
+        openModal('modalNewPatient');
+    }
+
+    function savePatient() {
+        const name = document.getElementById('pName').value.trim();
+        const hospital = document.getElementById('pHospital').value;
+        
+        if (!name || !hospital) {
+            showToast('Preencha os campos obrigatórios (*)', 'error');
+            return;
+        }
+
+        const patientData = {
+            name: name,
+            hospital: hospital,
+            doctor: document.getElementById('pDoctor').value.trim(),
+            procedure: document.getElementById('pProcedure').value.trim(),
+            comments: document.getElementById('pComments').value.trim(),
+            photos: tempPatientPhotos,
+            updatedAt: firebase.database.ServerValue.TIMESTAMP
+        };
+
+        if (editingPatientId) {
+            // MODO EDIÇÃO
+            db.ref('patients/' + editingPatientId).update(patientData)
+                .then(() => {
+                    showToast('Paciente atualizado com sucesso!', 'success');
+                    closeModal('modalNewPatient');
+                    clearPatientForm();
+                })
+                .catch(err => showToast('Erro ao atualizar: ' + err.message, 'error'));
+        } else {
+            // MODO CRIAÇÃO
+            patientData.createdAt = firebase.database.ServerValue.TIMESTAMP;
+            db.ref('patients').push(patientData)
+                .then(() => {
+                    showToast('Paciente cadastrado com sucesso!', 'success');
+                    closeModal('modalNewPatient');
+                    clearPatientForm();
+                })
+                .catch(err => showToast('Erro ao salvar: ' + err.message, 'error'));
+        }
+    }
+
+    // ==================== MEETINGS ====================
+    function renderMeetings() {
+        const list = document.getElementById('meetingList');
+        list.innerHTML = '';
+
+        if (meetings.length === 0) {
+            list.innerHTML = `<div class="empty-state"><h3>Nenhum evento encontrado</h3><p>Clique em + para criar.</p></div>`;
+            return;
+        }
+
+        const sorted = [...meetings].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+
+        const grid = document.createElement('div');
+        grid.className = 'meeting-grid';
+
+        sorted.forEach(m => {
+            const card = document.createElement('div');
+            card.className = 'meeting-card';
+            card.onclick = (e) => {
+                if (!e.target.classList.contains('meeting-cover-delete')) openMeetingDetail(m.id);
+            };
+            
+            const coverImg = m.photos && m.photos.length > 0 ? m.photos[0] : '';
+            const dateStr = m.date ? new Date(m.date + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Sem data';
+
+            card.innerHTML = `
+                <div class="meeting-cover">
+                    ${coverImg ? `<img src="${coverImg}" alt="Capa">` : ''}
+                    <div class="meeting-cover-overlay"></div>
+                    <div class="meeting-cover-badge">${dateStr}</div>
+                    <button class="meeting-cover-delete" onclick="event.stopPropagation();deleteMeeting('${m.id}')">🗑</button>
+                </div>
+                <div class="meeting-card-body">
+                    <div class="meeting-card-title">${m.title || 'Sem Título'}</div>
+                    <div class="meeting-card-date">${m.photos && m.photos.length > 0 ? `📷 ${m.photos.length} fotos` : ''}</div>
+                    <div class="meeting-card-desc">${m.description || ''}</div>
                 </div>
             `;
-        }).join('')}</div>`;
+            grid.appendChild(card);
+        });
+
+        list.appendChild(grid);
+    }
+
+    function openMeetingDetail(id) {
+        currentDetailMeetingId = id; // Salva ID para edição
+        const meeting = meetings.find(m => m.id === id);
+        if (!meeting) return;
+
+        document.getElementById('meetingDetailTitle').innerText = meeting.title || 'Detalhes';
+        
+        let photosHtml = '';
+        if (meeting.photos && meeting.photos.length > 0) {
+            photosHtml = `<div class="photo-grid">${meeting.photos.map((src, i) => `<img src="${src}" onclick="openLightbox(${JSON.stringify(meeting.photos).replace(/"/g, '&quot;')}, ${i})">`).join('')}</div>`;
+        }
+
+        document.getElementById('meetingDetailBody').innerHTML = `
+            <p style="margin-bottom:8px"><strong>Data:</strong> ${meeting.date ? new Date(meeting.date + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }) : 'Não definida'}</p>
+            <p style="margin-bottom:12px"><strong>Descrição:</strong><br>${meeting.description || 'Sem descrição'}</p>
+            ${photosHtml}
+        `;
+
+        document.getElementById('meetingDeleteBtn').onclick = () => deleteMeeting(id);
+        openModal('modalMeetingDetail');
+    }
+
+    function deleteMeeting(id) {
+        if (confirm("Tem certeza que deseja excluir este evento?")) {
+            db.ref('meetings/' + id).remove()
+                .then(() => {
+                    showToast('Evento excluído!', 'success');
+                    closeModal('modalMeetingDetail');
+                })
+                .catch(err => showToast('Erro ao excluir: ' + err.message, 'error'));
+        }
     }
 
     function handleMeetingPhotoSelect(input) {
@@ -987,23 +1059,11 @@
         files.forEach(file => {
             const reader = new FileReader();
             reader.onload = e => {
-                compressImage(e.target.result, 800, 0.7, dataUrl => {
-                    tempMeetingPhotos.push(dataUrl);
-                    renderMeetingPhotoPreview();
-                });
+                tempMeetingPhotos.push(e.target.result);
+                renderMeetingPhotoPreview();
             };
             reader.readAsDataURL(file);
         });
-    }
-
-    function renderMeetingPhotoPreview() {
-        const container = document.getElementById('mPhotoPreview');
-        container.innerHTML = tempMeetingPhotos.map((photo, i) => `
-            <div class="photo-preview-item">
-                <img src="${photo}" alt="Foto ${i+1}">
-                <button class="remove-photo" onclick="removeMeetingPhoto(${i})">&#10005;</button>
-            </div>
-        `).join('');
     }
 
     function removeMeetingPhoto(index) {
@@ -1011,82 +1071,99 @@
         renderMeetingPhotoPreview();
     }
 
+    function renderMeetingPhotoPreview() {
+        const preview = document.getElementById('mPhotoPreview');
+        preview.innerHTML = '';
+        tempMeetingPhotos.forEach((src, index) => {
+            const item = document.createElement('div');
+            item.className = 'photo-preview-item';
+            item.innerHTML = `<img src="${src}" alt="Preview"><button class="remove-photo" onclick="removeMeetingPhoto(${index})">×</button>`;
+            preview.appendChild(item);
+        });
+    }
+
     function clearMeetingForm() {
+        editingMeetingId = null; // Reseta modo edição
+
+        const titleEl = document.getElementById('meetingModalTitle');
+        titleEl.setAttribute('data-i18n', 'mod_newmeet');
+        titleEl.innerText = currentLang === 'pt' ? '＋ Criar Novo Evento' : '＋ Create New Event';
+
         document.getElementById('mTitle').value = '';
         document.getElementById('mDate').value = '';
         document.getElementById('mDesc').value = '';
         document.getElementById('mPhotos').value = '';
         tempMeetingPhotos = [];
+        document.getElementById('mPhotoPreview').innerHTML = '';
+    }
+
+    function editMeeting() {
+        if (!currentDetailMeetingId) return;
+        const meeting = meetings.find(m => m.id === currentDetailMeetingId);
+        if (!meeting) return;
+
+        closeModal('modalMeetingDetail');
+        
+        const titleEl = document.getElementById('meetingModalTitle');
+        titleEl.removeAttribute('data-i18n');
+        titleEl.innerText = currentLang === 'pt' ? '✏️ Editar Evento' : '✏️ Edit Event';
+
+        document.getElementById('mTitle').value = meeting.title || '';
+        document.getElementById('mDate').value = meeting.date || '';
+        document.getElementById('mDesc').value = meeting.description || '';
+        
+        tempMeetingPhotos = meeting.photos ? [...meeting.photos] : [];
         renderMeetingPhotoPreview();
+        document.getElementById('mPhotos').value = '';
+
+        editingMeetingId = meeting.id;
+        openModal('modalNewMeeting');
     }
 
     function saveMeeting() {
         const title = document.getElementById('mTitle').value.trim();
-        if (!title) { showToast('Preencha o título do evento', 'error'); return; }
         
+        if (!title) {
+            showToast('Digite o título do evento', 'error');
+            return;
+        }
+
         const meetingData = {
-            title,
+            title: title,
             date: document.getElementById('mDate').value,
             description: document.getElementById('mDesc').value.trim(),
             photos: tempMeetingPhotos,
-            createdAt: new Date().toISOString()
+            updatedAt: firebase.database.ServerValue.TIMESTAMP
         };
-        
-        db.ref('meetings').push(meetingData).then(() => {
-            showToast('Evento criado com sucesso!', 'success');
-            closeModal('modalNewMeeting');
-            clearMeetingForm();
-        }).catch(err => {
-            showToast('Erro ao salvar: ' + err.message, 'error');
-        });
-    }
 
-    function deleteMeeting(id) {
-        if (confirm('Excluir este evento?')) {
-            db.ref('meetings/' + id).remove().then(() => {
-                showToast('Evento excluído', 'info');
-            });
+        if (editingMeetingId) {
+            // MODO EDIÇÃO
+            db.ref('meetings/' + editingMeetingId).update(meetingData)
+                .then(() => {
+                    showToast('Evento atualizado com sucesso!', 'success');
+                    closeModal('modalNewMeeting');
+                    clearMeetingForm();
+                })
+                .catch(err => showToast('Erro ao atualizar: ' + err.message, 'error'));
+        } else {
+            // MODO CRIAÇÃO
+            meetingData.createdAt = firebase.database.ServerValue.TIMESTAMP;
+            db.ref('meetings').push(meetingData)
+                .then(() => {
+                    showToast('Evento criado com sucesso!', 'success');
+                    closeModal('modalNewMeeting');
+                    clearMeetingForm();
+                })
+                .catch(err => showToast('Erro ao salvar: ' + err.message, 'error'));
         }
-    }
-
-    function openMeetingDetail(id) {
-        const m = meetings.find(mt => mt.id === id);
-        if (!m) return;
-        
-        document.getElementById('meetingDetailTitle').innerText = m.title || 'Evento';
-        const dateStr = m.date ? new Date(m.date + 'T12:00:00').toLocaleDateString('pt-BR', {weekday:'long', day:'numeric', month:'long', year:'numeric'}) : '';
-        
-        let html = '';
-        if (dateStr) html += `<div style="margin-bottom:12px;font-size:13px;color:var(--gray-light)">${dateStr}</div>`;
-        if (m.description) html += `<div style="margin-bottom:16px;line-height:1.7">${m.description}</div>`;
-        
-        if (m.photos && m.photos.length > 0) {
-            html += `<div class="photo-grid">`;
-            m.photos.forEach((photo, i) => {
-                html += `<img src="${photo}" alt="Foto ${i+1}" onclick="openLightbox(${JSON.stringify(m.photos).replace(/"/g, '&quot;')}, ${i})">`;
-            });
-            html += `</div>`;
-        }
-        
-        document.getElementById('meetingDetailBody').innerHTML = html;
-        
-        document.getElementById('meetingDeleteBtn').onclick = () => {
-            if (confirm('Excluir este evento?')) {
-                db.ref('meetings/' + id).remove().then(() => {
-                    showToast('Evento excluído', 'info');
-                    closeModal('modalMeetingDetail');
-                });
-            }
-        };
-        
-        openModal('modalMeetingDetail');
     }
 
     // ==================== LIGHTBOX ====================
-    function openLightbox(images, startIndex) {
+    function openLightbox(images, index) {
         lightboxImages = images;
-        lightboxIndex = startIndex || 0;
-        updateLightbox();
+        lightboxIndex = index;
+        document.getElementById('lightboxImg').src = images[index];
+        document.getElementById('lightboxCounter').innerText = `${index + 1} / ${images.length}`;
         document.getElementById('lightbox').classList.add('active');
     }
 
@@ -1094,31 +1171,13 @@
         document.getElementById('lightbox').classList.remove('active');
     }
 
-    function updateLightbox() {
+    function navLightbox(dir) {
+        lightboxIndex += dir;
+        if (lightboxIndex >= lightboxImages.length) lightboxIndex = 0;
+        if (lightboxIndex < 0) lightboxIndex = lightboxImages.length - 1;
+        
         document.getElementById('lightboxImg').src = lightboxImages[lightboxIndex];
         document.getElementById('lightboxCounter').innerText = `${lightboxIndex + 1} / ${lightboxImages.length}`;
-    }
-
-    function navLightbox(dir) {
-        lightboxIndex = (lightboxIndex + dir + lightboxImages.length) % lightboxImages.length;
-        updateLightbox();
-    }
-
-    document.addEventListener('keydown', e => {
-        if (!document.getElementById('lightbox').classList.contains('active')) return;
-        if (e.key === 'Escape') closeLightbox();
-        if (e.key === 'ArrowLeft') navLightbox(-1);
-        if (e.key === 'ArrowRight') navLightbox(1);
-    });
-
-    // ==================== TOAST ====================
-    function showToast(msg, type) {
-        const container = document.getElementById('toastContainer');
-        const toast = document.createElement('div');
-        toast.className = `toast toast-${type || 'info'}`;
-        toast.innerText = msg;
-        container.appendChild(toast);
-        setTimeout(() => { toast.remove(); }, 3000);
     }
 
     // ==================== INIT ====================
