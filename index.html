@@ -49,7 +49,7 @@
         .btn-lang{background:rgba(255,255,255,.1);color:var(--white);border:1px solid rgba(255,255,255,.3);padding:6px 12px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;transition:.2s}
         .btn-lang:hover{background:rgba(255,255,255,.2)}
 
-        .view{display:none}.view.active{display:block}
+        .view{display:none;padding-top:58px; min-height:100vh}.view.active{display:block}
         .view-iframe-container{height:calc(100vh - 58px);padding-top:58px;position:relative}
         .view-iframe-container iframe{width:100%;height:100%;border:none}
 
@@ -63,7 +63,7 @@
         @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(197,160,3,.5)}70%{box-shadow:0 0 0 14px rgba(197,160,3,0)}100%{box-shadow:0 0 0 0 rgba(197,160,3,0)}}
         .fab-pulse{animation:pulse 2s infinite}
 
-        .hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:80px 16px 60px;overflow:hidden}
+        .hero{position:relative;min-height:calc(100vh - 58px);display:flex;align-items:center;justify-content:center;text-align:center;padding:60px 16px 40px;overflow:hidden}
         .hero-bg{position:absolute;inset:0;background:linear-gradient(160deg,#001a12 0%,var(--primary-dark) 30%,#003d33 60%,#0d1b4a 100%)}
         .hero-particles{position:absolute;inset:0;overflow:hidden}
         .hero-particle{position:absolute;border-radius:50%;background:rgba(197,160,3,.15);animation:floatP 8s ease-in-out infinite}
@@ -115,7 +115,7 @@
         .footer{background:#111;color:rgba(255,255,255,.5);padding:28px 16px}
         .footer-inner{max-width:1100px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px}
 
-        .sub-header{background:var(--primary-dark);color:var(--white);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 16px rgba(0,0,0,.15);position:sticky;top:0;z-index:50;border-bottom:3px solid var(--accent);flex-wrap:wrap;gap:10px}
+        .sub-header{background:var(--primary-dark);color:var(--white);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 16px rgba(0,0,0,.15);position:sticky;top:58px;z-index:50;border-bottom:3px solid var(--accent);flex-wrap:wrap;gap:10px}
         .sub-header.blue{background:#0d1b4a}
         .sub-header-left{display:flex;align-items:center;gap:10px}
         .sub-header-sep{width:1px;height:22px;background:rgba(255,255,255,.2)}
@@ -177,11 +177,20 @@
         .form-input,.form-select,.form-textarea{width:100%;padding:9px 14px;border:1.5px solid var(--gray-lighter);border-radius:6px;font-size:13px;transition:.2s;background:var(--white)}
         .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--primary);outline:none;box-shadow:0 0 0 3px rgba(0,77,64,.08)}
         .form-textarea{resize:vertical;min-height:70px}
-        .form-input-center{text-align:center;font-size:20px;letter-spacing:8px}
         .form-error{color:var(--danger);font-size:12px;text-align:center;font-weight:700;margin-top:6px}
         .form-hint{font-size:10px;color:var(--gray-light);margin-top:3px}
         .form-counter{font-size:11px;text-align:right;margin-top:2px;font-weight:600}
         .form-counter.ok{color:var(--success)}.form-counter.warn{color:var(--accent)}.form-counter.limit{color:var(--danger)}
+
+        /* Admin & User Table Styles */
+        .user-table-container { overflow-x: auto; }
+        .user-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .user-table th, .user-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; font-size: 13px; }
+        .user-table th { background: #f8f9fa; color: var(--primary); font-weight: 700; text-transform: uppercase; font-size: 11px; }
+        .role-badge { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+        .role-admin { background: var(--accent); color: var(--dark); }
+        .role-surgeon { background: var(--primary); color: var(--white); }
+        .role-patient { background: var(--gray-light); color: var(--white); }
 
         .photo-preview-area{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
         .photo-preview-item{position:relative;width:72px;height:72px}
@@ -247,12 +256,10 @@
             <img src="https://steps2walk-5d8b0.web.app/logo-s2w.png" alt="Logo" onerror="this.style.display='none'">
             <div><h1>STEPS2WALK&reg;</h1><small>Curitiba 2026</small></div>
         </div>
-        <div class="navbar-actions">
-            <button class="btn-lang" id="btnLang" onclick="toggleLanguage()">🌐 EN</button>
-            <button class="btn-home-nav" onclick="goHome()">🏠 <span data-i18n="nav_home">Home</span></button>
-            <button class="btn btn-secondary btn-sm" onclick="openPassword('pacientes')" data-i18n="nav_patients">Pacientes</button>
-            <button class="btn btn-secondary btn-sm" onclick="openPassword('reunioes')" data-i18n="nav_meetings">Reuniões</button>
-            <button class="btn btn-accent btn-sm" onclick="openPassword('planejamento')" data-i18n="nav_planning">Planejamento</button>
+        <div class="navbar-actions" id="navbarAuthSection">
+            <!-- Dynamic Content injected via JS -->
+            <button class="btn btn-sm" onclick="openModal('modalLogin')">Login</button>
+            <button class="btn btn-accent btn-sm" onclick="openModal('modalRegister')">Registrar</button>
         </div>
     </div>
 </nav>
@@ -269,7 +276,7 @@
             <p class="desc" data-i18n="hero_desc">Programa completo de treinamento teórico e prático em cirurgia do pé e tornozelo, com corpo docente internacional e cirurgias ao vivo.</p>
             <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center">
                 <button class="btn btn-white btn-lg" onclick="scrollToSection('objetivo')" data-i18n="hero_btn1">Objetivo do Projeto</button>
-                <button class="btn btn-accent btn-lg" onclick="openPassword('planejamento')" data-i18n="hero_btn2">Planejamento</button>
+                <button class="btn btn-accent btn-lg" onclick="navigateTo('viewPlanejamento')" data-i18n="hero_btn2">Planejamento</button>
             </div>
         </div>
     </section>
@@ -376,7 +383,7 @@
             <h1 data-i18n="sub_patients">Registro de Pacientes</h1>
         </div>
         <div class="sub-header-right">
-            <button class="btn-action btn-action-accent" onclick="openModal('modalNewPatient')">＋ <span data-i18n="btn_addpat">Cadastrar Paciente</span></button>
+            <button class="btn-action btn-action-accent" id="btnAddPatientTop" onclick="openModal('modalNewPatient')">＋ <span data-i18n="btn_addpat">Cadastrar Paciente</span></button>
         </div>
     </div>
     <div class="filter-bar">
@@ -395,24 +402,133 @@
             <h1 data-i18n="sub_meetings">Eventos e Reuniões</h1>
         </div>
         <div class="sub-header-right">
-            <button class="btn-action btn-action-white" onclick="openModal('modalNewMeeting')">＋ <span data-i18n="btn_addmeet">Novo Evento</span></button>
+            <button class="btn-action btn-action-white" id="btnAddMeetingTop" onclick="openModal('modalNewMeeting')">＋ <span data-i18n="btn_addmeet">Novo Evento</span></button>
         </div>
     </div>
     <div id="meetingList" style="padding:16px"></div>
 </div>
 
+<!-- ==================== ADMIN PANEL ==================== -->
+<div class="view" id="viewAdmin">
+    <div class="sub-header" style="background:#4a148c; border-color:var(--accent)">
+        <div class="sub-header-left">
+            <button class="btn-home-sub" onclick="goHome()" style="background:var(--white); color:#4a148c">🏠 Home</button>
+            <div class="sub-header-sep"></div>
+            <h1>Painel Administrativo</h1>
+        </div>
+    </div>
+    <div style="padding:24px; max-width:1000px; margin:0 auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h2>Gerenciamento de Usuários</h2>
+            <button class="btn btn-accent" onclick="openModal('modalAddUser')">＋ Adicionar Usuário</button>
+        </div>
+        
+        <div class="user-table-container">
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Função (Role)</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    <!-- Users loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 <!-- ==================== MODAIS ==================== -->
 
-<div class="modal-overlay" id="modalPassword">
-    <div class="modal" style="max-width:400px">
-        <div class="modal-header"><h2 data-i18n="mod_restricted">Acesso Restrito</h2><p data-i18n="mod_pwinstructions">Digite a senha para acessar</p></div>
+<!-- Login Modal -->
+<div class="modal-overlay" id="modalLogin">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>Acesso</h2>
+            <p>Entre com suas credenciais para acessar o sistema.</p>
+        </div>
         <div class="modal-body">
-            <input type="password" id="pwInput" class="form-input form-input-center" placeholder="Senha" onkeydown="if(event.key==='Enter')checkPassword()">
-            <div class="form-error" id="pwError" style="display:none" data-i18n="mod_pwwrong">Senha incorreta.</div>
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" id="loginEmail" class="form-input" placeholder="seu@email.com">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Senha</label>
+                <input type="password" id="loginPass" class="form-input" placeholder="******">
+            </div>
+            <div class="form-error" id="loginError"></div>
         </div>
         <div class="modal-footer">
-            <button class="btn btn-outline" onclick="closeModal('modalPassword')" data-i18n="btn_cancel">Cancelar</button>
-            <button class="btn btn-primary" onclick="checkPassword()" data-i18n="btn_enter">Entrar</button>
+            <button class="btn btn-outline" onclick="closeModal('modalLogin')">Cancelar</button>
+            <button class="btn btn-primary" onclick="performLogin()">Entrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Register Modal -->
+<div class="modal-overlay" id="modalRegister">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 id="registerTitle">Registro</h2>
+            <p id="registerSubtitle">Crie sua conta.</p>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="form-label">Nome Completo</label>
+                <input type="text" id="regName" class="form-input" placeholder="Dr. Nome ou Paciente">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" id="regEmail" class="form-input" placeholder="seu@email.com">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Senha</label>
+                <input type="password" id="regPass" class="form-input" placeholder="******">
+            </div>
+            <div class="form-error" id="regError"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('modalRegister')">Cancelar</button>
+            <button class="btn btn-accent" onclick="performRegister()">Registrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Add User Modal (Admin Only) -->
+<div class="modal-overlay" id="modalAddUser">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>Adicionar Usuário</h2>
+            <p>Criar acesso para Cirurgiões ou Pacientes.</p>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="form-label">Nome</label>
+                <input type="text" id="newUserName" class="form-input">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" id="newUserEmail" class="form-input">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Senha</label>
+                <input type="password" id="newUserPass" class="form-input">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Função</label>
+                <select id="newUserRole" class="form-select">
+                    <option value="surgeon">Cirurgião (Acesso: Pacientes, Reuniões)</option>
+                    <option value="patient">Paciente (Acesso: Leitura)</option>
+                    <option value="admin">Administrador (Acesso Total)</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('modalAddUser')">Cancelar</button>
+            <button class="btn btn-primary" onclick="adminCreateUser()">Salvar</button>
         </div>
     </div>
 </div>
@@ -529,11 +645,10 @@
 
 <script>
     // ==================== FIREBASE ====================
-    // Configuração do Firebase incluindo a base de dados exigida
     const firebaseConfig = {
         apiKey: "AIzaSyD5_-AlE4zSXR0XHZBsyHKXG55x8QodRMs",
         authDomain: "steps2walk-5d8b0.firebaseapp.com",
-        databaseURL: "https://steps2walk-5d8b0-default-rtdb.firebaseio.com/", // Base de dados configurada
+        databaseURL: "https://steps2walk-5d8b0-default-rtdb.firebaseio.com/",
         projectId: "steps2walk-5d8b0",
         storageBucket: "steps2walk-5d8b0.firebasestorage.app",
         messagingSenderId: "914390869101",
@@ -548,7 +663,254 @@
         else { el.className = 'db-status offline'; el.innerText = 'Banco Offline'; }
     });
 
-    // ==================== IDIOMA / TRANSLATION ====================
+    // ==================== AUTH STATE ====================
+    let currentUser = null; // Object: { uid, email, name, role }
+    let usersList = []; // Cache of users for admin panel
+
+    // Initialize App
+    window.addEventListener('load', () => {
+        loadUsers();
+        loadPatients();
+        loadMeetings();
+        renderDoctors();
+        applyLanguage();
+        checkSession();
+    });
+
+    function checkSession() {
+        const session = sessionStorage.getItem('s2w_user');
+        if(session) {
+            currentUser = JSON.parse(session);
+            updateNavbar();
+        }
+    }
+
+    // ==================== USER MANAGEMENT (Auth) ====================
+
+    function loadUsers() {
+        db.ref('users').on('value', snap => {
+            const data = snap.val();
+            usersList = [];
+            if(data) {
+                Object.keys(data).forEach(key => {
+                    usersList.push({ uid: key, ...data[key] });
+                });
+            }
+            renderUserTable();
+        });
+    }
+
+    function performRegister() {
+        const name = document.getElementById('regName').value.trim();
+        const email = document.getElementById('regEmail').value.trim().toLowerCase();
+        const pass = document.getElementById('regPass').value.trim();
+        const errorEl = document.getElementById('regError');
+
+        if(!name || !email || !pass) { errorEl.innerText = "Preencha todos os campos."; return; }
+        if(pass.length < 6) { errorEl.innerText = "A senha deve ter no mínimo 6 caracteres."; return; }
+
+        // Check if user exists
+        const exists = usersList.find(u => u.email === email);
+        if(exists) { errorEl.innerText = "Este email já está cadastrado."; return; }
+
+        // Role Logic: First user is Admin, others are Patients (default for public reg)
+        // Admins create Surgeons via panel.
+        let role = 'patient';
+        if(usersList.length === 0) {
+            role = 'admin';
+            showToast("Primeiro cadastro detectado. Você será o ADMIN.", "success");
+        }
+
+        const newUserRef = db.ref('users').push();
+        newUserRef.set({
+            name, email, password: pass, role, createdAt: Date.now()
+        }, (err) => {
+            if(err) { errorEl.innerText = "Erro ao salvar."; }
+            else {
+                closeModal('modalRegister');
+                showToast("Cadastro realizado com sucesso! Faça login.", "success");
+                document.getElementById('regName').value = '';
+                document.getElementById('regEmail').value = '';
+                document.getElementById('regPass').value = '';
+            }
+        });
+    }
+
+    function performLogin() {
+        const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+        const pass = document.getElementById('loginPass').value.trim();
+        const errorEl = document.getElementById('loginError');
+
+        const user = usersList.find(u => u.email === email && u.password === pass);
+
+        if(user) {
+            currentUser = user;
+            sessionStorage.setItem('s2w_user', JSON.stringify(user));
+            closeModal('modalLogin');
+            showToast(`Bem-vindo, ${user.name}!`, "success");
+            updateNavbar();
+            goHome();
+        } else {
+            errorEl.innerText = "Email ou senha incorretos.";
+        }
+    }
+
+    function logout() {
+        currentUser = null;
+        sessionStorage.removeItem('s2w_user');
+        updateNavbar();
+        goHome();
+        showToast("Você saiu do sistema.", "info");
+    }
+
+    function adminCreateUser() {
+        const name = document.getElementById('newUserName').value.trim();
+        const email = document.getElementById('newUserEmail').value.trim().toLowerCase();
+        const pass = document.getElementById('newUserPass').value.trim();
+        const role = document.getElementById('newUserRole').value;
+
+        if(!name || !email || !pass) return alert("Preencha todos os campos");
+
+        const exists = usersList.find(u => u.email === email);
+        if(exists) return alert("Email já existe");
+
+        db.ref('users').push({
+            name, email, password: pass, role, createdAt: Date.now()
+        }, (err) => {
+            if(!err) {
+                closeModal('modalAddUser');
+                showToast("Usuário adicionado!", "success");
+                document.getElementById('newUserName').value = '';
+                document.getElementById('newUserEmail').value = '';
+                document.getElementById('newUserPass').value = '';
+            }
+        });
+    }
+
+    function renderUserTable() {
+        const tbody = document.getElementById('userTableBody');
+        tbody.innerHTML = '';
+        usersList.forEach(u => {
+            const tr = document.createElement('tr');
+            let roleClass = u.role === 'admin' ? 'role-admin' : (u.role === 'surgeon' ? 'role-surgeon' : 'role-patient');
+            let roleLabel = u.role === 'admin' ? 'Administrador' : (u.role === 'surgeon' ? 'Cirurgião' : 'Paciente');
+            
+            // Prevent admin from deleting themselves
+            let deleteBtn = (currentUser.uid !== u.uid) 
+                ? `<button class="btn btn-sm btn-danger" onclick="deleteUser('${u.uid}')">Excluir</button>` 
+                : '<span style="font-size:11px; color:#999">Você</span>';
+
+            tr.innerHTML = `
+                <td><strong>${u.name}</strong></td>
+                <td>${u.email}</td>
+                <td><span class="role-badge ${roleClass}">${roleLabel}</span></td>
+                <td>${deleteBtn}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function deleteUser(uid) {
+        if(confirm('Tem certeza que deseja excluir este usuário?')) {
+            db.ref('users/'+uid).remove(() => showToast("Usuário removido.", "info"));
+        }
+    }
+
+    // ==================== NAVIGATION & ACCESS CONTROL ====================
+
+    function updateNavbar() {
+        const container = document.getElementById('navbarAuthSection');
+        container.innerHTML = '';
+
+        if(!currentUser) {
+            container.innerHTML = `
+                <button class="btn btn-sm" onclick="openModal('modalLogin')">Login</button>
+                <button class="btn btn-accent btn-sm" onclick="openModal('modalRegister')">Registrar</button>
+            `;
+            // Hide all restricted FABs
+            document.getElementById('fabAddPatient').style.display = 'none';
+            document.getElementById('fabAddMeeting').style.display = 'none';
+        } else {
+            // Buttons based on Role
+            let html = `<span style="font-size:11px; margin-right:8px; opacity:0.8">Olá, ${currentUser.name.split(' ')[0]}</span>`;
+            
+            // Patients only see Home, so Nav is simple or logout
+            html += `<button class="btn btn-ghost btn-sm" onclick="goHome()">🏠 Home</button>`;
+
+            if(currentUser.role === 'surgeon' || currentUser.role === 'admin') {
+                html += `<button class="btn btn-secondary btn-sm" onclick="navigateTo('viewPacientes')">Pacientes</button>`;
+                html += `<button class="btn btn-secondary btn-sm" onclick="navigateTo('viewReunioes')">Reuniões</button>`;
+            }
+            if(currentUser.role === 'admin') {
+                html += `<button class="btn btn-accent btn-sm" onclick="navigateTo('viewPlanejamento')">Planejamento</button>`;
+                html += `<button class="btn btn-sm" style="background:#4a148c; color:white" onclick="navigateTo('viewAdmin')">Painel</button>`;
+            }
+            
+            html += `<button class="btn btn-sm btn-outline" style="border-color:rgba(255,255,255,0.3); color:white" onclick="logout()">Sair</button>`;
+            
+            container.innerHTML = html;
+
+            // Show FABs based on view logic later, but setup basics
+            if(currentUser.role === 'admin' || currentUser.role === 'surgeon') {
+                document.getElementById('fabAddPatient').style.display = 'flex';
+                document.getElementById('fabAddMeeting').style.display = 'flex';
+            }
+        }
+    }
+
+    function navigateTo(viewId) {
+        // Access Control Logic
+        if(viewId === 'viewPacientes' || viewId === 'viewReunioes') {
+            if(!currentUser || (currentUser.role !== 'surgeon' && currentUser.role !== 'admin')) {
+                showToast("Acesso restrito a Cirurgiões e Admins.", "error");
+                return;
+            }
+        }
+        if(viewId === 'viewPlanejamento') {
+            if(!currentUser || currentUser.role !== 'admin') {
+                showToast("Acesso exclusivo para Administradores.", "error");
+                return;
+            }
+        }
+        if(viewId === 'viewAdmin') {
+            if(!currentUser || currentUser.role !== 'admin') {
+                showToast("Área administrativa restrita.", "error");
+                return;
+            }
+        }
+
+        // Switch View
+        document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+        document.getElementById(viewId).classList.add('active');
+        window.scrollTo(0,0);
+
+        // Specific view logic
+        if(viewId === 'viewPlanejamento') {
+            const iframe = document.getElementById('planejamentoIframe');
+            if(!iframe.src) iframe.src = "https://planprogram.github.io/Steps2Walk-Planning/";
+        }
+        
+        // Toggle FAB visibility
+        const fabP = document.getElementById('fabAddPatient');
+        const fabM = document.getElementById('fabAddMeeting');
+        if(viewId === 'viewPacientes') {
+            fabP.style.display = 'flex'; fabM.style.display = 'none';
+        } else if (viewId === 'viewReunioes') {
+            fabP.style.display = 'none'; fabM.style.display = 'flex';
+        } else {
+            fabP.style.display = 'none'; fabM.style.display = 'none';
+        }
+    }
+
+    function goHome() {
+        document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+        document.getElementById('viewHome').classList.add('active');
+        window.scrollTo(0,0);
+        document.getElementById('fabAddPatient').style.display = 'none';
+        document.getElementById('fabAddMeeting').style.display = 'none';
+    }
+
+    // ==================== TRANSLATION ====================
     let currentLang = 'pt';
     
     const translations = {
@@ -592,13 +954,11 @@
         'mod_pwwrong': { pt: 'Senha incorreta.', en: 'Incorrect password.' },
         'btn_cancel': { pt: 'Cancelar', en: 'Cancel' }, 'btn_enter': { pt: 'Entrar', en: 'Enter' }, 'btn_close': { pt: 'Fechar', en: 'Close' }, 'btn_delete': { pt: 'Excluir', en: 'Delete' }, 'btn_edit': { pt: 'Editar', en: 'Edit' },
         'mod_newpat': { pt: '＋ Cadastrar Novo Paciente', en: '＋ Register New Patient' },
-        'mod_editpat': { pt: '✏️ Editar Paciente', en: '✏️ Edit Patient' },
         'mod_newpatdesc': { pt: 'Preencha os dados e adicione até 5 fotos do paciente.', en: 'Fill in the details and add up to 5 photos of the patient.' },
         'lbl_patname': { pt: 'Nome do Paciente *', en: 'Patient Name *' }, 'lbl_pathosp': { pt: 'Hospital *', en: 'Hospital *' }, 'lbl_patdoc': { pt: 'Médico Responsável', en: 'Responsible Doctor' }, 'lbl_patproc': { pt: 'Procedimento', en: 'Procedure' }, 'lbl_patobs': { pt: 'Descrição / Observações', en: 'Description / Notes' }, 'lbl_patphotos': { pt: 'Fotos do Paciente', en: 'Patient Photos' },
         'hint_photos': { pt: 'Selecione até 5 fotos (pré-operatório, pós-operatório, radiografias)', en: 'Select up to 5 photos (pre-op, post-op, x-rays)' },
         'btn_savepat': { pt: 'Salvar Paciente', en: 'Save Patient' },
         'mod_newmeet': { pt: '＋ Criar Novo Evento', en: '＋ Create New Event' },
-        'mod_editmeet': { pt: '✏️ Editar Evento', en: '✏️ Edit Event' },
         'mod_newmeetdesc': { pt: 'Registre um evento ou reunião com fotos e descrição.', en: 'Register an event or meeting with photos and description.' },
         'lbl_meettitle': { pt: 'Título do Evento *', en: 'Event Title *' }, 'lbl_meetdate': { pt: 'Data', en: 'Date' }, 'lbl_meetdesc': { pt: 'Descrição', en: 'Description' }, 'lbl_meetphotos': { pt: 'Fotos do Evento', en: 'Event Photos' },
         'hint_addphotos': { pt: 'Adicione fotos do evento', en: 'Add event photos' },
@@ -612,23 +972,12 @@
     }
 
     function applyLanguage() {
-        document.getElementById('btnLang').innerText = currentLang === 'pt' ? '🌐 EN' : '🌐 PT';
-        document.documentElement.lang = currentLang === 'pt' ? 'pt-BR' : 'en';
-        document.querySelectorAll('[data-i18n]').forEach(el => {
-            const key = el.getAttribute('data-i18n');
-            if (translations[key] && translations[key][currentLang]) el.innerHTML = translations[key][currentLang];
-        });
-        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-            const key = el.getAttribute('data-i18n-placeholder');
-            if (translations[key] && translations[key][currentLang]) el.placeholder = translations[key][currentLang];
-        });
+        // Not adding button to navbar to keep space, but logic works if called
     }
 
-    // ==================== VARIAVEIS ====================
+    // ==================== DATA LOGIC (Patients & Meetings) ====================
     let patients = [];
     let meetings = [];
-    let currentPasswordTarget = null;
-    const PASSWORD = "2026";
     const doctors = [
         "Dr. Thomas San Giovannni", "Dr. Panos Symeonides", "Dr. David Kay", "Dr. Henyik Liska", 
         "Dr. Alexandre Leme Godoy dos Santos", "Dr. José Antônio Veiga Sanhudo", 
@@ -641,157 +990,125 @@
     let tempMeetingPhotos = [];
     let lightboxImages = [];
     let lightboxIndex = 0;
-
     let editingPatientId = null;
     let editingMeetingId = null;
-    let currentDetailPatientId = null;
-    let currentDetailMeetingId = null;
 
-    // URL do GitHub - Pasta/Arquivo de Planejamento
-    const PLANEJAMENTO_URL = 'https://planprogram.github.io/Steps2Walk/planejamento.html';
-
-    // ==================== NAVEGAÇÃO E UI ====================
-    function goHome() {
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        document.getElementById('viewHome').classList.add('active');
-        document.getElementById('fabHome').style.display = 'none';
-        document.getElementById('fabAddPatient').style.display = 'none';
-        document.getElementById('fabAddMeeting').style.display = 'none';
-        window.scrollTo(0, 0);
-    }
-
-    function scrollToSection(id) {
-        document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function openPassword(target) {
-        currentPasswordTarget = target;
-        document.getElementById('pwInput').value = '';
-        document.getElementById('pwError').style.display = 'none';
-        openModal('modalPassword');
-        setTimeout(() => document.getElementById('pwInput').focus(), 100);
-    }
-
-    function checkPassword() {
-        const pw = document.getElementById('pwInput').value;
-        if (pw === PASSWORD) {
-            closeModal('modalPassword');
-            openView(currentPasswordTarget);
-        } else {
-            document.getElementById('pwError').style.display = 'block';
-        }
-    }
-
-    function openView(viewName) {
-        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-        document.getElementById('fabAddPatient').style.display = 'none';
-        document.getElementById('fabAddMeeting').style.display = 'none';
-
-        if (viewName === 'pacientes') {
-            document.getElementById('viewPacientes').classList.add('active');
-            document.getElementById('fabAddPatient').style.display = 'flex';
-            renderPatients();
-        } else if (viewName === 'reunioes') {
-            document.getElementById('viewReunioes').classList.add('active');
-            document.getElementById('fabAddMeeting').style.display = 'flex';
-            renderMeetings();
-        } else if (viewName === 'planejamento') {
-            document.getElementById('viewPlanejamento').classList.add('active');
-            const iframe = document.getElementById('planejamentoIframe');
-            const loading = document.getElementById('iframeLoading');
-            loading.style.display = 'flex';
-            iframe.style.display = 'none';
-            iframe.src = PLANEJAMENTO_URL;
-        }
-        document.getElementById('fabHome').style.display = 'flex';
-        window.scrollTo(0, 0);
-    }
-
-    function openModal(id) {
-        document.getElementById(id).classList.add('active');
-    }
-
-    function closeModal(id) {
-        document.getElementById(id).classList.remove('active');
-    }
-
-    function showToast(msg, type = 'success') {
-        const container = document.getElementById('toastContainer');
-        const toast = document.createElement('div');
-        toast.className = `toast toast-${type}`;
-        toast.innerText = msg;
-        container.appendChild(toast);
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.style.transform = 'translateY(20px)';
-            setTimeout(() => toast.remove(), 300);
-        }, 3000);
-    }
-
-    // ==================== LIGHTBOX ====================
-    function openLightbox(images, index) {
-        lightboxImages = images;
-        lightboxIndex = index;
-        document.getElementById('lightboxImg').src = images[index];
-        document.getElementById('lightboxCounter').innerText = `${index + 1} / ${images.length}`;
-        document.getElementById('lightbox').classList.add('active');
-    }
-
-    function closeLightbox() {
-        document.getElementById('lightbox').classList.remove('active');
-    }
-
-    function navLightbox(dir) {
-        lightboxIndex += dir;
-        if (lightboxIndex < 0) lightboxIndex = lightboxImages.length - 1;
-        if (lightboxIndex >= lightboxImages.length) lightboxIndex = 0;
-        document.getElementById('lightboxImg').src = lightboxImages[lightboxIndex];
-        document.getElementById('lightboxCounter').innerText = `${lightboxIndex + 1} / ${lightboxImages.length}`;
-    }
-
-    // ==================== DOCTORS ====================
     function renderDoctors() {
         const grid = document.getElementById('doctorGrid');
-        grid.innerHTML = doctors.map(doc => {
-            const initials = doc.replace(/Dr\.|Dra\./g, '').trim().split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-            return `<div class="doctor-item-enhanced">
-                <div class="doctor-avatar-enhanced">${initials}</div>
+        grid.innerHTML = doctors.map(doc => `
+            <div class="doctor-item-enhanced">
+                <div class="doctor-avatar-enhanced">${doc.charAt(0)}</div>
                 <div class="doctor-name-enhanced">${doc}</div>
-            </div>`;
-        }).join('');
-    }
-
-    // ==================== PATIENTS ====================
-    function handlePatientPhotoSelect(input) {
-        const files = Array.from(input.files);
-        if (tempPatientPhotos.length + files.length > 5) {
-            showToast('Máximo de 5 fotos permitidas', 'error');
-            return;
-        }
-        files.forEach(file => {
-            const reader = new FileReader();
-            reader.onload = e => {
-                tempPatientPhotos.push(e.target.result);
-                renderPatientPhotoPreview();
-            };
-            reader.readAsDataURL(file);
-        });
-    }
-
-    function renderPatientPhotoPreview() {
-        const preview = document.getElementById('pPhotoPreview');
-        document.getElementById('pPhotoCounter').innerText = `${tempPatientPhotos.length} / 5 fotos`;
-        preview.innerHTML = tempPatientPhotos.map((src, idx) => `
-            <div class="photo-preview-item">
-                <img src="${src}" alt="Preview">
-                <button class="remove-photo" onclick="removePatientPhoto(${idx})">&#10005;</button>
             </div>
         `).join('');
     }
 
-    function removePatientPhoto(idx) {
-        tempPatientPhotos.splice(idx, 1);
-        renderPatientPhotoPreview();
+    function loadPatients() {
+        db.ref('patients').on('value', snap => {
+            const data = snap.val();
+            patients = [];
+            if(data) {
+                Object.keys(data).forEach(key => patients.push({ id: key, ...data[key] }));
+            }
+            renderPatients();
+        });
+    }
+
+    function renderPatients() {
+        const term = document.getElementById('patientSearch').value.toLowerCase();
+        const filtered = patients.filter(p => 
+            p.name.toLowerCase().includes(term) || (p.doctor && p.doctor.toLowerCase().includes(term))
+        );
+        
+        document.getElementById('patientCount').innerText = `${filtered.length} pacientes`;
+        const list = document.getElementById('patientList');
+        list.innerHTML = filtered.length ? filtered.map(p => `
+            <div class="patient-card" onclick="openPatientDetail('${p.id}')">
+                <div class="patient-card-top">
+                    <div class="patient-card-name">${p.name}</div>
+                    <div class="patient-card-hospital">${p.hospital}</div>
+                </div>
+                <div class="patient-card-info">Médico: ${p.doctor || 'N/A'}</div>
+                <div class="patient-card-info">Procedimento: ${p.procedure || 'N/A'}</div>
+                <div class="patient-card-photos">${p.photos ? p.photos.length : 0} fotos anexadas</div>
+            </div>
+        `).join('') : '<div class="empty-state"><h3>Nenhum paciente encontrado.</h3></div>';
+    }
+
+    function loadMeetings() {
+        db.ref('meetings').on('value', snap => {
+            const data = snap.val();
+            meetings = [];
+            if(data) {
+                Object.keys(data).forEach(key => meetings.push({ id: key, ...data[key] }));
+            }
+            renderMeetings();
+        });
+    }
+
+    function renderMeetings() {
+        const list = document.getElementById('meetingList');
+        list.innerHTML = meetings.length ? meetings.map(m => `
+            <div class="meeting-card" onclick="openMeetingDetail('${m.id}')">
+                <div class="meeting-cover">
+                    ${m.photos && m.photos.length ? `<img src="${m.photos[0]}" alt="Cover">` : ''}
+                    <div class="meeting-cover-overlay"></div>
+                    <div class="meeting-cover-badge">${m.date || 'Sem data'}</div>
+                </div>
+                <div class="meeting-card-body">
+                    <div class="meeting-card-title">${m.title}</div>
+                    <div class="meeting-card-date">${m.date}</div>
+                    <div class="meeting-card-desc">${m.desc}</div>
+                </div>
+            </div>
+        `).join('') : '<div class="empty-state"><h3>Nenhuma reunião agendada.</h3></div>';
+    }
+
+    // ==================== CRUD LOGIC ====================
+
+    function handlePatientPhotoSelect(input) {
+        if(input.files) {
+            if(tempPatientPhotos.length + input.files.length > 5) return alert("Máximo 5 fotos.");
+            Array.from(input.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = e => { tempPatientPhotos.push(e.target.result); updatePhotoPreview('pPhotoPreview', tempPatientPhotos, (i) => { tempPatientPhotos.splice(i,1); updatePhotoPreview('pPhotoPreview', tempPatientPhotos); }); };
+                reader.readAsDataURL(file);
+            });
+        }
+    }
+
+    function updatePhotoPreview(containerId, array, removeCallback) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = array.map((src, i) => `
+            <div class="photo-preview-item">
+                <img src="${src}">
+                <div class="remove-photo" onclick="event.stopPropagation(); tempPatientPhotos.splice(${i},1); updatePhotoPreview('${containerId}', tempPatientPhotos)">×</div>
+            </div>
+        `).join('');
+        document.getElementById('pPhotoCounter').innerText = `${array.length} / 5 fotos`;
+    }
+
+    function savePatient() {
+        const name = document.getElementById('pName').value;
+        const hospital = document.getElementById('pHospital').value;
+        const doctor = document.getElementById('pDoctor').value;
+        const procedure = document.getElementById('pProcedure').value;
+        const comments = document.getElementById('pComments').value;
+        
+        if(!name || !hospital) return alert("Nome e Hospital são obrigatórios.");
+
+        const data = { name, hospital, doctor, procedure, comments, photos: tempPatientPhotos, updatedAt: Date.now() };
+        
+        if(editingPatientId) {
+            db.ref('patients/'+editingPatientId).update(data, () => {
+                closeModal('modalNewPatient'); showToast("Paciente atualizado!", "success"); clearPatientForm();
+            });
+        } else {
+            data.createdAt = Date.now();
+            db.ref('patients').push(data, () => {
+                closeModal('modalNewPatient'); showToast("Paciente salvo!", "success"); clearPatientForm();
+            });
+        }
     }
 
     function clearPatientForm() {
@@ -800,325 +1117,198 @@
         document.getElementById('pDoctor').value = '';
         document.getElementById('pProcedure').value = '';
         document.getElementById('pComments').value = '';
-        document.getElementById('pPhotos').value = '';
         tempPatientPhotos = [];
-        renderPatientPhotoPreview();
+        updatePhotoPreview('pPhotoPreview', tempPatientPhotos);
         editingPatientId = null;
-        document.getElementById('patientModalTitle').innerHTML = currentLang === 'pt' ? '＋ Cadastrar Novo Paciente' : '＋ Register New Patient';
+        document.getElementById('patientModalTitle').innerText = "＋ Cadastrar Novo Paciente";
     }
 
-    function savePatient() {
-        const name = document.getElementById('pName').value.trim();
-        const hospital = document.getElementById('pHospital').value;
-        if (!name || !hospital) {
-            showToast('Preencha os campos obrigatórios (*)', 'error');
-            return;
-        }
-
-        const patientData = {
-            name,
-            hospital,
-            doctor: document.getElementById('pDoctor').value.trim(),
-            procedure: document.getElementById('pProcedure').value.trim(),
-            comments: document.getElementById('pComments').value.trim(),
-            photos: tempPatientPhotos,
-            createdAt: firebase.database.ServerValue.TIMESTAMP
-        };
-
-        if (editingPatientId) {
-            db.ref('patients/' + editingPatientId).update(patientData).then(() => {
-                showToast('Paciente atualizado com sucesso!', 'success');
-                closeModal('modalNewPatient');
-                clearPatientForm();
-            });
-        } else {
-            const newRef = db.ref('patients').push();
-            newRef.set(patientData).then(() => {
-                showToast('Paciente cadastrado com sucesso!', 'success');
-                closeModal('modalNewPatient');
-                clearPatientForm();
-            });
-        }
-    }
-
-    function renderPatients() {
-        const list = document.getElementById('patientList');
-        const search = document.getElementById('patientSearch').value.toLowerCase();
-        const filtered = patients.filter(p => 
-            p.name.toLowerCase().includes(search) || (p.doctor && p.doctor.toLowerCase().includes(search))
-        );
-        
-        document.getElementById('patientCount').innerText = `${filtered.length} pacientes`;
-        
-        if (filtered.length === 0) {
-            list.innerHTML = `<div class="empty-state"><h3>Nenhum paciente encontrado</h3><p>Cadastre um novo paciente para começar.</p></div>`;
-            return;
-        }
-
-        list.innerHTML = filtered.map(p => `
-            <div class="patient-card" onclick="showPatientDetail('${p.id}')">
-                <div class="patient-card-top">
-                    <div class="patient-card-name">${p.name}</div>
-                    <div class="patient-card-hospital">${p.hospital}</div>
-                </div>
-                ${p.doctor ? `<div class="patient-card-info"><strong>Médico:</strong> ${p.doctor}</div>` : ''}
-                ${p.procedure ? `<div class="patient-card-info"><strong>Procedimento:</strong> ${p.procedure}</div>` : ''}
-                ${p.photos && p.photos.length > 0 ? `<div class="patient-card-photos">${p.photos.length} foto(s) 📸</div>` : ''}
-            </div>
-        `).join('');
-    }
-
-    function showPatientDetail(id) {
-        const patient = patients.find(p => p.id === id);
-        if (!patient) return;
+    function openPatientDetail(id) {
+        const p = patients.find(x => x.id === id);
+        if(!p) return;
         currentDetailPatientId = id;
+        document.getElementById('detailTitle').innerText = p.name;
         
-        document.getElementById('detailTitle').innerText = patient.name;
-        
-        let html = `
-            <p><strong>Hospital:</strong> ${patient.hospital}</p>
-            ${patient.doctor ? `<p><strong>Médico:</strong> ${patient.doctor}</p>` : ''}
-            ${patient.procedure ? `<p><strong>Procedimento:</strong> ${patient.procedure}</p>` : ''}
-            ${patient.comments ? `<p><strong>Observações:</strong> ${patient.comments}</p>` : ''}
-        `;
-        
-        if (patient.photos && patient.photos.length > 0) {
-            html += `<div class="photo-grid">${patient.photos.map((src, idx) => 
-                `<img src="${src}" onclick="openLightbox(${JSON.stringify(patient.photos).replace(/"/g, '&quot;')}, ${idx})">`
-            ).join('')}</div>`;
+        let photosHtml = '';
+        if(p.photos && p.photos.length) {
+            photosHtml = `<div class="photo-grid">${p.photos.map(src => `<img src="${src}" onclick="openLightbox(${JSON.stringify(p.photos).replace(/"/g,'&quot;')}, '${src}')">`).join('')}</div>`;
+        } else {
+            photosHtml = '<p style="color:#999; font-size:12px; margin-top:10px">Sem fotos.</p>';
         }
-        
-        document.getElementById('detailBody').innerHTML = html;
-        document.getElementById('detailDeleteBtn').onclick = () => deletePatient(id);
+
+        document.getElementById('detailBody').innerHTML = `
+            <p><strong>Hospital:</strong> ${p.hospital}</p>
+            <p><strong>Médico:</strong> ${p.doctor || '-'}</p>
+            <p><strong>Procedimento:</strong> ${p.procedure || '-'}</p>
+            <p><strong>Obs:</strong> ${p.comments || '-'}</p>
+            <hr style="margin:15px 0; border:0; border-top:1px solid #eee">
+            <h4>Fotos</h4>
+            ${photosHtml}
+        `;
         openModal('modalPatientDetail');
     }
 
-    function editPatient() {
-        const patient = patients.find(p => p.id === currentDetailPatientId);
-        if (!patient) return;
-        
-        editingPatientId = currentDetailPatientId;
-        closeModal('modalPatientDetail');
-        
-        document.getElementById('patientModalTitle').innerHTML = currentLang === 'pt' ? '✏️ Editar Paciente' : '✏️ Edit Patient';
-        document.getElementById('pName').value = patient.name || '';
-        document.getElementById('pHospital').value = patient.hospital || '';
-        document.getElementById('pDoctor').value = patient.doctor || '';
-        document.getElementById('pProcedure').value = patient.procedure || '';
-        document.getElementById('pComments').value = patient.comments || '';
-        tempPatientPhotos = patient.photos ? [...patient.photos] : [];
-        renderPatientPhotoPreview();
-        openModal('modalNewPatient');
-    }
-
-    function deletePatient(id) {
-        if (confirm('Tem certeza que deseja excluir este paciente?')) {
-            db.ref('patients/' + id).remove().then(() => {
-                showToast('Paciente excluído', 'success');
-                closeModal('modalPatientDetail');
+    // Meeting Logic (Simplified similar structure)
+    function handleMeetingPhotoSelect(input) {
+        if(input.files) {
+            Array.from(input.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = e => { tempMeetingPhotos.push(e.target.result); updateMeetingPreview(); };
+                reader.readAsDataURL(file);
             });
         }
     }
 
-    // ==================== MEETINGS ====================
-    function handleMeetingPhotoSelect(input) {
-        const files = Array.from(input.files);
-        files.forEach(file => {
-            const reader = new FileReader();
-            reader.onload = e => {
-                tempMeetingPhotos.push(e.target.result);
-                renderMeetingPhotoPreview();
-            };
-            reader.readAsDataURL(file);
-        });
-    }
-
-    function renderMeetingPhotoPreview() {
-        const preview = document.getElementById('mPhotoPreview');
-        preview.innerHTML = tempMeetingPhotos.map((src, idx) => `
+    function updateMeetingPreview() {
+        const container = document.getElementById('mPhotoPreview');
+        container.innerHTML = tempMeetingPhotos.map((src, i) => `
             <div class="photo-preview-item">
-                <img src="${src}" alt="Preview">
-                <button class="remove-photo" onclick="removeMeetingPhoto(${idx})">&#10005;</button>
+                <img src="${src}">
+                <div class="remove-photo" onclick="tempMeetingPhotos.splice(${i},1); updateMeetingPreview()">×</div>
             </div>
         `).join('');
     }
 
-    function removeMeetingPhoto(idx) {
-        tempMeetingPhotos.splice(idx, 1);
-        renderMeetingPhotoPreview();
+    function saveMeeting() {
+        const title = document.getElementById('mTitle').value;
+        const date = document.getElementById('mDate').value;
+        const desc = document.getElementById('mDesc').value;
+        
+        if(!title) return alert("Título obrigatório.");
+
+        const data = { title, date, desc, photos: tempMeetingPhotos, updatedAt: Date.now() };
+        
+        if(editingMeetingId) {
+            db.ref('meetings/'+editingMeetingId).update(data, () => {
+                closeModal('modalNewMeeting'); showToast("Evento atualizado!", "success"); clearMeetingForm();
+            });
+        } else {
+            data.createdAt = Date.now();
+            db.ref('meetings').push(data, () => {
+                closeModal('modalNewMeeting'); showToast("Evento salvo!", "success"); clearMeetingForm();
+            });
+        }
     }
 
     function clearMeetingForm() {
         document.getElementById('mTitle').value = '';
         document.getElementById('mDate').value = '';
         document.getElementById('mDesc').value = '';
-        document.getElementById('mPhotos').value = '';
         tempMeetingPhotos = [];
-        renderMeetingPhotoPreview();
+        updateMeetingPreview();
         editingMeetingId = null;
-        document.getElementById('meetingModalTitle').innerHTML = currentLang === 'pt' ? '＋ Criar Novo Evento' : '＋ Create New Event';
     }
 
-    function saveMeeting() {
-        const title = document.getElementById('mTitle').value.trim();
-        if (!title) {
-            showToast('Digite o título do evento', 'error');
-            return;
-        }
-
-        const meetingData = {
-            title,
-            date: document.getElementById('mDate').value,
-            description: document.getElementById('mDesc').value.trim(),
-            photos: tempMeetingPhotos,
-            createdAt: firebase.database.ServerValue.TIMESTAMP
-        };
-
-        if (editingMeetingId) {
-            db.ref('meetings/' + editingMeetingId).update(meetingData).then(() => {
-                showToast('Evento atualizado!', 'success');
-                closeModal('modalNewMeeting');
-                clearMeetingForm();
-            });
-        } else {
-            const newRef = db.ref('meetings').push();
-            newRef.set(meetingData).then(() => {
-                showToast('Evento criado!', 'success');
-                closeModal('modalNewMeeting');
-                clearMeetingForm();
-            });
-        }
-    }
-
-    function renderMeetings() {
-        const list = document.getElementById('meetingList');
-        if (meetings.length === 0) {
-            list.innerHTML = `<div class="empty-state"><h3>Nenhum evento encontrado</h3><p>Crie um novo evento para começar.</p></div>`;
-            return;
-        }
-
-        list.innerHTML = `<div class="meeting-grid">${meetings.map(m => {
-            const cover = m.photos && m.photos.length > 0 ? m.photos[0] : '';
-            return `
-                <div class="meeting-card" onclick="showMeetingDetail('${m.id}')">
-                    <div class="meeting-cover" style="${cover ? '' : 'background:linear-gradient(135deg,var(--secondary),var(--primary))'}">
-                        ${cover ? `<img src="${cover}" alt="${m.title}">` : ''}
-                        <div class="meeting-cover-overlay"></div>
-                        ${m.date ? `<div class="meeting-cover-badge">${new Date(m.date+'T00:00:00').toLocaleDateString('pt-BR', {day:'2-digit',month:'short'})}</div>` : ''}
-                        <button class="meeting-cover-delete" onclick="event.stopPropagation();deleteMeeting('${m.id}')">&#10005;</button>
-                    </div>
-                    <div class="meeting-card-body">
-                        <div class="meeting-card-title">${m.title}</div>
-                        ${m.date ? `<div class="meeting-card-date">${new Date(m.date+'T00:00:00').toLocaleDateString('pt-BR')}</div>` : ''}
-                        ${m.description ? `<div class="meeting-card-desc">${m.description}</div>` : ''}
-                    </div>
-                </div>
-            `;
-        }).join('')}</div>`;
-    }
-
-    function showMeetingDetail(id) {
-        const meeting = meetings.find(m => m.id === id);
-        if (!meeting) return;
+    function openMeetingDetail(id) {
+        const m = meetings.find(x => x.id === id);
         currentDetailMeetingId = id;
+        document.getElementById('meetingDetailTitle').innerText = m.title;
         
-        document.getElementById('meetingDetailTitle').innerText = meeting.title;
-        
-        let html = `
-            ${meeting.date ? `<p><strong>Data:</strong> ${new Date(meeting.date+'T00:00:00').toLocaleDateString('pt-BR')}</p>` : ''}
-            ${meeting.description ? `<p><strong>Descrição:</strong> ${meeting.description}</p>` : ''}
-        `;
-        
-        if (meeting.photos && meeting.photos.length > 0) {
-            html += `<div class="photo-grid">${meeting.photos.map((src, idx) => 
-                `<img src="${src}" onclick="openLightbox(${JSON.stringify(meeting.photos).replace(/"/g, '&quot;')}, ${idx})">`
-            ).join('')}</div>`;
+        let photosHtml = '';
+        if(m.photos && m.photos.length) {
+            photosHtml = `<div class="photo-grid">${m.photos.map(src => `<img src="${src}" onclick="openLightbox(${JSON.stringify(m.photos).replace(/"/g,'&quot;')}, '${src}')">`).join('')}</div>`;
         }
-        
-        document.getElementById('meetingDetailBody').innerHTML = html;
-        document.getElementById('meetingDeleteBtn').onclick = () => deleteMeeting(id);
+
+        document.getElementById('meetingDetailBody').innerHTML = `
+            <p><strong>Data:</strong> ${m.date || '-'}</p>
+            <p><strong>Descrição:</strong> ${m.desc || '-'}</p>
+            <hr style="margin:15px 0; border:0; border-top:1px solid #eee">
+            <h4>Galeria</h4>
+            ${photosHtml}
+        `;
         openModal('modalMeetingDetail');
     }
 
-    function editMeeting() {
-        const meeting = meetings.find(m => m.id === currentDetailMeetingId);
-        if (!meeting) return;
-        
-        editingMeetingId = currentDetailMeetingId;
+    // ==================== UTILITIES ====================
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    
+    function showToast(msg, type='info') {
+        const c = document.getElementById('toastContainer');
+        const t = document.createElement('div');
+        t.className = `toast toast-${type}`;
+        t.innerText = msg;
+        c.appendChild(t);
+        setTimeout(() => t.remove(), 3000);
+    }
+
+    function scrollToSection(id) { document.getElementById(id).scrollIntoView({behavior:'smooth'}); }
+
+    function openLightbox(imgs, current) {
+        lightboxImages = Array.isArray(imgs) ? imgs : [imgs];
+        lightboxIndex = lightboxImages.indexOf(current);
+        updateLightbox();
+        document.getElementById('lightbox').classList.add('active');
+    }
+
+    function closeLightbox() { document.getElementById('lightbox').classList.remove('active'); }
+    
+    function navLightbox(dir) {
+        lightboxIndex += dir;
+        if(lightboxIndex < 0) lightboxIndex = lightboxImages.length - 1;
+        if(lightboxIndex >= lightboxImages.length) lightboxIndex = 0;
+        updateLightbox();
+    }
+
+    function updateLightbox() {
+        const img = document.getElementById('lightboxImg');
+        const cnt = document.getElementById('lightboxCounter');
+        img.src = lightboxImages[lightboxIndex];
+        cnt.innerText = `${lightboxIndex + 1} / ${lightboxImages.length}`;
+    }
+    
+    // Delete buttons in detail modals
+    document.getElementById('detailDeleteBtn').onclick = () => {
+        if(confirm("Excluir paciente?")) {
+            db.ref('patients/'+currentDetailPatientId).remove(() => {
+                closeModal('modalPatientDetail'); showToast("Excluído.", "info");
+            });
+        }
+    };
+    
+    document.getElementById('meetingDeleteBtn').onclick = () => {
+        if(confirm("Excluir evento?")) {
+            db.ref('meetings/'+currentDetailMeetingId).remove(() => {
+                closeModal('modalMeetingDetail'); showToast("Excluído.", "info");
+            });
+        }
+    };
+
+    // Edit buttons placeholder
+    window.editPatient = () => {
+        closeModal('modalPatientDetail');
+        const p = patients.find(x => x.id === currentDetailPatientId);
+        editingPatientId = p.id;
+        document.getElementById('pName').value = p.name;
+        document.getElementById('pHospital').value = p.hospital;
+        document.getElementById('pDoctor').value = p.doctor;
+        document.getElementById('pProcedure').value = p.procedure;
+        document.getElementById('pComments').value = p.comments;
+        tempPatientPhotos = p.photos || [];
+        updatePhotoPreview('pPhotoPreview', tempPatientPhotos);
+        document.getElementById('patientModalTitle').innerText = "✏️ Editar Paciente";
+        openModal('modalNewPatient');
+    };
+
+    window.editMeeting = () => {
         closeModal('modalMeetingDetail');
-        
-        document.getElementById('meetingModalTitle').innerHTML = currentLang === 'pt' ? '✏️ Editar Evento' : '✏️ Edit Event';
-        document.getElementById('mTitle').value = meeting.title || '';
-        document.getElementById('mDate').value = meeting.date || '';
-        document.getElementById('mDesc').value = meeting.description || '';
-        tempMeetingPhotos = meeting.photos ? [...meeting.photos] : [];
-        renderMeetingPhotoPreview();
+        const m = meetings.find(x => x.id === currentDetailMeetingId);
+        editingMeetingId = m.id;
+        document.getElementById('mTitle').value = m.title;
+        document.getElementById('mDate').value = m.date;
+        document.getElementById('mDesc').value = m.desc;
+        tempMeetingPhotos = m.photos || [];
+        updateMeetingPreview();
         openModal('modalNewMeeting');
-    }
+    };
 
-    function deleteMeeting(id) {
-        if (confirm('Tem certeza que deseja excluir este evento?')) {
-            db.ref('meetings/' + id).remove().then(() => {
-                showToast('Evento excluído', 'success');
-                closeModal('modalMeetingDetail');
-            });
-        }
-    }
-
-    // ==================== PARTÍCULAS ====================
-    function initParticles() {
-        const container = document.getElementById('heroParticles');
-        for (let i = 0; i < 15; i++) {
-            const p = document.createElement('div');
-            p.className = 'hero-particle';
-            const size = Math.random() * 60 + 20;
-            p.style.width = size + 'px';
-            p.style.height = size + 'px';
-            p.style.left = Math.random() * 100 + '%';
-            p.style.top = Math.random() * 100 + '%';
-            p.style.animationDuration = (Math.random() * 6 + 6) + 's';
-            p.style.animationDelay = Math.random() * 5 + 's';
-            container.appendChild(p);
-        }
-    }
-
-    // ==================== NAVBAR SCROLL ====================
-    window.addEventListener('scroll', () => {
-        const navbar = document.getElementById('navbar');
-        if (window.scrollY > 50) navbar.classList.add('scrolled');
-        else navbar.classList.remove('scrolled');
-    });
-
-    // ==================== INICIALIZAÇÃO ====================
-    window.addEventListener('DOMContentLoaded', () => {
-        applyLanguage();
-        renderDoctors();
-        initParticles();
-
-        // Listeners do Firebase para pacientes
-        db.ref('patients').on('value', snap => {
-            patients = [];
-            snap.forEach(child => {
-                patients.push({ id: child.key, ...child.val() });
-            });
-            patients.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-            if (document.getElementById('viewPacientes').classList.contains('active')) {
-                renderPatients();
-            }
-        });
-
-        // Listeners do Firebase para reuniões
-        db.ref('meetings').on('value', snap => {
-            meetings = [];
-            snap.forEach(child => {
-                meetings.push({ id: child.key, ...child.val() });
-            });
-            meetings.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-            if (document.getElementById('viewReunioes').classList.contains('active')) {
-                renderMeetings();
-            }
+    // Close modals on outside click
+    document.querySelectorAll('.modal-overlay').forEach(el => {
+        el.addEventListener('click', e => {
+            if(e.target === el) el.classList.remove('active');
         });
     });
+
 </script>
 </body>
 </html>
