@@ -187,6 +187,7 @@
         .user-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         .user-table th, .user-table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; font-size: 13px; }
         .user-table th { background: #f8f9fa; color: var(--primary); font-weight: 700; text-transform: uppercase; font-size: 11px; }
+        .user-table td .btn { margin-right: 4px; }
         .role-badge { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
         .role-admin { background: var(--accent); color: var(--dark); }
         .role-surgeon { background: var(--primary); color: var(--white); }
@@ -424,7 +425,7 @@
     <div style="padding:24px; max-width:1000px; margin:0 auto;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
             <h2>Gerenciamento de Usuários</h2>
-            <button class="btn btn-accent" onclick="openModal('modalAddUser')">＋ Adicionar Usuário</button>
+            <button class="btn btn-accent" onclick="openAddUserModal()">＋ Adicionar Usuário</button>
         </div>
         
         <div class="user-table-container">
@@ -501,12 +502,12 @@
     </div>
 </div>
 
-<!-- Add User Modal (Admin Only) -->
+<!-- Add/Edit User Modal (Admin Only) -->
 <div class="modal-overlay" id="modalAddUser">
     <div class="modal">
         <div class="modal-header">
-            <h2>Adicionar Usuário</h2>
-            <p>Criar acesso para Cirurgiões ou Pacientes.</p>
+            <h2 id="userModalTitle">Adicionar Usuário</h2>
+            <p id="userModalSubtitle">Criar acesso para Cirurgiões ou Pacientes.</p>
         </div>
         <div class="modal-body">
             <div class="form-group">
@@ -518,7 +519,7 @@
                 <input type="email" id="newUserEmail" class="form-input">
             </div>
             <div class="form-group">
-                <label class="form-label">Senha</label>
+                <label class="form-label">Senha <span id="passHint" style="font-weight:400; text-transform:none; font-size:10px"></span></label>
                 <input type="password" id="newUserPass" class="form-input">
             </div>
             <div class="form-group">
@@ -532,7 +533,7 @@
         </div>
         <div class="modal-footer">
             <button class="btn btn-outline" onclick="closeModal('modalAddUser')">Cancelar</button>
-            <button class="btn btn-primary" onclick="adminCreateUser()">Salvar</button>
+            <button class="btn btn-primary" onclick="saveUserForm()">Salvar</button>
         </div>
     </div>
 </div>
@@ -670,6 +671,7 @@
     // ==================== AUTH STATE ====================
     let currentUser = null; // Object: { uid, email, name, role }
     let usersList = []; // Cache of users for admin panel
+    let editingUserId = null; // ID do usuário sendo editado no painel admin
 
     // ==================== I18N / TRANSLATION ====================
     let currentLang = localStorage.getItem('s2w_lang') || 'pt';
@@ -986,29 +988,79 @@
         setTimeout(() => toast.remove(), 3500);
     }
 
-    // ==================== ADMIN USER CREATION ====================
-    function adminCreateUser() {
+    // ==================== ADMIN USER CREATION & EDITING ====================
+    function openAddUserModal() {
+        editingUserId = null;
+        document.getElementById('userModalTitle').innerText = 'Adicionar Usuário';
+        document.getElementById('userModalSubtitle').innerText = 'Criar acesso para Cirurgiões ou Pacientes.';
+        document.getElementById('newUserName').value = '';
+        document.getElementById('newUserEmail').value = '';
+        document.getElementById('newUserPass').value = '';
+        document.getElementById('newUserRole').value = 'surgeon';
+        document.getElementById('passHint').innerText = '';
+        openModal('modalAddUser');
+    }
+
+    function editUser(uid) {
+        const user = usersList.find(u => u.uid === uid);
+        if(!user) return;
+        editingUserId = uid;
+        document.getElementById('userModalTitle').innerText = 'Editar Usuário';
+        document.getElementById('userModalSubtitle').innerText = 'Altere os dados do usuário. Deixe a senha em branco para não alterar.';
+        document.getElementById('newUserName').value = user.name || '';
+        document.getElementById('newUserEmail').value = user.email || '';
+        document.getElementById('newUserPass').value = ''; // Deixa em branco por segurança
+        document.getElementById('newUserRole').value = user.role || 'patient';
+        document.getElementById('passHint').innerText = '(deixe em branco para manter a atual)';
+        openModal('modalAddUser');
+    }
+
+    function saveUserForm() {
         const name = document.getElementById('newUserName').value.trim();
         const email = document.getElementById('newUserEmail').value.trim().toLowerCase();
         const pass = document.getElementById('newUserPass').value.trim();
         const role = document.getElementById('newUserRole').value;
 
-        if(!name || !email || !pass) { showToast("Preencha todos os campos.", "error"); return; }
+        if(!name || !email) { showToast("Preencha nome e email.", "error"); return; }
 
-        const exists = usersList.find(u => u.email === email);
-        if(exists) { showToast("Email já cadastrado.", "error"); return; }
+        if(editingUserId) {
+            // Atualizar usuário existente
+            const updates = { name, email, role, updatedAt: Date.now() };
+            
+            // Verifica conflito de email com OUTROS usuários
+            const emailConflict = usersList.find(u => u.email === email && u.uid !== editingUserId);
+            if(emailConflict) { showToast("Este email já está cadastrado para outro usuário.", "error"); return; }
 
-        const newUserRef = db.ref('users').push();
-        newUserRef.set({ name, email, password: pass, role, createdAt: Date.now() }, (err) => {
-            if(err) { showToast("Erro ao salvar.", "error"); }
-            else {
-                closeModal('modalAddUser');
-                showToast("Usuário criado com sucesso!", "success");
-                document.getElementById('newUserName').value = '';
-                document.getElementById('newUserEmail').value = '';
-                document.getElementById('newUserPass').value = '';
+            // Se a senha foi preenchida, atualiza
+            if(pass.length > 0) {
+                if(pass.length < 6) { showToast("A nova senha deve ter no mínimo 6 caracteres.", "error"); return; }
+                updates.password = pass;
             }
-        });
+
+            db.ref('users/' + editingUserId).update(updates, err => {
+                if(err) showToast("Erro ao atualizar.", "error");
+                else {
+                    closeModal('modalAddUser');
+                    showToast("Usuário atualizado com sucesso!", "success");
+                }
+            });
+        } else {
+            // Criar novo usuário (lógica original de adminCreateUser)
+            if(!pass) { showToast("Preencha a senha.", "error"); return; }
+            if(pass.length < 6) { showToast("A senha deve ter no mínimo 6 caracteres.", "error"); return; }
+
+            const exists = usersList.find(u => u.email === email);
+            if(exists) { showToast("Email já cadastrado.", "error"); return; }
+
+            const newUserRef = db.ref('users').push();
+            newUserRef.set({ name, email, password: pass, role, createdAt: Date.now() }, (err) => {
+                if(err) { showToast("Erro ao salvar.", "error"); }
+                else {
+                    closeModal('modalAddUser');
+                    showToast("Usuário criado com sucesso!", "success");
+                }
+            });
+        }
     }
 
     function renderUserTable() {
@@ -1022,7 +1074,10 @@
                 <td>${u.name || '-'}</td>
                 <td>${u.email || '-'}</td>
                 <td><span class="role-badge ${roleClass}">${u.role}</span></td>
-                <td><button class="btn btn-danger btn-sm" onclick="deleteUser('${u.uid}')">Excluir</button></td>
+                <td>
+                    <button class="btn btn-sm btn-outline" onclick="editUser('${u.uid}')">Editar</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteUser('${u.uid}')">Excluir</button>
+                </td>
             `;
             tbody.appendChild(tr);
         });
