@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -98,6 +98,23 @@
         #loadingScreen { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; z-index: 9999; }
         .paciente-group-title { font-size: 11px; font-weight: bold; color: var(--accent); margin-top: 8px; margin-bottom: 4px; text-transform: uppercase; }
         .paciente-item { font-size: 12px; padding: 2px 0; color: var(--dark); }
+
+        /* New styles for independent rooms */
+        .sala-card { background: var(--white); border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 20px; overflow: hidden; border: 1px solid #ddd; }
+        .sala-header { background: var(--primary); color: var(--white); padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+        .sala-header h3 { margin: 0; font-size: 15px; }
+        .sala-header .sala-date-field { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+        .sala-header .sala-date-field input[type="date"] { padding: 4px 6px; border: 1px solid rgba(255,255,255,0.4); border-radius: 4px; background: rgba(255,255,255,0.15); color: var(--white); font-size: 12px; }
+        .sala-header .sala-date-field input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
+        .sala-body { padding: 12px; }
+        .surgery-item { background: var(--primary-light); border-radius: 6px; padding: 10px; margin-bottom: 10px; border-left: 4px solid var(--accent); position: relative; }
+        .surgery-item:last-child { margin-bottom: 0; }
+        .surgery-time-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .surgery-time-row input[type="text"] { width: 130px; font-weight: bold; color: var(--primary); }
+        .surgery-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .surgery-fields .full-width { grid-column: 1 / -1; }
+        .surgery-item .btn-remove { position: absolute; top: 8px; right: 8px; }
+        .no-surgeries { color: #999; font-size: 12px; font-style: italic; text-align: center; padding: 15px; }
     </style>
 </head>
 <body>
@@ -231,16 +248,24 @@
         return result;
     }
 
+    function makeEmptySurgery() {
+        return { time: "", medico: "", materiais: [], paciente: "", instrumentador: "", motor: false, neoortho: "", observacao: "", status: "", sponsor: "" };
+    }
+
+    function makeDefaultRoomData(defaultDate) {
+        return { date: defaultDate, surgeries: [] };
+    }
+
     const defaultDatabaseState = {
       "medicos": [ "Dr. Thomas San Giovannni", "Dr. Panos Symeonides", "Dr. David kay", "Dr. Henyik Liska", "Dr. Alexandre Leme Godoy dos Santos", "Dr. José Antônio Veiga Sanhudo", "Dr. Bernard Fábio Meyer", "Dr. Orides Rinaldi Merino", "Dr. João Luiz Vieira da Silva", "Dr. Bruno A. B. Moura", "Dr. Luiz Fernando Bonaroski", "Dra. Amanda Damazio de Oliveira", "Dra. Barbara Heloisa Breidenbach Pupim", "Dr. Daniel Kyubin Cho", "Dr. José Tarcio de Campos Filho", "Dr. Alexandre Antonio de Camargo", "Dr. Jamil Faissal Soni" ],
       "materiais": { "TTL": { "chc": 4, "chr": 3, "components": {} }, "TTCL": { "chc": 0, "chr": 3, "components": {} }, "FlexaFt": { "chc": 21, "chr": 0, "components": {} }, "Placa Retas": { "chc": 6, "chr": 2, "components": {} }, "Placa em T": { "chc": 8, "chr": 2, "components": {} }, "Pudu": { "chc": 5, "chr": 0, "components": {} }, "Osteotomia Calcâneo": { "chc": 3, "chr": 2, "components": {} }, "Parafuso 7mm": { "chc": 100, "chr": 0, "components": {} }, "Parafuso 4.5mm": { "chc": 8, "chr": 0, "components": {} }, "MTF": { "chc": 2, "chr": 4, "components": {} }, "Herbert": { "chc": 0, "chr": 10, "components": {} }, "Parafusos Canulados": { "chc": 0, "chr": 40, "components": {} } },
       "instrumentadores": [],
       "neoorthos": [ "Vladimir", "Natacha", "Gustavo", "Maycon" ],
       "scheduleData": {
-        "CHC_08": { "Sala 1": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "", "status": "", "sponsor": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "", "status": "", "sponsor": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "", "status": "", "sponsor": "" } }, "Sala 2": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "", "status": "", "sponsor": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "", "status": "", "sponsor": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "", "status": "", "sponsor": "" } }, "Sala 3": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "", "status": "", "sponsor": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "", "status": "", "sponsor": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "", "status": "", "sponsor": "" } }, "Sala 4": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "", "status": "", "sponsor": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "", "status": "", "sponsor": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "", "status": "", "sponsor": "" } }, "Sala 5": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "", "status": "", "sponsor": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "", "status": "", "sponsor": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "", "status": "", "sponsor": "" } } },
-        "CHC_09": { "Sala 1": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": true, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": true, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } }, "Sala 2": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": true, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": true, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } }, "Sala 3": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": true, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": true, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } }, "Sala 4": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": true, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": true, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } }, "Sala 5": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": true, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": true, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } } },
-        "CHR_08": { "Sala 1": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } }, "Sala 2": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } }, "Sala 3": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } }, "Sala 4": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } }, "Sala 5": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": true, "neoortho": "", "observacao": "" } } },
-        "CHR_09": { "Sala 1": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } }, "Sala 2": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "Vladimir", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } }, "Sala 3": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } }, "Sala 4": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } }, "Sala 5": { "07:00 - 10:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "10:00 - 13:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" }, "14:00 - 17:00": { "medico": "", "materiais": [], "paciente": "", "instrumentador": "", "motor": false, "neoortho": "", "observacao": "" } } },
+        "CHC_08": { "Sala 1": { "date": "2026-10-08", "surgeries": [] }, "Sala 2": { "date": "2026-10-08", "surgeries": [] }, "Sala 3": { "date": "2026-10-08", "surgeries": [] }, "Sala 4": { "date": "2026-10-08", "surgeries": [] } },
+        "CHC_09": { "Sala 1": { "date": "2026-10-09", "surgeries": [] }, "Sala 2": { "date": "2026-10-09", "surgeries": [] }, "Sala 3": { "date": "2026-10-09", "surgeries": [] }, "Sala 4": { "date": "2026-10-09", "surgeries": [] }, "Sala 5": { "date": "2026-10-09", "surgeries": [] } },
+        "CHR_08": { "Sala 1": { "date": "2026-10-08", "surgeries": [] }, "Sala 2": { "date": "2026-10-08", "surgeries": [] }, "Sala 3": { "date": "2026-10-08", "surgeries": [] }, "Sala 4": { "date": "2026-10-08", "surgeries": [] }, "Sala 5": { "date": "2026-10-08", "surgeries": [] } },
+        "CHR_09": { "Sala 1": { "date": "2026-10-09", "surgeries": [] }, "Sala 2": { "date": "2026-10-09", "surgeries": [] }, "Sala 3": { "date": "2026-10-09", "surgeries": [] }, "Sala 4": { "date": "2026-10-09", "surgeries": [] }, "Sala 5": { "date": "2026-10-09", "surgeries": [] } },
         "EVENT_05": [ { "time": "7:00", "title": "Fotografos e Equipe", "desc": "", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 10000, "comments": "" }, { "time": "7:00", "title": "Entrega dos Crachás", "desc": "", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 2000, "comments": "Crachás divididos em cores diferentes:\nProfessores (25 Unid.);\nStaffs (25 Unid.);\nInscritos (40 Unid.);\nObservadores (40 Unid.):" } ],
         "EVENT_06": [ { "time": "07:30 - 08:00", "title": "Entrega de Scrubs", "desc": "", "resp": "Heloise", "sponsor": "NeoOrtho", "price": 141000, "comments": "" } ],
         "EVENT_07": [ { "time": "08:00 - 09:20", "title": "Aula", "desc": "", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 3000, "comments": "" } ]
@@ -249,7 +274,6 @@
 
     let medicos = [], materiais = {}, instrumentadores = [], neoorthos = [], scheduleData = {}, expandedMaterials = {}, dragState = { tabKey: null, dragIndex: null }, patientsDB = {};
     const regrasMedicos = { "Dr. Bruno A. B. Moura": "CHR", "Dr. Luiz Fernando Bonaroski": "CHR", "Dr. João Luiz Vieira da Silva": "CHC" };
-    const times = ["07:00 - 10:00", "10:00 - 13:00", "14:00 - 17:00"];
     const salas = ["Sala 1", "Sala 2", "Sala 3", "Sala 4", "Sala 5"];
     const maxMotorsPerHospital = 5;
     let autoSaveTimer = null;
@@ -301,27 +325,37 @@
 
             ["CHC_08", "CHC_09", "CHR_08", "CHR_09"].forEach(tab => {
                 if(!scheduleData[tab]) scheduleData[tab] = {};
+                const tabDate = tab.split('_')[1];
+                const defaultDate = `2026-10-${tabDate}`;
                 salas.forEach(sala => {
-                    if(!scheduleData[tab][sala]) scheduleData[tab][sala] = {};
-                    times.forEach(time => {
-                        if(!scheduleData[tab][sala][time]) {
-                             scheduleData[tab][sala][time] = { medico: "", materiais: [], paciente: "", instrumentador: "", motor: false, neoortho: "", observacao: "", status: "", sponsor: "" };
-                        } else {
-                            const slot = scheduleData[tab][sala][time];
-                            if(slot.material && typeof slot.material === 'string' && slot.material !== "") {
-                                slot.materiais = [slot.material];
-                                delete slot.material;
+                    if(!scheduleData[tab][sala]) {
+                        scheduleData[tab][sala] = makeDefaultRoomData(defaultDate);
+                    } else if (!scheduleData[tab][sala].surgeries && !scheduleData[tab][sala].date) {
+                        const oldSlots = scheduleData[tab][sala];
+                        const surgeries = [];
+                        for (const timeKey in oldSlots) {
+                            if (Object.prototype.hasOwnProperty.call(oldSlots, timeKey)) {
+                                const slot = oldSlots[timeKey];
+                                if(slot.material && typeof slot.material === 'string' && slot.material !== "") {
+                                    slot.materiais = [slot.material];
+                                    delete slot.material;
+                                }
+                                if(!slot.materiais) slot.materiais = [];
+                                if(slot.observacao === undefined) slot.observacao = "";
+                                if(slot.status === undefined) slot.status = "";
+                                if(slot.sponsor === undefined) slot.sponsor = "";
+                                surgeries.push({ time: timeKey, ...slot });
                             }
-                            if(!slot.materiais) slot.materiais = [];
-                            if(slot.observacao === undefined) slot.observacao = "";
-                            if(slot.status === undefined) slot.status = "";
-                            if(slot.sponsor === undefined) slot.sponsor = "";
                         }
-                    });
+                        scheduleData[tab][sala] = { date: defaultDate, surgeries: surgeries };
+                    } else {
+                        if(!scheduleData[tab][sala].date) scheduleData[tab][sala].date = defaultDate;
+                        if(!scheduleData[tab][sala].surgeries) scheduleData[tab][sala].surgeries = [];
+                    }
                 });
             });
 
-            document.getElementById('loadingScreen').style.display = 'none'; 
+            document.getElementById('loadingScreen').style.display = 'none';
             updateSaveStatus('salvo'); 
             initUI();
         }).catch(error => { console.error("Erro CRÍTICO:", error); document.getElementById('loadingScreen').innerHTML = "<h2>Erro ao conectar ao Banco</h2>"; });
@@ -443,8 +477,36 @@
     }
     function updateComponent(mat, compName, val) { if(materiais[mat] && materiais[mat].components[compName] !== undefined) { materiais[mat].components[compName] = parseInt(val) || 0; triggerAutoSave(); } }
 
-    function getUsedResourcesSameHospitalTime(tabPrefix, date, time, excludeSala) { const tabKey = `${tabPrefix}_${date}`; const used = { medicos: [], instrumentadores: [], motores: 0 }; if (scheduleData[tabKey]) { salas.forEach(sala => { if (sala === excludeSala) return; const slot = scheduleData[tabKey][sala]?.[time]; if (slot) { if (slot.medico) used.medicos.push(slot.medico); if (slot.instrumentador) used.instrumentadores.push(slot.instrumentador); if (slot.motor) used.motores++; } }); } return used; }
-    function isUsedInOtherHospitalDay(resourceType, resourceName, currentHospital, date) { const otherHospital = currentHospital === "CHC" ? "CHR" : "CHC"; const otherTabKey = `${otherHospital}_${date}`; if (!scheduleData[otherTabKey]) return false; for (let sala in scheduleData[otherTabKey]) { for (let time in scheduleData[otherTabKey][sala]) { const slot = scheduleData[otherTabKey][sala][time]; if (resourceType === 'medico' && slot.medico === resourceName) return true; if (resourceType === 'neoortho' && slot.neoortho === resourceName) return true; } } return false; }
+    function getRoomDate(tabKey, sala) { return scheduleData[tabKey]?.[sala]?.date || ""; }
+    function getUsedResourcesSameHospitalTime(tabKey, sala, surgeryIndex) {
+        const used = { medicos: [], instrumentadores: [], motores: 0 };
+        if (!scheduleData[tabKey]) return used;
+        salas.forEach(s => {
+            if (s === sala) return;
+            const room = scheduleData[tabKey][s];
+            if (!room || !room.surgeries) return;
+            room.surgeries.forEach(surgery => {
+                if (surgery.medico) used.medicos.push(surgery.medico);
+                if (surgery.instrumentador) used.instrumentadores.push(surgery.instrumentador);
+                if (surgery.motor) used.motores++;
+            });
+        });
+        return used;
+    }
+    function isUsedInOtherHospitalDay(resourceType, resourceName, currentHospital, date) {
+        const otherHospital = currentHospital === "CHC" ? "CHR" : "CHC";
+        const otherTabKey = `${otherHospital}_${date}`;
+        if (!scheduleData[otherTabKey]) return false;
+        for (let sala in scheduleData[otherTabKey]) {
+            const room = scheduleData[otherTabKey][sala];
+            if (!room || !room.surgeries) continue;
+            for (const surgery of room.surgeries) {
+                if (resourceType === 'medico' && surgery.medico === resourceName) return true;
+                if (resourceType === 'neoortho' && surgery.neoortho === resourceName) return true;
+            }
+        }
+        return false;
+    }
     function formatBRL(value) { return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
 
     function renderSponsorSummary() { const summary = {}; let totalGeral = 0; ['EVENT_05', 'EVENT_06', 'EVENT_07'].forEach(day => { if (scheduleData[day]) { scheduleData[day].forEach(task => { const sponsorName = task.sponsor.trim() || "Sem Patrocinador"; const cost = parseFloat(task.price) || 0; if (cost > 0) { if (!summary[sponsorName]) summary[sponsorName] = 0; summary[sponsorName] += cost; totalGeral += cost; } }); } }); let html = `<div class="summary-box"><div class="summary-title">📊 Resumo de Custos</div><div class="summary-grid">`; const sponsors = Object.keys(summary).sort(); if (sponsors.length === 0) html += `<p style="color:#777; font-size:12px;">Nenhum custo.</p>`; else sponsors.forEach(spon => html += `<div class="sponsor-card"><div class="sponsor-name">${spon}</div><div class="sponsor-value">${formatBRL(summary[spon])}</div></div>`); html += `</div><div class="total-geral">Total Geral: ${formatBRL(totalGeral)}</div></div>`; return html; }
@@ -455,10 +517,12 @@
         surgeryTabs.forEach(tab => {
             if (!scheduleData[tab]) return;
             for (let sala in scheduleData[tab]) {
-                for (let time in scheduleData[tab][sala]) {
-                    const slotMats = scheduleData[tab][sala][time].materiais || [];
+                const room = scheduleData[tab][sala];
+                if (!room || !room.surgeries) continue;
+                room.surgeries.forEach(surgery => {
+                    const slotMats = surgery.materiais || [];
                     slotMats.forEach(m => { if(m) usedMaterials[m] = (usedMaterials[m] || 0) + 1; });
-                }
+                });
             }
         });
         let html = `<div class="summary-box"><div class="summary-title">📦 Previsão de Materiais e Componentes (Cirurgias)</div><div class="summary-grid">`;
@@ -495,12 +559,7 @@
         ['CHC_08', 'CHC_09', 'CHR_08', 'CHR_09'].forEach(tab => { 
             const hosp = tab.split('_')[0]; 
             if (!scheduleData[tab]) return; 
-            for (let sala in scheduleData[tab]) { 
-                for (let time in scheduleData[tab][sala]) { 
-                    const slotMats = scheduleData[tab][sala][time].materiais || [];
-                    slotMats.forEach(m => { if(m) kitUsage[hosp][m] = (kitUsage[hosp][m] || 0) + 1; });
-                } 
-            } 
+            for (let sala in scheduleData[tab]) { const room = scheduleData[tab][sala]; if (!room || !room.surgeries) continue; room.surgeries.forEach(surgery => { const slotMats = surgery.materiais || []; slotMats.forEach(m => { if(m) kitUsage[hosp][m] = (kitUsage[hosp][m] || 0) + 1; }); }); } 
         }); 
         let html = `<h2 style="color:var(--primary);">📦 Relatório de Materiais</h2>`;
         html += `<table><thead><tr><th>Kit</th><th>CHC</th><th>CHR</th><th>Total</th></tr></thead><tbody>`; 
@@ -537,25 +596,27 @@
         });
         ['CHC_08', 'CHR_08', 'CHC_09', 'CHR_09'].forEach(dayKey => {
             if (!scheduleData[dayKey]) return;
-            const day = parseInt(dayKey.split('_')[1]);
             const hosp = dayKey.split('_')[0];
-            const dateStr = `${String(day).padStart(2, '0')}/10/2026 (${hosp})`;
-            const dateObj = new Date(2026, 9, day);
             for (let sala in scheduleData[dayKey]) {
-                for (let time in scheduleData[dayKey][sala]) {
-                    const slot = scheduleData[dayKey][sala][time];
-                    if (slot.medico || slot.paciente) {
+                const room = scheduleData[dayKey][sala];
+                if (!room || !room.surgeries) continue;
+                const roomDate = room.date || `2026-10-${dayKey.split('_')[1]}`;
+                const dateParts = roomDate.split('-');
+                const dateObj = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+                const dateStr = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]} (${hosp})`;
+                room.surgeries.forEach(surgery => {
+                    if (surgery.medico || surgery.paciente) {
                         agendaItems.push({
                             dateObj: dateObj,
                             dateStr: dateStr,
-                            time: time,
-                            desc: `Cirurgia - Sala ${sala}`,
-                            resp: `Médico: ${slot.medico || 'N/A'} | Paciente: ${slot.paciente || 'N/A'}`,
-                            status: slot.status || '',
-                            sponsor: slot.sponsor || ''
+                            time: surgery.time || '-',
+                            desc: `Cirurgia - ${sala}`,
+                            resp: `Médico: ${surgery.medico || 'N/A'} | Paciente: ${surgery.paciente || 'N/A'}`,
+                            status: surgery.status || '',
+                            sponsor: surgery.sponsor || ''
                         });
                     }
-                }
+                });
             }
         });
         agendaItems.sort((a, b) => {
@@ -590,47 +651,73 @@
     function addTask(tabKey) { if (!scheduleData[tabKey]) scheduleData[tabKey] = []; scheduleData[tabKey].push({ time: "-", title: "Nova Tarefa", desc: "", resp: "", status: "", sponsor: "", price: 0, comments: "" }); renderEvento(tabKey); triggerAutoSave(); }
     function deleteTask(tabKey, index) { if(confirm("Excluir tarefa?")) { scheduleData[tabKey].splice(index, 1); renderEvento(tabKey); triggerAutoSave(); } }
 
-    function updateSlot(tabKey, sala, time, field, value) {
-        scheduleData[tabKey][sala][time][field] = value;
+
+    function updateSurgeryField(tabKey, sala, surgeryIndex, field, value) {
+        scheduleData[tabKey][sala].surgeries[surgeryIndex][field] = value;
         triggerAutoSave();
-        renderCirurgias(tabKey); 
+        renderCirurgias(tabKey);
     }
 
-    // --- FUNÇÃO CORRIGIDA: AGORA PERMITE DUPLICATAS ---
-    function addMaterialToSlot(tabKey, sala, time, selectId) {
+    function addSurgery(tabKey, sala) {
+        if (!scheduleData[tabKey][sala].surgeries) scheduleData[tabKey][sala].surgeries = [];
+        scheduleData[tabKey][sala].surgeries.push(makeEmptySurgery());
+        triggerAutoSave();
+        renderCirurgias(tabKey);
+    }
+
+    function removeSurgery(tabKey, sala, surgeryIndex) {
+        if (confirm('Excluir cirurgia?')) {
+            scheduleData[tabKey][sala].surgeries.splice(surgeryIndex, 1);
+            triggerAutoSave();
+            renderCirurgias(tabKey);
+        }
+    }
+
+    function moveSurgery(tabKey, sala, surgeryIndex, direction) {
+        const surgeries = scheduleData[tabKey][sala].surgeries;
+        const newIndex = surgeryIndex + direction;
+        if (newIndex < 0 || newIndex >= surgeries.length) return;
+        const temp = surgeries[surgeryIndex];
+        surgeries[surgeryIndex] = surgeries[newIndex];
+        surgeries[newIndex] = temp;
+        triggerAutoSave();
+        renderCirurgias(tabKey);
+    }
+
+    function addMaterialToSurgery(tabKey, sala, surgeryIndex, selectId) {
         const select = document.getElementById(selectId);
         const matName = select.value;
-        
-        // Se não selecionou nada, sai
-        if(!matName) return;
-
-        const slot = scheduleData[tabKey][sala][time];
-        
-        // REMOVIDA A VERIFICAÇÃO DE DUPLICATIA: if(!slot.materiais.includes(matName))
-        // Agora adiciona sempre, pois o estoque já foi validado no dropdown.
-        slot.materiais.push(matName);
-        
+        if (!matName) return;
+        const surgery = scheduleData[tabKey][sala].surgeries[surgeryIndex];
+        surgery.materiais.push(matName);
         triggerAutoSave();
-        renderCirurgias(tabKey); 
+        renderCirurgias(tabKey);
     }
 
-    function removeMaterialFromSlot(tabKey, sala, time, index) {
-        const slot = scheduleData[tabKey][sala][time];
-        slot.materiais.splice(index, 1);
+    function removeMaterialFromSurgery(tabKey, sala, surgeryIndex, matIndex) {
+        scheduleData[tabKey][sala].surgeries[surgeryIndex].materiais.splice(matIndex, 1);
+        triggerAutoSave();
+        renderCirurgias(tabKey);
+    }
+
+    function updateRoomDate(tabKey, sala, newDate) {
+        scheduleData[tabKey][sala].date = newDate;
         triggerAutoSave();
         renderCirurgias(tabKey);
     }
 
     function getAllUsedPatients() {
         let used = new Set();
-        if(scheduleData) {
+        if (scheduleData) {
             Object.keys(scheduleData).forEach(tab => {
-                if(tab.startsWith('CHC') || tab.startsWith('CHR')) {
+                if (tab.startsWith('CHC') || tab.startsWith('CHR')) {
                     Object.keys(scheduleData[tab]).forEach(sala => {
-                        Object.keys(scheduleData[tab][sala]).forEach(time => {
-                            const p = scheduleData[tab][sala][time].paciente;
-                            if(p) used.add(p);
-                        });
+                        const room = scheduleData[tab][sala];
+                        if (room && room.surgeries) {
+                            room.surgeries.forEach(surgery => {
+                                if (surgery.paciente) used.add(surgery.paciente);
+                            });
+                        }
                     });
                 }
             });
@@ -638,100 +725,118 @@
         return used;
     }
 
-    function renderCirurgias(tabKey) { 
-        const container = document.getElementById('scheduleContainer'); 
-        const [hospital, date] = tabKey.split('_'); 
-        const hKey = hospital.toLowerCase(); 
-        const medFilter = medicos.filter(m => { if (regrasMedicos[m] && regrasMedicos[m] !== hospital) return false; return true; }).sort(); 
+    function renderCirurgias(tabKey) {
+        const container = document.getElementById('scheduleContainer');
+        const [hospital, defaultDate] = tabKey.split('_');
+        const hKey = hospital.toLowerCase();
+        const medFilter = medicos.filter(m => { if (regrasMedicos[m] && regrasMedicos[m] !== hospital) return false; return true; }).sort();
         const globallyUsedPatients = getAllUsedPatients();
 
-        let html = `<table><thead><tr><th>Horário</th>${salas.map(s => `<th>${s}</th>`).join('')}</tr></thead><tbody>`; 
-        
-        times.forEach((time, timeIdx) => { 
-            const separatorClass = timeIdx < times.length - 1 ? 'time-separator' : ''; 
-            html += `<tr><td class="time-col ${separatorClass}">${time}</td>`; 
-            
-            salas.forEach(sala => { 
-                const slot = scheduleData[tabKey][sala][time]; 
-                const usedSameTime = getUsedResourcesSameHospitalTime(hospital, date, time, sala); 
-                
-                let medOpt = `<option value="">Selecione...</option>`; 
-                medFilter.forEach(m => { 
-                    if (usedSameTime.medicos.includes(m) && slot.medico !== m) return; 
-                    if (isUsedInOtherHospitalDay('medico', m, hospital, date) && slot.medico !== m) return; 
-                    medOpt += `<option value="${m}" ${slot.medico === m ? 'selected' : ''}>${m}</option>`; 
-                }); 
-                
-                let instOpt = `<option value="">Selecione...</option>`; 
-                instrumentadores.forEach(i => { 
-                    if (usedSameTime.instrumentadores.includes(i) && slot.instrumentador !== i) return; 
-                    instOpt += `<option value="${i}" ${slot.instrumentador === i ? 'selected' : ''}>${i}</option>`; 
-                }); 
-                
-                let neoOpt = `<option value="">Selecione...</option>`; 
-                neoorthos.forEach(n => { 
-                    if (isUsedInOtherHospitalDay('neoortho', n, hospital, date) && slot.neoortho !== n) return; 
-                    neoOpt += `<option value="${n}" ${slot.neoortho === n ? 'selected' : ''}>${n}</option>`; 
-                }); 
+        let html = '';
+        salas.forEach(sala => {
+            const room = scheduleData[tabKey][sala];
+            if (!room) return;
+            const roomDate = room.date || ('2026-10-' + defaultDate);
+            const surgeries = room.surgeries || [];
+            const usedSameHosp = getUsedResourcesSameHospitalTime(tabKey, sala);
 
-                let pacOpt = `<option value="">Selecione...</option>`;
-                if(patientsDB) {
+            html += '<div class="sala-card">';
+            html += '<div class="sala-header">';
+            html += '<h3>' + sala + '</h3>';
+            html += '<div class="sala-date-field"><label>Data:</label><input type="date" value="' + roomDate + '" onchange="updateRoomDate(\'' + tabKey + '\',\'' + sala + '\',this.value)"></div>';
+            html += '<button class="btn btn-add" style="height:28px; font-size:11px;" onclick="addSurgery(\'' + tabKey + '\',\'' + sala + '\')">+ Cirurgia</button>';
+            html += '</div>';
+            html += '<div class="sala-body">';
+
+            if (surgeries.length === 0) {
+                html += '<div class="no-surgeries">Nenhuma cirurgia agendada para esta sala</div>';
+            }
+
+            surgeries.forEach((surgery, sIdx) => {
+                let medOpt = '<option value="">Selecione...</option>';
+                medFilter.forEach(m => {
+                    if (usedSameHosp.medicos.includes(m) && surgery.medico !== m) return;
+                    if (isUsedInOtherHospitalDay('medico', m, hospital, roomDate.split('-')[2]) && surgery.medico !== m) return;
+                    medOpt += '<option value="' + m + '"' + (surgery.medico === m ? ' selected' : '') + '>' + m + '</option>';
+                });
+
+                let instOpt = '<option value="">Selecione...</option>';
+                instrumentadores.forEach(i => {
+                    if (usedSameHosp.instrumentadores.includes(i) && surgery.instrumentador !== i) return;
+                    instOpt += '<option value="' + i + '"' + (surgery.instrumentador === i ? ' selected' : '') + '>' + i + '</option>';
+                });
+
+                let neoOpt = '<option value="">Selecione...</option>';
+                neoorthos.forEach(n => {
+                    if (isUsedInOtherHospitalDay('neoortho', n, hospital, roomDate.split('-')[2]) && surgery.neoortho !== n) return;
+                    neoOpt += '<option value="' + n + '"' + (surgery.neoortho === n ? ' selected' : '') + '>' + n + '</option>';
+                });
+
+                let pacOpt = '<option value="">Selecione...</option>';
+                if (patientsDB) {
                     Object.values(patientsDB).forEach(p => {
-                        if(p.hospital && p.hospital !== hospital) return;
-                        if(globallyUsedPatients.has(p.name) && slot.paciente !== p.name) return;
-                        pacOpt += `<option value="${p.name}" ${slot.paciente === p.name ? 'selected' : ''}>${p.name}</option>`;
+                        if (p.hospital && p.hospital !== hospital) return;
+                        if (globallyUsedPatients.has(p.name) && surgery.paciente !== p.name) return;
+                        pacOpt += '<option value="' + p.name + '"' + (surgery.paciente === p.name ? ' selected' : '') + '>' + p.name + '</option>';
                     });
                 }
 
-                // Logic Dropdown Material (Stock Check)
                 let currentHospitalMatUsage = {};
                 Object.keys(scheduleData).filter(t => t.startsWith(hospital)).forEach(tk => {
-                    salas.forEach(s => times.forEach(t => {
-                        const m = scheduleData[tk][s][t].materiais || [];
-                        m.forEach(matName => {
-                            currentHospitalMatUsage[matName] = (currentHospitalMatUsage[matName] || 0) + 1;
-                        });
-                    }));
+                    salas.forEach(s => {
+                        const r = scheduleData[tk][s];
+                        if (r && r.surgeries) {
+                            r.surgeries.forEach(sur => {
+                                const mats = sur.materiais || [];
+                                mats.forEach(matName => {
+                                    currentHospitalMatUsage[matName] = (currentHospitalMatUsage[matName] || 0) + 1;
+                                });
+                            });
+                        }
+                    });
                 });
 
-                let matOpt = `<option value="">Adicionar Material...</option>`;
-                Object.keys(materiais).forEach(m => { 
+                let matOpt = '<option value="">Adicionar Material...</option>';
+                Object.keys(materiais).forEach(m => {
                     const stock = materiais[m][hKey];
                     const used = currentHospitalMatUsage[m] || 0;
                     const remaining = stock - used;
                     if (remaining > 0) {
-                         matOpt += `<option value="${m}">${m} (Disp: ${remaining})</option>`; 
+                        matOpt += '<option value="' + m + '">' + m + ' (Disp: ' + remaining + ')</option>';
                     }
-                }); 
-
-                const motorDisabled = (usedSameTime.motores >= maxMotorsPerHospital && !slot.motor) ? 'disabled' : ''; 
-                const motorAlert = (motorDisabled === 'disabled') ? `<span class="alert">Esgotado</span>` : ''; 
-                
-                let tagsHtml = '';
-                (slot.materiais || []).forEach((m, idx) => {
-                    tagsHtml += `<div class="mat-tag" onclick="removeMaterialFromSlot('${tabKey}','${sala}','${time}',${idx})">${m} <span>✕</span></div>`;
                 });
 
-                html += `<td class="${separatorClass}">
-                    <div style="margin-bottom:3px;"><b>Médico:</b><select onchange="updateSlot('${tabKey}','${sala}','${time}','medico',this.value)">${medOpt}</select></div>
-                    <div style="margin-bottom:3px;"><b>Paciente:</b><select onchange="updateSlot('${tabKey}','${sala}','${time}','paciente',this.value)">${pacOpt}</select></div>
-                    <div style="margin-bottom:3px;"><b>Materiais:</b>
-                        <div style="min-height:20px; margin-bottom:2px;">${tagsHtml}</div>
-                        <div style="display:flex; gap:2px;">
-                            <select id="mat-add-${sala}-${time}" style="flex:1;">${matOpt}</select>
-                            <button class="btn btn-add" style="width:30px;" onclick="addMaterialToSlot('${tabKey}','${sala}','${time}','mat-add-${sala}-${time}')">+</button>
-                        </div>
-                    </div>
-                    <div style="margin-bottom:3px;"><b>Instrumentador:</b><select onchange="updateSlot('${tabKey}','${sala}','${time}','instrumentador',this.value)">${instOpt}</select></div>
-                    <div style="margin-bottom:3px;"><b>Motor:</b> <input type="checkbox" onchange="updateSlot('${tabKey}','${sala}','${time}','motor',this.checked)" ${slot.motor ? 'checked' : ''} ${motorDisabled}> ${motorAlert}</div>
-                    <div style="margin-bottom:0px;"><b>Resp. Neo:</b><select onchange="updateSlot('${tabKey}','${sala}','${time}','neoortho',this.value)">${neoOpt}</select></div>
-                    <div style="margin-top:3px; margin-bottom:0px;"><b>Obs:</b><input type="text" value="${slot.observacao || ''}" placeholder="Observações..." onchange="updateSlot('${tabKey}','${sala}','${time}','observacao',this.value)"></div>
-                </td>`; 
-            }); 
-            html += `</tr>`; 
-        }); 
-        html += `</tbody></table>`; 
-        container.innerHTML = html; 
+                const motorDisabled = (usedSameHosp.motores >= maxMotorsPerHospital && !surgery.motor) ? 'disabled' : '';
+                const motorAlert = (motorDisabled === 'disabled') ? '<span class="alert">Esgotado</span>' : '';
+
+                let tagsHtml = '';
+                (surgery.materiais || []).forEach((m, idx) => {
+                    tagsHtml += '<div class="mat-tag" onclick="removeMaterialFromSurgery(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',' + idx + ')">' + m + ' <span>✕</span></div>';
+                });
+
+                html += '<div class="surgery-item">';
+                html += '<button class="btn btn-remove" onclick="removeSurgery(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ')">✕</button>';
+                html += '<div class="surgery-time-row">';
+                html += '<div><label>Horário</label><input type="text" value="' + surgery.time + '" placeholder="ex: 07:00 - 10:00" onchange="updateSurgeryField(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',\'time\',this.value)"></div>';
+                html += '<div class="move-btns" style="margin-top:12px;"><button class="move-btn" onclick="moveSurgery(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',-1)"' + (sIdx === 0 ? ' disabled' : '') + '>▲</button><button class="move-btn" onclick="moveSurgery(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',1)"' + (sIdx === surgeries.length - 1 ? ' disabled' : '') + '>▼</button></div>';
+                html += '</div>';
+                html += '<div class="surgery-fields">';
+                html += '<div><label>Médico</label><select onchange="updateSurgeryField(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',\'medico\',this.value)">' + medOpt + '</select></div>';
+                html += '<div><label>Paciente</label><select onchange="updateSurgeryField(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',\'paciente\',this.value)">' + pacOpt + '</select></div>';
+                html += '<div><label>Instrumentador</label><select onchange="updateSurgeryField(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',\'instrumentador\',this.value)">' + instOpt + '</select></div>';
+                html += '<div><label>Resp. Neo</label><select onchange="updateSurgeryField(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',\'neoortho\',this.value)">' + neoOpt + '</select></div>';
+                html += '<div class="full-width"><label>Materiais</label><div style="min-height:20px; margin-bottom:2px;">' + tagsHtml + '</div><div style="display:flex; gap:2px;"><select id="mat-add-' + sala + '-' + sIdx + '" style="flex:1;">' + matOpt + '</select><button class="btn btn-add" style="width:30px;" onclick="addMaterialToSurgery(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',\'mat-add-' + sala + '-' + sIdx + '\')">+</button></div></div>';
+                html += '<div><label>Motor</label><div style="display:flex;align-items:center;gap:5px;"><input type="checkbox" onchange="updateSurgeryField(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',\'motor\',this.checked)"' + (surgery.motor ? ' checked' : '') + (motorDisabled ? ' disabled' : '') + '> ' + motorAlert + '</div></div>';
+                html += '<div><label>Status</label><input type="text" value="' + (surgery.status || '') + '" placeholder="Status..." onchange="updateSurgeryField(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',\'status\',this.value)"></div>';
+                html += '<div><label>Patrocinador</label><input type="text" value="' + (surgery.sponsor || '') + '" placeholder="Patrocinador..." onchange="updateSurgeryField(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',\'sponsor\',this.value)"></div>';
+                html += '<div class="full-width"><label>Observação</label><input type="text" value="' + (surgery.observacao || '') + '" placeholder="Observações..." onchange="updateSurgeryField(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',\'observacao\',this.value)"></div>';
+                html += '</div></div>';
+            });
+
+            html += '</div></div>';
+        });
+
+        container.innerHTML = html;
     }
 
     loadDataFromCloud();
