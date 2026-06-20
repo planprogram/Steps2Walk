@@ -684,11 +684,11 @@
         renderCirurgias(tabKey);
     }
 
-    function addMaterialToSurgery(tabKey, sala, surgeryIndex, selectId) {
-        const select = document.getElementById(selectId);
-        const matName = select.value;
+    function addMaterialToSurgery(tabKey, sala, surgeryIndex, selectEl) {
+        const matName = selectEl?.value || "";
         if (!matName) return;
         const surgery = scheduleData[tabKey][sala].surgeries[surgeryIndex];
+        if (!surgery.materiais) surgery.materiais = [];
         surgery.materiais.push(matName);
         triggerAutoSave();
         renderCirurgias(tabKey);
@@ -825,7 +825,7 @@
                 html += '<div><label>Paciente</label><select onchange="updateSurgeryField(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',\'paciente\',this.value)">' + pacOpt + '</select></div>';
                 html += '<div><label>Instrumentador</label><select onchange="updateSurgeryField(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',\'instrumentador\',this.value)">' + instOpt + '</select></div>';
                 html += '<div><label>Resp. Neo</label><select onchange="updateSurgeryField(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',\'neoortho\',this.value)">' + neoOpt + '</select></div>';
-                html += '<div class="full-width"><label>Materiais</label><div style="min-height:20px; margin-bottom:2px;">' + tagsHtml + '</div><div style="display:flex; gap:2px;"><select id="mat-add-' + sala + '-' + sIdx + '" style="flex:1;">' + matOpt + '</select><button class="btn btn-add" style="width:30px;" onclick="addMaterialToSurgery(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',\'mat-add-' + sala + '-' + sIdx + '\')">+</button></div></div>';
+                html += '<div class="full-width"><label>Materiais</label><div style="min-height:20px; margin-bottom:2px;">' + tagsHtml + '</div><div style="display:flex; gap:2px;"><select id="mat-add-' + tabKey + '-' + sala + '-' + sIdx + '" style="flex:1;">' + matOpt + '</select><button class="btn btn-add" style="width:30px;" onclick="addMaterialToSurgery(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',document.getElementById(\'mat-add-' + tabKey + '-' + sala + '-' + sIdx + '\'))">+</button></div></div>';
                 html += '<div><label>Motor</label><div style="display:flex;align-items:center;gap:5px;"><input type="checkbox" onchange="updateSurgeryField(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',\'motor\',this.checked)"' + (surgery.motor ? ' checked' : '') + (motorDisabled ? ' disabled' : '') + '> ' + motorAlert + '</div></div>';
                 html += '<div><label>Status</label><input type="text" value="' + (surgery.status || '') + '" placeholder="Status..." onchange="updateSurgeryField(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',\'status\',this.value)"></div>';
                 html += '<div><label>Patrocinador</label><input type="text" value="' + (surgery.sponsor || '') + '" placeholder="Patrocinador..." onchange="updateSurgeryField(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',\'sponsor\',this.value)"></div>';
