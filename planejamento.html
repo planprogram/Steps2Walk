@@ -806,7 +806,8 @@
                     }
                 });
 
-                const motorDisabled = (usedSameHosp.motores >= maxMotorsPerHospital && !surgery.motor) ? 'disabled' : '';
+                const isDay08or09 = tabKey.endsWith('_08') || tabKey.endsWith('_09');
+                const motorDisabled = (!isDay08or09 && usedSameHosp.motores >= maxMotorsPerHospital && !surgery.motor) ? 'disabled' : '';
                 const motorAlert = (motorDisabled === 'disabled') ? '<span class="alert">Esgotado</span>' : '';
 
                 let tagsHtml = '';

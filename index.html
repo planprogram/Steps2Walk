@@ -403,6 +403,25 @@
     ></iframe>
 </div>
 
+<!-- ==================== ORIENTAÇÕES (Patient View) ==================== -->
+<div class="view" id="viewOrientacoes">
+    <div class="sub-header" style="background:#1b5e20; border-color:var(--accent)">
+        <div class="sub-header-left">
+            <button class="btn-home-sub" onclick="goHome()">🏠 Home</button>
+            <div class="sub-header-sep"></div>
+            <h1>📋 Minhas Orientações</h1>
+        </div>
+    </div>
+    <div style="padding:24px; max-width:900px; margin:0 auto;">
+        <div id="orientacoesPatientContent">
+            <div class="empty-state">
+                <h3>Nenhuma orientação disponível</h3>
+                <p>Suas orientações pós-cirúrgicas aparecerão aqui quando forem adicionadas pelo seu médico.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- ==================== PACIENTES ==================== -->
 <div class="view" id="viewPacientes">
     <div class="sub-header">
@@ -412,6 +431,7 @@
             <h1 data-i18n="sub_patients">Registro de Pacientes</h1>
         </div>
         <div class="sub-header-right">
+            <button class="btn-action btn-action-white" onclick="openOrientPatientListModal()" style="margin-right:8px;">📋 Orientações</button>
             <button class="btn-action btn-action-accent" id="btnAddPatientTop" onclick="openModal('modalNewPatient')">＋ <span data-i18n="btn_addpat">Cadastrar Paciente</span></button>
         </div>
     </div>
@@ -657,6 +677,69 @@
         <div class="modal-footer">
             <button class="btn btn-outline" onclick="closeModal('modalOrientacoes')">Fechar</button>
             <button class="btn btn-accent" onclick="saveOrientacoes()">💾 Salvar Orientações</button>
+        </div>
+    </div>
+</div>
+
+<!-- Orientation Edit Modal (Surgeon/Admin only) -->
+<div class="modal-overlay" id="modalOrientEdit">
+    <div class="modal modal-wide">
+        <div class="modal-header">
+            <h2>📋 Orientações do Paciente</h2>
+            <p style="font-size:13px;color:var(--gray-light);margin-top:4px">Gerencie as orientações para: <strong id="orientEditPatientName"></strong></p>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="form-label">Título da Orientação</label>
+                <input type="text" class="form-input" id="orientEditTitle" placeholder="Ex: Orientações Pós-Operatórias">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Descrição</label>
+                <textarea class="form-textarea" id="orientEditDesc" rows="2" placeholder="Descrição geral das orientações..."></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Instruções (uma por linha)</label>
+                <textarea class="form-textarea" id="orientEditInstructions" rows="5" placeholder="Ex:&#10;Manter o curativo limpo e seco&#10;Tomar medicamento conforme prescrito&#10;Retorno em 7 dias"></textarea>
+                <div class="form-hint">Cada linha será exibida como um item numerado para o paciente.</div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Fotos e Vídeos</label>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <label class="btn btn-primary" style="cursor:pointer;">
+                        📷 Adicionar Foto
+                        <input type="file" accept="image/*" multiple style="display:none" onchange="handleOrientEditFileSelect(this, 'image')">
+                    </label>
+                    <label class="btn btn-secondary" style="cursor:pointer;">
+                        🎥 Adicionar Vídeo
+                        <input type="file" accept="video/*" multiple style="display:none" onchange="handleOrientEditFileSelect(this, 'video')">
+                    </label>
+                </div>
+                <div class="form-hint" style="margin-top:4px">Adicione fotos e vídeos com orientações para o paciente.</div>
+                <div class="orientacao-upload-preview" id="orientEditPreview"></div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('modalOrientEdit')">Cancelar</button>
+            <button class="btn btn-accent" onclick="saveOrientEdit()">💾 Salvar Orientações</button>
+        </div>
+    </div>
+</div>
+
+<!-- Patient Orientation List Modal (Surgeon/Admin) -->
+<div class="modal-overlay" id="modalOrientPatientList">
+    <div class="modal modal-wide">
+        <div class="modal-header">
+            <h2>📋 Orientações dos Pacientes</h2>
+            <p style="font-size:13px;color:var(--gray-light);margin-top:4px">Selecione um paciente para gerenciar suas orientações.</p>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <input type="text" class="form-input" id="orientPatientSearch" placeholder="Buscar paciente por nome..." oninput="renderOrientPatientList()">
+            </div>
+            <div id="orientPatientListContainer" style="max-height:400px;overflow-y:auto;"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('modalOrientPatientList')">Fechar</button>
         </div>
     </div>
 </div>
@@ -996,10 +1079,13 @@
             if(currentUser.role === 'admin') {
                 navButtons += '<button class="btn btn-sm btn-ghost" onclick="showView(\'viewAdmin\')">Admin</button>';
             }
-            if(currentUser.role === 'admin' || currentUser.role === 'surgeon' || currentUser.role === 'patient') {
+            if(currentUser.role === 'admin' || currentUser.role === 'surgeon') {
                 navButtons += '<button class="btn btn-sm btn-ghost" onclick="showView(\'viewPacientes\')">Pacientes</button>';
                 navButtons += '<button class="btn btn-sm btn-ghost" onclick="showView(\'viewReunioes\')">Reuniões</button>';
                 navButtons += '<button class="btn btn-sm btn-ghost" onclick="showView(\'viewPlanejamento\')">Planejamento</button>';
+            }
+            if(currentUser.role === 'patient') {
+                navButtons += '<button class="btn btn-sm btn-ghost" onclick="showView(\'viewOrientacoes\')">📋 Orientação</button>';
             }
             navButtons += '<button class="btn btn-sm btn-accent" onclick="logout()">Sair (' + currentUser.name.split(' ')[0] + ')</button>';
             section.innerHTML = btnLang + navButtons;
@@ -1329,6 +1415,13 @@
             photosHtml = '<div class="photo-grid">' + p.photos.map((src,i) => "<img src='" + src + "' onclick='openLightbox(" + JSON.stringify(p.photos) + ", " + i + ")'>").join('') + '</div>';
         }
         const orientacoesCount = p.orientacoes ? p.orientacoes.length : 0;
+        
+        // Find matching patient user by name
+        const patientUser = usersList.find(u => u.role === 'patient' && u.name && p.name && u.name.toLowerCase() === p.name.toLowerCase());
+        const patientUserUid = patientUser ? patientUser.uid : null;
+        const patientUserOrient = patientUserUid && patientOrientationsCache[patientUserUid];
+        const patientOrientItemsCount = patientUserOrient && patientUserOrient.items ? patientUserOrient.items.length : 0;
+        
         body.innerHTML = '<p><strong>Hospital:</strong> ' + (p.hospital || '-') + '</p>'
             + '<p><strong>Médico:</strong> ' + (p.doctor || '-') + '</p>'
             + '<p><strong>Procedimento:</strong> ' + (p.procedure || '-') + '</p>'
@@ -1342,6 +1435,40 @@
             + '</div></div>'
             + '<div id="detailOrientacoesGrid"></div>'
             + '</div>';
+        
+        // Patient User Orientation Section (for patient to view)
+        if(currentUser && (currentUser.role === 'admin' || currentUser.role === 'surgeon')) {
+            body.innerHTML += '<div class="orientacoes-section" style="border-top:2px solid var(--secondary);margin-top:16px;padding-top:16px;">'
+                + '<div class="orientacoes-header">'
+                + '<div class="orientacoes-title" style="color:var(--secondary);">📋 Orientação do Paciente (Visualização do Paciente)</div>'
+                + '<div class="orientacoes-actions">';
+            
+            if(patientUserUid) {
+                body.innerHTML += '<button class="btn btn-sm btn-secondary" onclick="openOrientPatientUserModal(\'' + patientUserUid + '\',\'' + (p.name || '').replace(/'/g, "\\'") + '\')">✏️ Editar Orientação do Paciente</button>';
+            } else {
+                body.innerHTML += '<span style="font-size:12px;color:var(--gray-light);font-style:italic;">Nenhum usuário paciente encontrado com o nome "' + (p.name || '') + '"</span>';
+            }
+            
+            body.innerHTML += '</div></div>';
+            
+            if(patientUserUid && patientUserOrient) {
+                let orientPreviewHtml = '';
+                if(patientUserOrient.title) orientPreviewHtml += '<p><strong>Título:</strong> ' + patientUserOrient.title + '</p>';
+                if(patientUserOrient.description) orientPreviewHtml += '<p><strong>Descrição:</strong> ' + patientUserOrient.description + '</p>';
+                if(patientUserOrient.instructions && patientUserOrient.instructions.length > 0) orientPreviewHtml += '<p><strong>Instruções:</strong> ' + patientUserOrient.instructions.length + ' item(ns)</p>';
+                orientPreviewHtml += '<p><strong>Mídia:</strong> ' + patientOrientItemsCount + ' foto(s)/vídeo(s)</p>';
+                if(patientUserOrient.updatedAt) {
+                    const d = new Date(patientUserOrient.updatedAt);
+                    orientPreviewHtml += '<p style="font-size:11px;color:var(--gray-light);">Atualizado em: ' + d.toLocaleDateString('pt-BR') + '</p>';
+                }
+                body.innerHTML += orientPreviewHtml;
+            } else {
+                body.innerHTML += '<div class="orientacoes-empty">Nenhuma orientação definida para o paciente. Clique em "Editar" para adicionar.</div>';
+            }
+            
+            body.innerHTML += '</div>';
+        }
+        
         renderDetailOrientacoes(p);
         const deleteBtn = document.getElementById('detailDeleteBtn');
         deleteBtn.onclick = () => deletePatient(id);
@@ -1757,6 +1884,276 @@ function deletePatient(id) {
             c.appendChild(p);
         }
     })();
+
+    // ==================== PATIENT ORIENTATIONS (User-based) ====================
+    // Each patient user (role='patient') gets their own orientation content
+    // Stored in Firebase under /patientOrientations/{patientUid}
+    // Surgeons/admins manage via the patient detail modal in Pacientes view
+
+    let patientOrientationsCache = {}; // Cache: { patientUid: { items: [], ... } }
+
+    // Load all orientations for admin/surgeon management
+    function loadPatientOrientations() {
+        db.ref('patientOrientations').on('value', snap => {
+            patientOrientationsCache = snap.val() || {};
+        });
+    }
+
+    // Render the patient's own orientation view
+    function renderPatientOrientationsView() {
+        const container = document.getElementById('orientacoesPatientContent');
+        if(!container || !currentUser) return;
+        
+        const orientData = patientOrientationsCache[currentUser.uid];
+        if(!orientData || !orientData.items || orientData.items.length === 0) {
+            container.innerHTML = '<div class="empty-state"><h3>Nenhuma orientação disponível</h3><p>Suas orientações pós-cirúrgicas aparecerão aqui quando forem adicionadas pelo seu médico.</p></div>';
+            return;
+        }
+
+        const items = orientData.items;
+        let html = '<div style="margin-bottom:20px;">';
+        if(orientData.title) {
+            html += '<h2 style="color:var(--primary);margin-bottom:4px;">' + orientData.title + '</h2>';
+        }
+        if(orientData.description) {
+            html += '<p style="color:var(--gray);font-size:14px;margin-bottom:16px;">' + orientData.description + '</p>';
+        }
+        html += '</div>';
+
+        // Text instructions section
+        if(orientData.instructions && orientData.instructions.length > 0) {
+            html += '<div style="background:var(--white);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px;border-left:4px solid var(--primary);box-shadow:var(--shadow);">';
+            html += '<h3 style="color:var(--primary);margin-bottom:12px;font-size:16px;">📝 Instruções</h3>';
+            html += '<div style="display:flex;flex-direction:column;gap:8px;">';
+            orientData.instructions.forEach((inst, i) => {
+                html += '<div style="display:flex;gap:10px;align-items:flex-start;">';
+                html += '<span style="background:var(--primary);color:white;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;flex-shrink:0;">' + (i+1) + '</span>';
+                html += '<span style="font-size:14px;color:var(--dark);line-height:1.6;">' + inst + '</span>';
+                html += '</div>';
+            });
+            html += '</div></div>';
+        }
+
+        // Photos and videos grid
+        const mediaItems = items.filter(item => item.type === 'photo' || item.type === 'video');
+        if(mediaItems.length > 0) {
+            html += '<div style="background:var(--white);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px;box-shadow:var(--shadow);">';
+            html += '<h3 style="color:var(--primary);margin-bottom:12px;font-size:16px;">📷 Fotos e Vídeos</h3>';
+            html += '<div class="orientacoes-grid">';
+            mediaItems.forEach((item, idx) => {
+                if(item.type === 'video') {
+                    html += '<div class="orientacao-item" onclick="openPatientOrientacaoLightbox(' + idx + ')">';
+                    html += '<video src="' + item.url + '" muted></video>';
+                    html += '<div class="play-overlay"><span>&#9658;</span></div>';
+                    html += '<span class="orientacao-type-badge">Vídeo</span>';
+                    html += '</div>';
+                } else {
+                    html += '<div class="orientacao-item" onclick="openPatientOrientacaoLightbox(' + idx + ')">';
+                    html += '<img src="' + item.url + '" alt="Orientação">';
+                    html += '<span class="orientacao-type-badge">Foto</span>';
+                    html += '</div>';
+                }
+            });
+            html += '</div></div>';
+        }
+
+        // Last updated info
+        if(orientData.updatedAt) {
+            const date = new Date(orientData.updatedAt);
+            html += '<p style="font-size:11px;color:var(--gray-light);text-align:right;">Última atualização: ' + date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR') + '</p>';
+        }
+
+        container.innerHTML = html;
+    }
+
+    // Lightbox for patient orientation media
+    let patientOrientMediaItems = [];
+    let patientOrientMediaIndex = 0;
+
+    function openPatientOrientacaoLightbox(idx) {
+        const orientData = patientOrientationsCache[currentUser.uid];
+        if(!orientData || !orientData.items) return;
+        patientOrientMediaItems = orientData.items.filter(item => item.type === 'photo' || item.type === 'video');
+        patientOrientMediaIndex = idx;
+        showPatientOrientMedia(patientOrientMediaItems[idx]);
+    }
+
+    function showPatientOrientMedia(item) {
+        const lb = document.getElementById('lightbox');
+        const imgEl = document.getElementById('lightboxImg');
+        const counterEl = document.getElementById('lightboxCounter');
+        const oldVid = lb.querySelector('video');
+        if(oldVid) oldVid.remove();
+        if(item.type === 'video') {
+            imgEl.style.display = 'none';
+            const vid = document.createElement('video');
+            vid.id = 'lightboxVideo';
+            vid.src = item.url;
+            vid.controls = true;
+            vid.style.maxWidth = '92%';
+            vid.style.maxHeight = '92vh';
+            vid.style.borderRadius = '8px';
+            imgEl.parentNode.insertBefore(vid, imgEl);
+        } else {
+            imgEl.style.display = 'block';
+            const oldV = document.getElementById('lightboxVideo');
+            if(oldV) oldV.remove();
+            imgEl.src = item.url;
+        }
+        counterEl.innerText = (patientOrientMediaIndex + 1) + ' / ' + patientOrientMediaItems.length;
+        lb.classList.add('active');
+    }
+
+    // Override showView to load orientations when patient opens the view
+    const _originalShowView = showView;
+    showView = function(viewId) {
+        _originalShowView(viewId);
+        if(viewId === 'viewOrientacoes' && currentUser && currentUser.role === 'patient') {
+            renderPatientOrientationsView();
+        }
+    };
+
+    // ==================== SURGEON ORIENTATION MANAGEMENT ====================
+    // Add orientation management to the patient detail modal
+    // This allows surgeons to set orientations for patient users
+
+    let orientEditItems = [];
+    let orientEditPatientUid = null;
+
+    // Open orientation management modal for a specific patient user
+    function openOrientPatientUserModal(patientUid, patientName) {
+        orientEditPatientUid = patientUid;
+        orientEditItems = [];
+        
+        // Load existing orientations for this patient
+        const existing = patientOrientationsCache[patientUid];
+        if(existing) {
+            document.getElementById('orientEditTitle').value = existing.title || '';
+            document.getElementById('orientEditDesc').value = existing.description || '';
+            document.getElementById('orientEditInstructions').value = (existing.instructions || []).join('\n');
+            orientEditItems = existing.items ? existing.items.map(item => ({ ...item, data: item.url })) : [];
+        } else {
+            document.getElementById('orientEditTitle').value = '';
+            document.getElementById('orientEditDesc').value = '';
+            document.getElementById('orientEditInstructions').value = '';
+            orientEditItems = [];
+        }
+        
+        document.getElementById('orientEditPatientName').innerText = patientName || '';
+        renderOrientEditPreview();
+        openModal('modalOrientEdit');
+    }
+
+    function handleOrientEditFileSelect(input, mediaType) {
+        const files = Array.from(input.files);
+        files.forEach(file => {
+            if(file.size > 50 * 1024 * 1024) { showToast('Arquivo muito grande. Máximo 50MB.', 'error'); return; }
+            const reader = new FileReader();
+            reader.onload = e => {
+                orientEditItems.push({ type: mediaType, data: e.target.result, url: e.target.result });
+                renderOrientEditPreview();
+            };
+            reader.readAsDataURL(file);
+        });
+        input.value = '';
+    }
+
+    function renderOrientEditPreview() {
+        const area = document.getElementById('orientEditPreview');
+        if(!area) return;
+        area.innerHTML = '';
+        orientEditItems.forEach((item, i) => {
+            const div = document.createElement('div');
+            div.className = 'orientacao-upload-item';
+            if(item.type === 'video') {
+                div.innerHTML = '<video src="' + item.data + '" muted></video><span class="type-badge">VID</span><button class="remove-orientacao" onclick="removeOrientEditItem(' + i + ')">&#10005;</button>';
+            } else {
+                div.innerHTML = '<img src="' + item.data + '"><span class="type-badge">FOTO</span><button class="remove-orientacao" onclick="removeOrientEditItem(' + i + ')">&#10005;</button>';
+            }
+            area.appendChild(div);
+        });
+    }
+
+    function removeOrientEditItem(idx) {
+        orientEditItems.splice(idx, 1);
+        renderOrientEditPreview();
+    }
+
+    function saveOrientEdit() {
+        if(!orientEditPatientUid) { showToast('Erro: paciente não identificado.', 'error'); return; }
+        
+        const title = document.getElementById('orientEditTitle').value.trim();
+        const description = document.getElementById('orientEditDesc').value.trim();
+        const instructionsText = document.getElementById('orientEditInstructions').value.trim();
+        const instructions = instructionsText ? instructionsText.split('\n').filter(l => l.trim()) : [];
+        
+        const items = orientEditItems.map(item => ({
+            type: item.type,
+            url: item.url,
+            addedAt: item.addedAt || Date.now()
+        }));
+
+        const data = {
+            title,
+            description,
+            instructions,
+            items,
+            updatedAt: Date.now(),
+            updatedBy: currentUser.uid
+        };
+
+        db.ref('patientOrientations/' + orientEditPatientUid).set(data, err => {
+            if(err) { showToast('Erro ao salvar orientações.', 'error'); }
+            else { showToast('Orientações salvas com sucesso!', 'success'); closeModal('modalOrientEdit'); }
+        });
+    }
+
+    // ==================== PATIENT ORIENTATION LIST MODAL ====================
+    function openOrientPatientListModal() {
+        renderOrientPatientList();
+        openModal('modalOrientPatientList');
+    }
+
+    function renderOrientPatientList() {
+        const container = document.getElementById('orientPatientListContainer');
+        if(!container) return;
+        const search = (document.getElementById('orientPatientSearch')?.value || '').toLowerCase();
+        
+        // Get all patient users
+        const patientUsers = usersList.filter(u => u.role === 'patient');
+        const filtered = patientUsers.filter(u => !search || (u.name && u.name.toLowerCase().includes(search)));
+        
+        if(filtered.length === 0) {
+            container.innerHTML = '<div class="orientacoes-empty">Nenhum usuário paciente encontrado.</div>';
+            return;
+        }
+        
+        let html = '<div style="display:flex;flex-direction:column;gap:8px;">';
+        filtered.forEach(u => {
+            const orient = patientOrientationsCache[u.uid];
+            const hasOrient = orient && orient.items && orient.items.length > 0;
+            const mediaCount = hasOrient ? orient.items.length : 0;
+            const instrCount = hasOrient && orient.instructions ? orient.instructions.length : 0;
+            
+            html += '<div style="display:flex;align-items:center;justify-content:space-between;background:var(--white);border:1px solid #eee;border-radius:var(--radius);padding:12px 16px;gap:12px;">';
+            html += '<div style="flex:1;">';
+            html += '<div style="font-weight:700;font-size:14px;color:var(--dark);">' + (u.name || 'Sem Nome') + '</div>';
+            html += '<div style="font-size:11px;color:var(--gray-light);">' + (u.email || '') + '</div>';
+            if(hasOrient) {
+                html += '<div style="font-size:11px;color:var(--success);margin-top:4px;">✅ ' + mediaCount + ' mídia(s), ' + instrCount + ' instrução(ões)</div>';
+            } else {
+                html += '<div style="font-size:11px;color:var(--gray-light);margin-top:4px;font-style:italic;">Nenhuma orientação definida</div>';
+            }
+            html += '</div>';
+            html += '<button class="btn btn-sm btn-primary" onclick="openOrientPatientUserModal(\'' + u.uid + '\',\'' + (u.name || '').replace(/'/g, "\\'") + '\')">' + (hasOrient ? '✏️ Editar' : '＋ Criar') + '</button>';
+            html += '</div>';
+        });
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
+    // Load orientations on app start
+    loadPatientOrientations();
 
     // Close modals on overlay click
     document.querySelectorAll('.modal-overlay').forEach(overlay => {
