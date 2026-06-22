@@ -133,6 +133,7 @@
         <button class="btn-header" onclick="exportData()">💾 Backup</button>
         <button class="btn-header import-btn" onclick="document.getElementById('importFile').click()">📂 Importar</button>
         <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+        <button class="btn-header" onclick="refreshCirurgiasView()" title="Recarregar lista de pacientes">🔄 Pacientes</button>
     </div>
     
     <div class="tabs">
@@ -246,6 +247,11 @@
             }
         }
         return result;
+    }
+
+    function escapeHtml(str) {
+        if (str === null || str === undefined) return '';
+        return String(str).replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/"/g, '"').replace(/'/g, '&#039;');
     }
 
     function makeEmptySurgery() {
@@ -364,13 +370,6 @@
             const data = snap.val();
             patientsDB = data || {};
             renderPacientesSidebar();
-            const activeTab = document.querySelector('.tab-btn.active');
-            if(activeTab) {
-                const tabKey = activeTab.getAttribute('onclick').match(/'(.*?)'/)[1];
-                if(!tabKey.startsWith('EVENT_') && tabKey !== 'REPORT' && tabKey !== 'AGENDA') {
-                    renderCirurgias(tabKey);
-                }
-            }
         });
     }
 
@@ -655,7 +654,6 @@
     function updateSurgeryField(tabKey, sala, surgeryIndex, field, value) {
         scheduleData[tabKey][sala].surgeries[surgeryIndex][field] = value;
         triggerAutoSave();
-        renderCirurgias(tabKey);
     }
 
     function addSurgery(tabKey, sala) {
@@ -753,31 +751,40 @@
             }
 
             surgeries.forEach((surgery, sIdx) => {
+                const sTime = escapeHtml(surgery.time);
+                const sStatus = escapeHtml(surgery.status || '');
+                const sSponsor = escapeHtml(surgery.sponsor || '');
+                const sObs = escapeHtml(surgery.observacao || '');
+                const sPaciente = surgery.paciente || '';
+                const sMedico = surgery.medico || '';
+                const sInstrumentador = surgery.instrumentador || '';
+                const sNeoortho = surgery.neoortho || '';
+
                 let medOpt = '<option value="">Selecione...</option>';
                 medFilter.forEach(m => {
-                    if (usedSameHosp.medicos.includes(m) && surgery.medico !== m) return;
-                    if (isUsedInOtherHospitalDay('medico', m, hospital, roomDate.split('-')[2]) && surgery.medico !== m) return;
-                    medOpt += '<option value="' + m + '"' + (surgery.medico === m ? ' selected' : '') + '>' + m + '</option>';
+                    if (usedSameHosp.medicos.includes(m) && sMedico !== m) return;
+                    if (isUsedInOtherHospitalDay('medico', m, hospital, roomDate.split('-')[2]) && sMedico !== m) return;
+                    medOpt += '<option value="' + escapeHtml(m) + '"' + (sMedico === m ? ' selected' : '') + '>' + escapeHtml(m) + '</option>';
                 });
 
                 let instOpt = '<option value="">Selecione...</option>';
                 instrumentadores.forEach(i => {
-                    if (usedSameHosp.instrumentadores.includes(i) && surgery.instrumentador !== i) return;
-                    instOpt += '<option value="' + i + '"' + (surgery.instrumentador === i ? ' selected' : '') + '>' + i + '</option>';
+                    if (usedSameHosp.instrumentadores.includes(i) && sInstrumentador !== i) return;
+                    instOpt += '<option value="' + escapeHtml(i) + '"' + (sInstrumentador === i ? ' selected' : '') + '>' + escapeHtml(i) + '</option>';
                 });
 
                 let neoOpt = '<option value="">Selecione...</option>';
                 neoorthos.forEach(n => {
-                    if (isUsedInOtherHospitalDay('neoortho', n, hospital, roomDate.split('-')[2]) && surgery.neoortho !== n) return;
-                    neoOpt += '<option value="' + n + '"' + (surgery.neoortho === n ? ' selected' : '') + '>' + n + '</option>';
+                    if (isUsedInOtherHospitalDay('neoortho', n, hospital, roomDate.split('-')[2]) && sNeoortho !== n) return;
+                    neoOpt += '<option value="' + escapeHtml(n) + '"' + (sNeoortho === n ? ' selected' : '') + '>' + escapeHtml(n) + '</option>';
                 });
 
                 let pacOpt = '<option value="">Selecione...</option>';
                 if (patientsDB) {
                     Object.values(patientsDB).forEach(p => {
                         if (p.hospital && p.hospital !== hospital) return;
-                        if (globallyUsedPatients.has(p.name) && surgery.paciente !== p.name) return;
-                        pacOpt += '<option value="' + p.name + '"' + (surgery.paciente === p.name ? ' selected' : '') + '>' + p.name + '</option>';
+                        if (globallyUsedPatients.has(p.name) && sPaciente !== p.name) return;
+                        pacOpt += '<option value="' + escapeHtml(p.name) + '"' + (sPaciente === p.name ? ' selected' : '') + '>' + escapeHtml(p.name) + '</option>';
                     });
                 }
 
@@ -802,7 +809,7 @@
                     const used = currentHospitalMatUsage[m] || 0;
                     const remaining = stock - used;
                     if (remaining > 0) {
-                        matOpt += '<option value="' + m + '">' + m + ' (Disp: ' + remaining + ')</option>';
+                        matOpt += '<option value="' + escapeHtml(m) + '">' + escapeHtml(m) + ' (Disp: ' + remaining + ')</option>';
                     }
                 });
 
@@ -812,13 +819,13 @@
 
                 let tagsHtml = '';
                 (surgery.materiais || []).forEach((m, idx) => {
-                    tagsHtml += '<div class="mat-tag" onclick="removeMaterialFromSurgery(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',' + idx + ')">' + m + ' <span>✕</span></div>';
+                    tagsHtml += '<div class="mat-tag" onclick="removeMaterialFromSurgery(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',' + idx + ')">' + escapeHtml(m) + ' <span>✕</span></div>';
                 });
 
                 html += '<div class="surgery-item">';
                 html += '<button class="btn btn-remove" onclick="removeSurgery(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ')">✕</button>';
                 html += '<div class="surgery-time-row">';
-                html += '<div><label>Horário</label><input type="text" value="' + surgery.time + '" placeholder="ex: 07:00 - 10:00" onchange="updateSurgeryField(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',\'time\',this.value)"></div>';
+                html += '<div><label>Horário</label><input type="text" value="' + sTime + '" placeholder="ex: 07:00 - 10:00" onchange="updateSurgeryField(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',\'time\',this.value)"></div>';
                 html += '<div class="move-btns" style="margin-top:12px;"><button class="move-btn" onclick="moveSurgery(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',-1)"' + (sIdx === 0 ? ' disabled' : '') + '>▲</button><button class="move-btn" onclick="moveSurgery(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',1)"' + (sIdx === surgeries.length - 1 ? ' disabled' : '') + '>▼</button></div>';
                 html += '</div>';
                 html += '<div class="surgery-fields">';
@@ -828,9 +835,9 @@
                 html += '<div><label>Resp. Neo</label><select onchange="updateSurgeryField(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',\'neoortho\',this.value)">' + neoOpt + '</select></div>';
                 html += '<div class="full-width"><label>Materiais</label><div style="min-height:20px; margin-bottom:2px;">' + tagsHtml + '</div><div style="display:flex; gap:2px;"><select id="mat-add-' + tabKey + '-' + sala + '-' + sIdx + '" style="flex:1;">' + matOpt + '</select><button class="btn btn-add" style="width:30px;" onclick="addMaterialToSurgery(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',document.getElementById(\'mat-add-' + tabKey + '-' + sala + '-' + sIdx + '\'))">+</button></div></div>';
                 html += '<div><label>Motor</label><div style="display:flex;align-items:center;gap:5px;"><input type="checkbox" onchange="updateSurgeryField(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',\'motor\',this.checked)"' + (surgery.motor ? ' checked' : '') + (motorDisabled ? ' disabled' : '') + '> ' + motorAlert + '</div></div>';
-                html += '<div><label>Status</label><input type="text" value="' + (surgery.status || '') + '" placeholder="Status..." onchange="updateSurgeryField(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',\'status\',this.value)"></div>';
-                html += '<div><label>Patrocinador</label><input type="text" value="' + (surgery.sponsor || '') + '" placeholder="Patrocinador..." onchange="updateSurgeryField(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',\'sponsor\',this.value)"></div>';
-                html += '<div class="full-width"><label>Observação</label><input type="text" value="' + (surgery.observacao || '') + '" placeholder="Observações..." onchange="updateSurgeryField(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',\'observacao\',this.value)"></div>';
+                html += '<div><label>Status</label><input type="text" value="' + sStatus + '" placeholder="Status..." onchange="updateSurgeryField(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',\'status\',this.value)"></div>';
+                html += '<div><label>Patrocinador</label><input type="text" value="' + sSponsor + '" placeholder="Patrocinador..." onchange="updateSurgeryField(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',\'sponsor\',this.value)"></div>';
+                html += '<div class="full-width"><label>Observação</label><input type="text" value="' + sObs + '" placeholder="Observações..." onchange="updateSurgeryField(\'' + tabKey + '\',\'' + sala + '\',' + sIdx + ',\'observacao\',this.value)"></div>';
                 html += '</div></div>';
             });
 
@@ -838,6 +845,24 @@
         });
 
         container.innerHTML = html;
+    }
+
+    function refreshCirurgiasView() {
+        const activeTab = document.querySelector('.tab-btn.active');
+        if (activeTab) {
+            const onclickAttr = activeTab.getAttribute('onclick');
+            if (onclickAttr) {
+                const match = onclickAttr.match(/'(.*?)'/);
+                if (match) {
+                    const tabKey = match[1];
+                    if (!tabKey.startsWith('EVENT_') && tabKey !== 'REPORT' && tabKey !== 'AGENDA') {
+                        renderCirurgias(tabKey);
+                        return;
+                    }
+                }
+            }
+        }
+        showTab('CHC_08');
     }
 
     loadDataFromCloud();
