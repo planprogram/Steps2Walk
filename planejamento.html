@@ -435,35 +435,17 @@
         const container = document.getElementById('listaMateriais');
         container.innerHTML = '';
         Object.keys(materiais).forEach(mat => {
-            const m = materiais[mat];
-            const isExpanded = expandedMaterials[mat];
+            const m = materiais[mat] || {};
             let html = `<div class="list-item" style="align-items:flex-start; flex-direction:column;">
                 <div style="display:flex; width:100%; justify-content:space-between; align-items:center;">
-                    <div style="flex:1; display:grid; grid-template-columns: 1fr 50px 50px 30px 30px; gap:4px; align-items:center;">
+                    <div style="flex:1; display:grid; grid-template-columns: 1fr 50px 50px 30px; gap:4px; align-items:center;">
                         <span style="font-size:12px;">${mat}</span>
-                        <input type="number" class="estoque-input" value="${m.chc}" onchange="updateMaterialStock('${mat}', 'chc', this.value)">
-                        <input type="number" class="estoque-input" value="${m.chr}" onchange="updateMaterialStock('${mat}', 'chr', this.value)">
-                        <button class="btn btn-outline" onclick="toggleMaterialDetails('${mat}')">⚙️</button>
+                        <input type="number" class="estoque-input" value="${m.chc || 0}" onchange="updateMaterialStock('${mat}', 'chc', this.value)">
+                        <input type="number" class="estoque-input" value="${m.chr || 0}" onchange="updateMaterialStock('${mat}', 'chr', this.value)">
                         <button class="btn btn-remove" style="padding:0 5px;" onclick="deleteMaterial('${mat}')">x</button>
                     </div>
-                </div>`;
-            if (isExpanded) {
-                html += `<div class="mat-comp-box">`;
-                html += `<div style="display:flex; gap:5px; margin-bottom:5px;">
-                            <input type="text" id="newComp-${mat}" placeholder="Novo Componente" style="font-size:11px;">
-                            <button class="btn btn-add" style="height:25px;" onclick="addComponent('${mat}')">+</button>
-                         </div>`;
-                if (m.components && Object.keys(m.components).length > 0) {
-                    Object.keys(m.components).forEach(comp => {
-                        html += `<div class="comp-item">
-                                    <span>${comp}</span>
-                                    <input type="number" value="${m.components[comp]}" style="width:50px; text-align:center; font-size:11px;" onchange="updateComponent('${mat}', '${comp}', this.value)">
-                                 </div>`;
-                    });
-                } else { html += `<div style="font-size:10px; color:#999; font-style:italic;">Sem componentes</div>`; }
-                html += `</div>`;
-            }
-            html += `</div>`;
+                </div>
+            </div>`;
             container.innerHTML += html;
         });
     }
@@ -471,7 +453,7 @@
         const nome = document.getElementById('newMatNome').value.trim();
         if (!nome) return;
         if (!materiais[nome]) {
-            materiais[nome] = { chc: 0, chr: 0, components: {} };
+            materiais[nome] = { chc: 0, chr: 0 };
             document.getElementById('newMatNome').value = '';
             renderMateriais();
             triggerAutoSave();
@@ -479,17 +461,6 @@
     }
     function updateMaterialStock(mat, hospital, val) { if (materiais[mat]) { materiais[mat][hospital] = parseInt(val) || 0; triggerAutoSave(); } }
     function deleteMaterial(mat) { if(confirm(`Excluir material ${mat}?`)) { delete materiais[mat]; renderMateriais(); triggerAutoSave(); } }
-    function toggleMaterialDetails(matName) { expandedMaterials[matName] = !expandedMaterials[matName]; renderMateriais(); }
-    function addComponent(mat) {
-        const input = document.getElementById(`newComp-${mat}`);
-        const compName = input.value.trim();
-        if(compName && materiais[mat]) {
-            materiais[mat].components[compName] = 1;
-            renderMateriais();
-            triggerAutoSave();
-        }
-    }
-    function updateComponent(mat, compName, val) { if(materiais[mat] && materiais[mat].components[compName] !== undefined) { materiais[mat].components[compName] = parseInt(val) || 0; triggerAutoSave(); } }
 
     function getRoomDate(tabKey, sala) { return scheduleData[tabKey]?.[sala]?.date || ""; }
     function getUsedResourcesSameHospitalTime(tabKey, sala, surgeryIndex) {
@@ -539,7 +510,7 @@
                 });
             }
         });
-        let html = `<div class="summary-box"><div class="summary-title">📦 Previsão de Materiais e Componentes (Cirurgias)</div><div class="summary-grid">`;
+        let html = `<div class="summary-box"><div class="summary-title">📦 Previsão de Materiais (Cirurgias)</div><div class="summary-grid">`;
         const usedMatsKeys = Object.keys(usedMaterials).sort();
         if (usedMatsKeys.length === 0) { html += `<p style="color:#777; font-size:12px;">Nenhum material alocado nas cirurgias ainda.</p>`; } 
         else {
@@ -547,18 +518,8 @@
                 const qty = usedMaterials[mat];
                 html += `<div class="sponsor-card">
                     <div class="sponsor-name">${mat} <span style="color: var(--danger); font-size: 12px;">(${qty}x)</span></div>
-                    <div style="margin-top: 5px; font-size: 12px; color: #333;">`;
-                const m = materiais[mat];
-                if (m && m.components && Object.keys(m.components).length > 0) {
-                    for (let comp in m.components) {
-                        const totalCompQty = m.components[comp] * qty; 
-                        html += `<div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #ccc; padding: 2px 0;">
-                                    <span>${comp}</span>
-                                    <span style="font-weight: bold; color: var(--primary);">Qtd: ${totalCompQty}</span>
-                                 </div>`;
-                    }
-                } else { html += `<div style="color:#777; font-style: italic; font-size: 11px;">Sem componentes cadastrados</div>`; }
-                html += `</div></div>`;
+                    <div style="margin-top: 5px; font-size: 12px; color: #333;">Quantidade prevista para esta semana</div>
+                </div>`;
             });
         }
         html += `</div></div>`;
