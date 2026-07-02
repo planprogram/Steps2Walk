@@ -637,40 +637,51 @@
         <div class="modal-body" id="detailBody"></div>
         <div class="modal-footer">
             <button class="btn btn-primary" onclick="editPatient()" data-i18n="btn_edit">Editar Paciente</button>
+            <button class="btn btn-secondary" onclick="openPatientLinkModal(editingPatientId)" id="detailLinkBtn">🔗 Vincular Usuário</button>
             <button class="btn btn-danger" id="detailDeleteBtn" data-i18n="btn_delete">Excluir Paciente</button>
             <button class="btn btn-outline" onclick="closeModal('modalPatientDetail')" data-i18n="btn_close">Fechar</button>
         </div>
     </div>
 </div>
 
-<!-- Orientacoes Modal (Photos & Videos for any user) -->
+<div class="modal-overlay" id="modalPatientLink">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>Vincular usuário paciente</h2>
+            <p>Selecione o usuário paciente para associar a este registro.</p>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="form-label">Usuário paciente</label>
+                <select id="patientLinkUserSelect" class="form-select"></select>
+                <div class="form-hint">Escolha um usuário paciente ou deixe em branco para remover o vínculo.</div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('modalPatientLink')">Cancelar</button>
+            <button class="btn btn-primary" onclick="savePatientUserLink()">Salvar vínculo</button>
+        </div>
+    </div>
+</div>
+
+<!-- Orientacoes Modal (Text only) -->
 <div class="modal-overlay" id="modalOrientacoes">
     <div class="modal modal-wide">
         <div class="modal-header">
             <h2 id="orientacoesTitle">📋 Orientações</h2>
-            <p style="font-size:13px;color:var(--gray-light);margin-top:4px">Adicione fotos e vídeos com orientações pós-cirúrgicas e instruções para o paciente.</p>
+            <p style="font-size:13px;color:var(--gray-light);margin-top:4px">Escreva as orientações pós-cirúrgicas e instruções para o paciente em texto.</p>
         </div>
         <div class="modal-body">
             <div style="background:var(--primary-light);border-radius:var(--radius);padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;">
                 <span style="font-size:20px">💡</span>
                 <div style="font-size:13px;color:var(--primary);">
-                    <strong>Dica:</strong> Todos os usuários (médicos, equipe e o próprio paciente) podem adicionar orientações com fotos e vídeos.
+                    <strong>Dica:</strong> As orientações serão exibidas apenas por escrito no perfil do paciente.
                 </div>
             </div>
             <div class="form-group">
-                <label class="form-label">Adicionar Foto ou Vídeo</label>
-                <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                    <label class="btn btn-primary" style="cursor:pointer;">
-                        📷 Adicionar Foto
-                        <input type="file" accept="image/*" multiple style="display:none" onchange="handleOrientacaoFileSelect(this, 'image')">
-                    </label>
-                    <label class="btn btn-secondary" style="cursor:pointer;">
-                        🎥 Adicionar Vídeo
-                        <input type="file" accept="video/*" multiple style="display:none" onchange="handleOrientacaoFileSelect(this, 'video')">
-                    </label>
-                </div>
-                <div class="form-hint" style="margin-top:4px">Selecione uma ou mais fotos ou vídeos. Formatos aceitos: JPG, PNG, MP4, MOV.</div>
-                <div class="orientacao-upload-preview" id="orientacoesUploadPreview"></div>
+                <label class="form-label">Instruções por escrito</label>
+                <textarea class="form-textarea" id="orientacoesTextInput" rows="7" placeholder="Ex:&#10;Manter o curativo limpo e seco&#10;Tomar o medicamento conforme prescrito&#10;Retorno em 7 dias"></textarea>
+                <div class="form-hint" style="margin-top:4px">Cada linha será exibida como um item para o paciente.</div>
             </div>
             <div id="orientacoesListContainer"></div>
         </div>
@@ -703,19 +714,8 @@
                 <div class="form-hint">Cada linha será exibida como um item numerado para o paciente.</div>
             </div>
             <div class="form-group">
-                <label class="form-label">Fotos e Vídeos</label>
-                <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                    <label class="btn btn-primary" style="cursor:pointer;">
-                        📷 Adicionar Foto
-                        <input type="file" accept="image/*" multiple style="display:none" onchange="handleOrientEditFileSelect(this, 'image')">
-                    </label>
-                    <label class="btn btn-secondary" style="cursor:pointer;">
-                        🎥 Adicionar Vídeo
-                        <input type="file" accept="video/*" multiple style="display:none" onchange="handleOrientEditFileSelect(this, 'video')">
-                    </label>
-                </div>
-                <div class="form-hint" style="margin-top:4px">Adicione fotos e vídeos com orientações para o paciente.</div>
-                <div class="orientacao-upload-preview" id="orientEditPreview"></div>
+                <label class="form-label">Orientações em texto</label>
+                <div class="form-hint" style="margin-top:4px">O conteúdo será exibido apenas por escrito para o paciente.</div>
             </div>
         </div>
         <div class="modal-footer">
@@ -806,6 +806,7 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+    const storage = firebase.storage();
 
     db.ref('.info/connected').on('value', snap => {
         const el = document.getElementById('mainDbStatus');
@@ -1004,8 +1005,26 @@
                     usersList.push({ uid: key, ...data[key] });
                 });
             }
+            renderPatientUserSelect();
             renderUserTable();
         });
+    }
+
+    function renderPatientUserSelect(selectedValue = '') {
+        const select = document.getElementById('pPatientUser');
+        if(!select) return;
+        const currentValue = select.value || selectedValue || '';
+        select.innerHTML = '<option value="">Nenhum usuário paciente vinculado</option>';
+        usersList.filter(u => u.role === 'patient').forEach(u => {
+            const option = document.createElement('option');
+            option.value = u.uid;
+            option.textContent = u.name || u.email || 'Usuário paciente';
+            if(currentValue === u.uid) option.selected = true;
+            select.appendChild(option);
+        });
+        if(currentValue) {
+            select.value = currentValue;
+        }
     }
 
     function performRegister() {
@@ -1268,6 +1287,77 @@
     let patientPhotos = [];
     let editingPatientId = null;
 
+    let selectedPatientLinkId = null;
+
+    function getLinkedPatientUser(p) {
+        if(!p) return null;
+        if(p.patientUserId) {
+            const linkedUser = usersList.find(u => u.uid === p.patientUserId);
+            if(linkedUser) return linkedUser;
+        }
+        const name = (p.name || '').trim().toLowerCase();
+        return usersList.find(u => u.role === 'patient' && u.name && u.name.toLowerCase() === name) || null;
+    }
+
+    function renderPatientLinkUserSelect(selectedValue = '') {
+        const select = document.getElementById('patientLinkUserSelect');
+        if(!select) return;
+        const currentValue = selectedValue || '';
+        select.innerHTML = '<option value="">Nenhum usuário paciente vinculado</option>';
+        usersList.filter(u => u.role === 'patient').forEach(u => {
+            const option = document.createElement('option');
+            option.value = u.uid;
+            option.textContent = u.name || u.email || 'Usuário paciente';
+            if(currentValue === u.uid) option.selected = true;
+            select.appendChild(option);
+        });
+        if(currentValue) {
+            select.value = currentValue;
+        }
+    }
+
+    function openPatientLinkModal(patientId) {
+        if(!patientId) return;
+        selectedPatientLinkId = patientId;
+        const patient = patientsList.find(x => x.id === patientId);
+        renderPatientLinkUserSelect(patient?.patientUserId || '');
+        openModal('modalPatientLink');
+    }
+
+    function savePatientUserLink() {
+        if(!selectedPatientLinkId) {
+            showToast('Paciente não selecionado.', 'error');
+            return;
+        }
+        const patient = patientsList.find(x => x.id === selectedPatientLinkId);
+        const selectedUserId = document.getElementById('patientLinkUserSelect')?.value || '';
+        const previousPatientUserId = patient?.patientUserId || null;
+        syncPatientUserLink(selectedUserId, selectedPatientLinkId, previousPatientUserId)
+            .then(() => {
+                closeModal('modalPatientLink');
+                showToast('Vínculo atualizado com sucesso.', 'success');
+            })
+            .catch(() => {
+                showToast('Erro ao atualizar o vínculo.', 'error');
+            });
+    }
+
+    function syncPatientUserLink(patientUserId, patientId, previousPatientUserId) {
+        const updates = {};
+        if(previousPatientUserId && previousPatientUserId !== patientUserId) {
+            updates['users/' + previousPatientUserId + '/patientRecordId'] = null;
+        }
+        if(patientUserId) {
+            const currentLink = usersList.find(u => u.uid === patientUserId)?.patientRecordId;
+            if(currentLink && currentLink !== patientId) {
+                updates['patients/' + currentLink + '/patientUserId'] = null;
+            }
+            updates['users/' + patientUserId + '/patientRecordId'] = patientId;
+        }
+        updates['patients/' + patientId + '/patientUserId'] = patientUserId || null;
+        return db.ref().update(updates);
+    }
+
     function loadPatients() {
         db.ref('patients').on('value', snap => {
             const data = snap.val();
@@ -1359,6 +1449,7 @@
         document.getElementById('pDoctor').value = '';
         document.getElementById('pProcedure').value = '';
         document.getElementById('pComments').value = '';
+        renderPatientUserSelect();
         patientPhotos = [];
         editingPatientId = null;
         renderPatientPhotoPreview();
@@ -1371,6 +1462,7 @@
         const name = document.getElementById('pName').value.trim();
         const hospital = document.getElementById('pHospital').value;
         if(!name || !hospital) { showToast("Preencha nome e hospital.", "error"); return; }
+        const linkedUserId = document.getElementById('pPatientUser')?.value || '';
         const data = {
             name,
             hospital,
@@ -1378,29 +1470,22 @@
             procedure: document.getElementById('pProcedure').value.trim(),
             comments: document.getElementById('pComments').value.trim(),
             photos: patientPhotos,
+            patientUserId: linkedUserId || null,
             updatedAt: Date.now()
         };
-        if(editingPatientId) {
-            db.ref('patients/' + editingPatientId).update(data, err => {
-                if(err) showToast("Erro ao atualizar.", "error");
-                else {
-                    closeModal('modalNewPatient');
-                    clearPatientForm();
-                    showToast("Paciente atualizado!", "success");
-                }
-            });
-        } else {
-            data.createdAt = Date.now();
-            data.createdBy = currentUser.uid;
-            db.ref('patients').push(data, err => {
-                if(err) showToast("Erro ao salvar.", "error");
-                else {
-                    closeModal('modalNewPatient');
-                    clearPatientForm();
-                    showToast("Paciente cadastrado!", "success");
-                }
-            });
-        }
+        const patientRef = editingPatientId ? db.ref('patients/' + editingPatientId) : db.ref('patients').push();
+        const previousPatientUserId = editingPatientId ? (patientsList.find(x => x.id === editingPatientId)?.patientUserId || null) : null;
+        const savePromise = editingPatientId ? patientRef.update(data) : patientRef.set({ ...data, createdAt: Date.now(), createdBy: currentUser.uid });
+        savePromise.then(() => {
+            const patientId = editingPatientId || patientRef.key;
+            return syncPatientUserLink(linkedUserId || null, patientId, previousPatientUserId);
+        }).then(() => {
+            closeModal('modalNewPatient');
+            clearPatientForm();
+            showToast(editingPatientId ? "Paciente atualizado!" : "Paciente cadastrado!", "success");
+        }).catch(() => {
+            showToast("Erro ao salvar.", "error");
+        });
     }
 
     function openPatientDetail(id) {
@@ -1414,16 +1499,17 @@
         if(p.photos && p.photos.length) {
             photosHtml = '<div class="photo-grid">' + p.photos.map((src,i) => "<img src='" + src + "' onclick='openLightbox(" + JSON.stringify(p.photos) + ", " + i + ")'>").join('') + '</div>';
         }
-        const orientacoesCount = p.orientacoes ? p.orientacoes.length : 0;
-        
-        // Find matching patient user by name
-        const patientUser = usersList.find(u => u.role === 'patient' && u.name && p.name && u.name.toLowerCase() === p.name.toLowerCase());
-        const patientUserUid = patientUser ? patientUser.uid : null;
-        const patientUserOrient = patientUserUid && patientOrientationsCache[patientUserUid];
-        const patientOrientItemsCount = patientUserOrient && patientUserOrient.items ? patientUserOrient.items.length : 0;
+        const linkedPatientUser = getLinkedPatientUser(p);
+        const patientUserUid = linkedPatientUser ? linkedPatientUser.uid : null;
+        const linkedOrientation = patientUserUid ? patientOrientationsCache[patientUserUid] : null;
+        const instructionCount = Array.isArray(linkedOrientation?.instructions) ? linkedOrientation.instructions.length : (Array.isArray(p.orientacoes) ? p.orientacoes.filter(item => item.type === 'text' && item.text).length : 0);
+        const mediaCount = Array.isArray(linkedOrientation?.items) ? linkedOrientation.items.length : (Array.isArray(p.orientacoes) ? p.orientacoes.filter(item => item.type === 'photo' || item.type === 'video').length : 0);
+        const orientacoesCount = instructionCount + mediaCount;
+        const patientUserLabel = linkedPatientUser ? (linkedPatientUser.name || linkedPatientUser.email || '-') : 'Nenhum usuário paciente vinculado';
         
         body.innerHTML = '<p><strong>Hospital:</strong> ' + (p.hospital || '-') + '</p>'
             + '<p><strong>Médico:</strong> ' + (p.doctor || '-') + '</p>'
+            + '<p><strong>Usuário vinculado:</strong> ' + patientUserLabel + '</p>'
             + '<p><strong>Procedimento:</strong> ' + (p.procedure || '-') + '</p>'
             + '<p><strong>Observações:</strong> ' + (p.comments || '-') + '</p>'
             + photosHtml
@@ -1437,7 +1523,7 @@
             + '</div>';
         
         // Patient User Orientation Section (for patient to view)
-        if(currentUser && (currentUser.role === 'admin' || currentUser.role === 'surgeon')) {
+        if(false) {
             body.innerHTML += '<div class="orientacoes-section" style="border-top:2px solid var(--secondary);margin-top:16px;padding-top:16px;">'
                 + '<div class="orientacoes-header">'
                 + '<div class="orientacoes-title" style="color:var(--secondary);">📋 Orientação do Paciente (Visualização do Paciente)</div>'
@@ -1469,42 +1555,84 @@
             body.innerHTML += '</div>';
         }
         
-        renderDetailOrientacoes(p);
+        renderDetailOrientacoes(p, patientUserUid);
         const deleteBtn = document.getElementById('detailDeleteBtn');
         deleteBtn.onclick = () => deletePatient(id);
         openModal('modalPatientDetail');
     }
 
-    function renderDetailOrientacoes(p) {
+    function renderDetailOrientacoes(p, patientUserUid = null) {
         const grid = document.getElementById('detailOrientacoesGrid');
         if(!grid) return;
-        if(!p.orientacoes || p.orientacoes.length === 0) {
-            grid.innerHTML = '<div class="orientacoes-empty">Nenhuma orienta&#231;&#227;o adicionada. Clique em "Gerenciar Orienta&#231;&#245;es" para adicionar fotos e v&#237;deos.</div>';
-            return;
-        }
-        let html = '<div class="orientacoes-grid">';
-        p.orientacoes.forEach((item, idx) => {
-            if(item.type === 'video') {
-                html += '<div class="orientacao-item" onclick="openOrientacaoLightbox(\'' + p.id + '\',' + idx + ')">';
-                html += '<video src="' + item.url + '" muted></video>';
-                html += '<div class="play-overlay"><span>&#9658;</span></div>';
-                html += '<span class="orientacao-type-badge">V&#237;deo</span>';
-                html += '</div>';
-            } else {
-                html += '<div class="orientacao-item" onclick="openOrientacaoLightbox(\'' + p.id + '\',' + idx + ')">';
-                html += '<img src="' + item.url + '" alt="Orienta&#231;&#227;o">';
-                html += '<span class="orientacao-type-badge">Foto</span>';
+
+        const renderFromData = (linkedOrientation) => {
+            const instructions = Array.isArray(linkedOrientation?.instructions) ? linkedOrientation.instructions : [];
+            const mediaItems = Array.isArray(linkedOrientation?.items) ? linkedOrientation.items : [];
+            const legacyItems = Array.isArray(p.orientacoes) ? p.orientacoes : [];
+            const fallbackTextItems = legacyItems.filter(item => item.type === 'text' && item.text).map(item => item.text);
+            const fallbackMediaItems = legacyItems.filter(item => item.type === 'photo' || item.type === 'video');
+            const finalInstructions = instructions.length > 0 ? instructions : fallbackTextItems;
+            const finalMediaItems = mediaItems.length > 0 ? mediaItems : fallbackMediaItems;
+
+            if(finalInstructions.length === 0 && finalMediaItems.length === 0) {
+                grid.innerHTML = '<div class="orientacoes-empty">Nenhuma orienta&#231;&#227;o adicionada. Clique em "Gerenciar Orienta&#231;&#245;es" para adicionar instruções e mídias.</div>';
+                return;
+            }
+
+            let html = '';
+            if(finalInstructions.length > 0) {
+                html += '<div style="background:var(--primary-light);border-radius:var(--radius);padding:12px 14px;margin-bottom:10px;">';
+                html += '<div style="font-weight:700;font-size:13px;color:var(--primary);margin-bottom:8px;">📝 Instruções</div>';
+                html += '<div style="display:flex;flex-direction:column;gap:8px;">';
+                finalInstructions.forEach(text => {
+                    html += '<div style="font-size:13px;color:var(--dark);white-space:pre-wrap;line-height:1.5;">' + escapeHtml(text) + '</div>';
+                });
+                html += '</div></div>';
+            }
+
+            if(finalMediaItems.length > 0) {
+                html += '<div class="orientacoes-grid">';
+                finalMediaItems.forEach((item, idx) => {
+                    if(item.type === 'video') {
+                        html += '<div class="orientacao-item" onclick="openOrientacaoLightbox(\'' + p.id + '\',' + idx + ')">';
+                        html += '<video src="' + (item.url || item.data || '') + '" muted></video>';
+                        html += '<div class="play-overlay"><span>&#9658;</span></div>';
+                        html += '<span class="orientacao-type-badge">V&#237;deo</span>';
+                        html += '</div>';
+                    } else if(item.type === 'photo' || item.type === 'image') {
+                        html += '<div class="orientacao-item" onclick="openOrientacaoLightbox(\'' + p.id + '\',' + idx + ')">';
+                        html += '<img src="' + (item.url || item.data || '') + '" alt="Orienta&#231;&#227;o">';
+                        html += '<span class="orientacao-type-badge">Foto</span>';
+                        html += '</div>';
+                    }
+                });
                 html += '</div>';
             }
-        });
-        html += '</div>';
-        grid.innerHTML = html;
+            grid.innerHTML = html;
+        };
+
+        if(patientUserUid && !patientOrientationsCache[patientUserUid]) {
+            db.ref('patientOrientations/' + patientUserUid).once('value', snap => {
+                const data = snap.val() || null;
+                if(data) patientOrientationsCache[patientUserUid] = data;
+                renderFromData(data);
+            });
+            return;
+        }
+
+        renderFromData(patientUserUid ? patientOrientationsCache[patientUserUid] : null);
     }
 
 
 function deletePatient(id) {
         if(!confirm("Excluir este paciente?")) return;
-        db.ref('patients/' + id).remove().then(() => {
+        const patient = patientsList.find(x => x.id === id);
+        const updates = {};
+        if(patient?.patientUserId) {
+            updates['users/' + patient.patientUserId + '/patientRecordId'] = null;
+        }
+        updates['patients/' + id] = null;
+        db.ref().update(updates).then(() => {
             closeModal('modalPatientDetail');
             showToast("Paciente excluído.", "success");
         }).catch(() => showToast("Erro ao excluir.", "error"));
@@ -1519,6 +1647,7 @@ function deletePatient(id) {
         document.getElementById('pDoctor').value = p.doctor || '';
         document.getElementById('pProcedure').value = p.procedure || '';
         document.getElementById('pComments').value = p.comments || '';
+        renderPatientUserSelect(p.patientUserId || '');
         patientPhotos = p.photos ? [...p.photos] : [];
         renderPatientPhotoPreview();
         openModal('modalNewPatient');
@@ -1526,82 +1655,51 @@ function deletePatient(id) {
 
 
     
-    // ==================== ORIENTACOES (Photos & Videos) ====================
-    let orientacoesUploadItems = [];
+    // ==================== ORIENTACOES (Text only) ====================
     let currentOrientacoesPatientId = null;
+
+    function escapeHtml(value = '') {
+        return String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
 
     function openOrientacoesModal(patientId) {
         if(!currentUser) { showToast('Faca login para gerenciar orientacoes.', 'error'); return; }
         currentOrientacoesPatientId = patientId;
-        orientacoesUploadItems = [];
-        renderOrientacoesUploadPreview();
-        renderOrientacoesList();
         const p = patientsList.find(x => x.id === patientId);
+        const patientUser = getLinkedPatientUser(p);
+        const patientUserUid = patientUser ? patientUser.uid : null;
+        const textInput = document.getElementById('orientacoesTextInput');
+        if(textInput) {
+            const existingOrientation = patientUserUid ? patientOrientationsCache[patientUserUid] : null;
+            const existingTexts = Array.isArray(existingOrientation?.instructions) ? existingOrientation.instructions : [];
+            textInput.value = existingTexts.join('\n');
+        }
+        renderOrientacoesList(patientUserUid);
         document.getElementById('orientacoesTitle').innerText = 'Orientacoes - ' + (p ? p.name : '');
         openModal('modalOrientacoes');
     }
 
-    function handleOrientacaoFileSelect(input, mediaType) {
-        const files = Array.from(input.files);
-        files.forEach(file => {
-            if(file.size > 50 * 1024 * 1024) { showToast('Arquivo muito grande. Maximo 50MB.', 'error'); return; }
-            const reader = new FileReader();
-            reader.onload = e => {
-                orientacoesUploadItems.push({ type: mediaType, data: e.target.result });
-                renderOrientacoesUploadPreview();
-            };
-            reader.readAsDataURL(file);
-        });
-        input.value = '';
-    }
-
-    function renderOrientacoesUploadPreview() {
-        const area = document.getElementById('orientacoesUploadPreview');
-        if(!area) return;
-        area.innerHTML = '';
-        orientacoesUploadItems.forEach((item, i) => {
-            const div = document.createElement('div');
-            div.className = 'orientacao-upload-item';
-            if(item.type === 'video') {
-                div.innerHTML = '<video src="' + item.data + '" muted></video><span class="type-badge">VID</span><button class="remove-orientacao" onclick="removeOrientacaoUpload(' + i + ')">&#10005;</button>';
-            } else {
-                div.innerHTML = '<img src="' + item.data + '"><span class="type-badge">FOTO</span><button class="remove-orientacao" onclick="removeOrientacaoUpload(' + i + ')">&#10005;</button>';
-            }
-            area.appendChild(div);
-        });
-    }
-
-    function removeOrientacaoUpload(idx) {
-        orientacoesUploadItems.splice(idx, 1);
-        renderOrientacoesUploadPreview();
-    }
-
-    function renderOrientacoesList() {
+    function renderOrientacoesList(patientUserUid = null) {
         const container = document.getElementById('orientacoesListContainer');
         if(!container) return;
-        const p = patientsList.find(x => x.id === currentOrientacoesPatientId);
-        if(!p) return;
-        if(!p.orientacoes || p.orientacoes.length === 0) {
-            container.innerHTML = '<div class="orientacoes-empty">Nenhuma orientacao salva ainda. Use os botoes acima para adicionar.</div>';
+        const orientation = patientUserUid ? patientOrientationsCache[patientUserUid] : null;
+        const textItems = Array.isArray(orientation?.instructions) ? orientation.instructions : [];
+        if(textItems.length === 0) {
+            container.innerHTML = '<div class="orientacoes-empty">Nenhuma orientação por escrito salva ainda. Digite abaixo para adicionar.</div>';
             return;
         }
-        let html = '<div style="font-weight:700;font-size:13px;color:var(--gray);margin-bottom:8px;">&#128193; Orientacoes salvas (' + p.orientacoes.length + ')</div>';
+        let html = '<div style="font-weight:700;font-size:13px;color:var(--gray);margin-bottom:8px;">📝 Orientações por escrito (' + textItems.length + ')</div>';
         html += '<div class="orientacoes-grid">';
-        p.orientacoes.forEach((item, idx) => {
-            if(item.type === 'video') {
-                html += '<div class="orientacao-item">';
-                html += '<video src="' + item.url + '" muted></video>';
-                html += '<div class="play-overlay"><span>&#9658;</span></div>';
-                html += '<span class="orientacao-type-badge">Video</span>';
-                html += '<button class="orientacao-remove" onclick="deleteOrientacao(' + idx + ')">&#10005;</button>';
-                html += '</div>';
-            } else {
-                html += '<div class="orientacao-item">';
-                html += '<img src="' + item.url + '" alt="Orientacao">';
-                html += '<span class="orientacao-type-badge">Foto</span>';
-                html += '<button class="orientacao-remove" onclick="deleteOrientacao(' + idx + ')">&#10005;</button>';
-                html += '</div>';
-            }
+        textItems.forEach((text, idx) => {
+            html += '<div class="orientacao-item" style="aspect-ratio:auto;min-height:120px;padding:12px;display:flex;flex-direction:column;justify-content:space-between;">';
+            html += '<div style="font-size:13px;color:var(--dark);white-space:pre-wrap;line-height:1.5;">' + escapeHtml(text) + '</div>';
+            html += '<span class="orientacao-type-badge">Texto</span>';
+            html += '</div>';
         });
         html += '</div>';
         container.innerHTML = html;
@@ -1609,62 +1707,30 @@ function deletePatient(id) {
 
     function saveOrientacoes() {
         if(!currentOrientacoesPatientId) return;
-        if(orientacoesUploadItems.length === 0) { showToast('Selecione pelo menos uma foto ou video.', 'error'); return; }
         const p = patientsList.find(x => x.id === currentOrientacoesPatientId);
-        if(!p) return;
-        if(!p.orientacoes) p.orientacoes = [];
-        orientacoesUploadItems.forEach(item => {
-            p.orientacoes.push({ type: item.type === 'video' ? 'video' : 'photo', url: item.data, addedBy: currentUser.uid, addedAt: Date.now() });
-        });
-        db.ref('patients/' + currentOrientacoesPatientId).update({ orientacoes: p.orientacoes, updatedAt: Date.now() }, err => {
+        const patientUser = getLinkedPatientUser(p);
+        const patientUserUid = patientUser ? patientUser.uid : null;
+        if(!patientUserUid) { showToast('Vincule um usuário paciente antes de salvar as orientações.', 'error'); return; }
+        const textInput = document.getElementById('orientacoesTextInput');
+        const lines = (textInput?.value || '').split('\n').map(line => line.trim()).filter(Boolean);
+        if(lines.length === 0) { showToast('Digite pelo menos uma orientação por escrito.', 'error'); return; }
+        const existing = patientOrientationsCache[patientUserUid] || {};
+        const data = {
+            title: existing.title || '',
+            description: existing.description || '',
+            instructions: lines,
+            items: Array.isArray(existing.items) ? existing.items : [],
+            updatedAt: Date.now(),
+            updatedBy: currentUser.uid
+        };
+        db.ref('patientOrientations/' + patientUserUid).set(data, err => {
             if(err) { showToast('Erro ao salvar.', 'error'); }
-            else { showToast('Orientacoes salvas com sucesso!', 'success'); orientacoesUploadItems = []; renderOrientacoesUploadPreview(); renderOrientacoesList(); }
+            else {
+                patientOrientationsCache[patientUserUid] = data;
+                showToast('Orientações salvas com sucesso!', 'success');
+                renderOrientacoesList(patientUserUid);
+            }
         });
-    }
-
-    function deleteOrientacao(idx) {
-        if(!confirm('Excluir esta orientacao?')) return;
-        const p = patientsList.find(x => x.id === currentOrientacoesPatientId);
-        if(!p || !p.orientacoes) return;
-        p.orientacoes.splice(idx, 1);
-        db.ref('patients/' + currentOrientacoesPatientId).update({ orientacoes: p.orientacoes, updatedAt: Date.now() }, err => {
-            if(err) showToast('Erro ao excluir.', 'error');
-            else { showToast('Orientacao excluida.', 'success'); renderOrientacoesList(); }
-        });
-    }
-
-    function openOrientacaoLightbox(patientId, idx) {
-        const p = patientsList.find(x => x.id === patientId);
-        if(!p || !p.orientacoes) return;
-        lightboxPhotos = p.orientacoes;
-        lightboxIndex = idx;
-        showLightboxMedia(p.orientacoes[idx]);
-    }
-
-    function showLightboxMedia(item) {
-        const lb = document.getElementById('lightbox');
-        const imgEl = document.getElementById('lightboxImg');
-        const counterEl = document.getElementById('lightboxCounter');
-        const oldVid = lb.querySelector('video');
-        if(oldVid) oldVid.remove();
-        if(item.type === 'video') {
-            imgEl.style.display = 'none';
-            const vid = document.createElement('video');
-            vid.id = 'lightboxVideo';
-            vid.src = item.url;
-            vid.controls = true;
-            vid.style.maxWidth = '92%';
-            vid.style.maxHeight = '92vh';
-            vid.style.borderRadius = '8px';
-            imgEl.parentNode.insertBefore(vid, imgEl);
-        } else {
-            imgEl.style.display = 'block';
-            const oldV = document.getElementById('lightboxVideo');
-            if(oldV) oldV.remove();
-            imgEl.src = item.url;
-        }
-        counterEl.innerText = (lightboxIndex + 1) + ' / ' + lightboxPhotos.length;
-        lb.classList.add('active');
     }
 
 
@@ -1890,7 +1956,7 @@ function deletePatient(id) {
     // Stored in Firebase under /patientOrientations/{patientUid}
     // Surgeons/admins manage via the patient detail modal in Pacientes view
 
-    let patientOrientationsCache = {}; // Cache: { patientUid: { items: [], ... } }
+    let patientOrientationsCache = {}; // Cache: { patientUid: { instructions: [], items: [] } }
 
     // Load all orientations for admin/surgeon management
     function loadPatientOrientations() {
@@ -1899,18 +1965,218 @@ function deletePatient(id) {
         });
     }
 
+    function loadPatientOrientationData(patientUid, callback) {
+        if(!patientUid) {
+            if(callback) callback(null);
+            return;
+        }
+        if(patientOrientationsCache[patientUid]) {
+            if(callback) callback(patientOrientationsCache[patientUid]);
+            return;
+        }
+        db.ref('patientOrientations/' + patientUid).once('value', snap => {
+            const data = snap.val() || null;
+            if(data) patientOrientationsCache[patientUid] = data;
+            if(callback) callback(data);
+        });
+    }
+
     // Render the patient's own orientation view
     function renderPatientOrientationsView() {
         const container = document.getElementById('orientacoesPatientContent');
         if(!container || !currentUser) return;
         
-        const orientData = patientOrientationsCache[currentUser.uid];
-        if(!orientData || !orientData.items || orientData.items.length === 0) {
-            container.innerHTML = '<div class="empty-state"><h3>Nenhuma orientação disponível</h3><p>Suas orientações pós-cirúrgicas aparecerão aqui quando forem adicionadas pelo seu médico.</p></div>';
-            return;
-        }
+        loadPatientOrientationData(currentUser.uid, orientData => {
+            if(!orientData) {
+                container.innerHTML = '<div class="empty-state"><h3>Nenhuma orientação disponível</h3><p>Suas orientações pós-cirúrgicas aparecerão aqui quando forem adicionadas pelo seu médico. Você também pode enviar fotos e vídeos aqui.</p></div>';
+                return;
+            }
 
-        const items = orientData.items;
+            const instructions = Array.isArray(orientData.instructions) ? orientData.instructions : [];
+            const items = Array.isArray(orientData.items) ? orientData.items : [];
+            if(instructions.length === 0 && items.length === 0) {
+                container.innerHTML = '<div class="empty-state"><h3>Nenhuma orientação disponível</h3><p>Suas orientações pós-cirúrgicas aparecerão aqui quando forem adicionadas pelo seu médico. Você também pode enviar fotos e vídeos aqui.</p></div>';
+                return;
+            }
+
+            let html = '<div style="margin-bottom:20px;">';
+            if(orientData.title) {
+                html += '<h2 style="color:var(--primary);margin-bottom:4px;">' + orientData.title + '</h2>';
+            }
+            if(orientData.description) {
+                html += '<p style="color:var(--gray);font-size:14px;margin-bottom:16px;">' + orientData.description + '</p>';
+            }
+            html += '</div>';
+
+            html += '<div style="background:var(--white);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px;box-shadow:var(--shadow);">';
+            html += '<h3 style="color:var(--primary);margin-bottom:12px;font-size:16px;">📤 Enviar fotos e vídeos</h3>';
+            html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">';
+            html += '<label class="btn btn-primary" style="cursor:pointer;">📷 Adicionar Foto<input type="file" accept="image/*" multiple style="display:none" onchange="handlePatientOrientationMediaSelect(this, \"image\")"></label>';
+            html += '<label class="btn btn-secondary" style="cursor:pointer;">🎥 Adicionar Vídeo<input type="file" accept="video/*" multiple style="display:none" onchange="handlePatientOrientationMediaSelect(this, \"video\")"></label>';
+            html += '</div>';
+            html += '<div class="form-hint">Envie fotos ou vídeos para complementar as orientações recebidas. Eles ficarão visíveis para você e para o médico responsável.</div>';
+            html += '</div>';
+
+            if(instructions.length > 0) {
+                html += '<div style="background:var(--white);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px;border-left:4px solid var(--primary);box-shadow:var(--shadow);">';
+                html += '<h3 style="color:var(--primary);margin-bottom:12px;font-size:16px;">📝 Instruções</h3>';
+                html += '<div style="display:flex;flex-direction:column;gap:8px;">';
+                instructions.forEach((inst, i) => {
+                    html += '<div style="display:flex;gap:10px;align-items:flex-start;">';
+                    html += '<span style="background:var(--primary);color:white;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;flex-shrink:0;">' + (i+1) + '</span>';
+                    html += '<span style="font-size:14px;color:var(--dark);line-height:1.6;">' + inst + '</span>';
+                    html += '</div>';
+                });
+                html += '</div></div>';
+            }
+
+            if(items.length > 0) {
+                html += '<div style="background:var(--white);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px;box-shadow:var(--shadow);">';
+                html += '<h3 style="color:var(--primary);margin-bottom:12px;font-size:16px;">📷 Fotos e Vídeos enviados</h3>';
+                html += '<div class="orientacoes-grid">';
+                items.forEach((item, idx) => {
+                    if(item.type === 'video') {
+                        html += '<div class="orientacao-item" onclick="openPatientOrientacaoLightbox(' + idx + ')">';
+                        html += '<video src="' + (item.url || item.data || '') + '" muted></video>';
+                        html += '<div class="play-overlay"><span>&#9658;</span></div>';
+                        html += '<span class="orientacao-type-badge">Vídeo</span>';
+                        html += '<button class="orientacao-remove" onclick="event.stopPropagation();removePatientOrientationMedia(' + idx + ')">&#10005;</button>';
+                        html += '</div>';
+                    } else {
+                        html += '<div class="orientacao-item" onclick="openPatientOrientacaoLightbox(' + idx + ')">';
+                        html += '<img src="' + (item.url || item.data || '') + '" alt="Orientação">';
+                        html += '<span class="orientacao-type-badge">Foto</span>';
+                        html += '<button class="orientacao-remove" onclick="event.stopPropagation();removePatientOrientationMedia(' + idx + ')">&#10005;</button>';
+                        html += '</div>';
+                    }
+                });
+                html += '</div></div>';
+            }
+
+            if(orientData.updatedAt) {
+                const date = new Date(orientData.updatedAt);
+                html += '<p style="font-size:11px;color:var(--gray-light);text-align:right;">Última atualização: ' + date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR') + '</p>';
+            }
+
+            container.innerHTML = html;
+        });
+    }
+
+    function handlePatientOrientationMediaSelect(input, mediaType) {
+        const files = Array.from(input.files || []);
+        if(files.length === 0) return;
+        const current = patientOrientationsCache[currentUser.uid] || {};
+        const existingItems = Array.isArray(current.items) ? current.items : [];
+        let loaded = 0;
+        const newItems = [];
+        const uploadPromises = files.map(file => {
+            if(file.size > 100 * 1024 * 1024) { showToast('Arquivo muito grande. Máximo 100MB.', 'error'); return Promise.resolve(null); }
+            const storageRef = storage.ref('patientOrientations/' + currentUser.uid + '/' + Date.now() + '_' + (file.name || (mediaType === 'video' ? 'video' : 'photo')).replace(/[^a-zA-Z0-9._-]/g, '_'));
+            return storageRef.put(file).then(snapshot => snapshot.ref.getDownloadURL()).then(url => ({
+                type: mediaType === 'video' ? 'video' : 'photo',
+                url,
+                name: file.name || '',
+                addedAt: Date.now()
+            }));
+        });
+
+        Promise.all(uploadPromises).then(uploadedItems => {
+            const validItems = uploadedItems.filter(Boolean);
+            if(validItems.length === 0) return;
+            const data = {
+                title: current.title || '',
+                description: current.description || '',
+                instructions: Array.isArray(current.instructions) ? current.instructions : [],
+                items: [...existingItems, ...validItems],
+                updatedAt: Date.now(),
+                updatedBy: currentUser.uid
+            };
+            db.ref('patientOrientations/' + currentUser.uid).set(data, err => {
+                if(err) { showToast('Erro ao salvar mídia.', 'error'); }
+                else {
+                    patientOrientationsCache[currentUser.uid] = data;
+                    renderPatientOrientationsView();
+                    showToast('Mídia enviada com sucesso!', 'success');
+                }
+            });
+        }).catch(() => {
+            showToast('Erro ao enviar a mídia.', 'error');
+        });
+        input.value = '';
+    }
+
+    function removePatientOrientationMedia(idx) {
+        const current = patientOrientationsCache[currentUser.uid] || {};
+        const items = Array.isArray(current.items) ? current.items : [];
+        if(idx < 0 || idx >= items.length) return;
+        items.splice(idx, 1);
+        const data = {
+            title: current.title || '',
+            description: current.description || '',
+            instructions: Array.isArray(current.instructions) ? current.instructions : [],
+            items,
+            updatedAt: Date.now(),
+            updatedBy: currentUser.uid
+        };
+        db.ref('patientOrientations/' + currentUser.uid).set(data, err => {
+            if(err) { showToast('Erro ao remover mídia.', 'error'); }
+            else {
+                patientOrientationsCache[currentUser.uid] = data;
+                renderPatientOrientationsView();
+                showToast('Mídia removida.', 'success');
+            }
+        });
+    }
+
+    // Lightbox for patient orientation media
+    let patientOrientMediaItems = [];
+    let patientOrientMediaIndex = 0;
+
+    function openPatientOrientacaoLightbox(idx) {
+        const orientData = patientOrientationsCache[currentUser.uid];
+        if(!orientData || !orientData.items) return;
+        patientOrientMediaItems = orientData.items.filter(item => item.type === 'photo' || item.type === 'video');
+        patientOrientMediaIndex = idx;
+        showPatientOrientMedia(patientOrientMediaItems[idx]);
+    }
+
+    function showPatientOrientMedia(item) {
+        const lb = document.getElementById('lightbox');
+        const imgEl = document.getElementById('lightboxImg');
+        const counterEl = document.getElementById('lightboxCounter');
+        const oldVid = lb.querySelector('video');
+        if(oldVid) oldVid.remove();
+        if(item.type === 'video') {
+            imgEl.style.display = 'none';
+            const vid = document.createElement('video');
+            vid.id = 'lightboxVideo';
+            vid.src = item.url;
+            vid.controls = true;
+            vid.style.maxWidth = '92%';
+            vid.style.maxHeight = '92vh';
+            vid.style.borderRadius = '8px';
+            imgEl.parentNode.insertBefore(vid, imgEl);
+        } else {
+            imgEl.style.display = 'block';
+            const oldV = document.getElementById('lightboxVideo');
+            if(oldV) oldV.remove();
+            imgEl.src = item.url;
+        }
+        counterEl.innerText = (patientOrientMediaIndex + 1) + ' / ' + patientOrientMediaItems.length;
+        lb.classList.add('active');
+    }
+
+    // Override showView to load orientations when patient opens the view
+    const _originalShowView = showView;
+    showView = function(viewId) {
+        _originalShowView(viewId);
+        if(viewId === 'viewOrientacoes' && currentUser && currentUser.role === 'patient') {
+            renderPatientOrientationsView();
+        }
+    };
+
+    // ==================== SURGEON ORIENTATION MANAGEMENT ====================
+
         let html = '<div style="margin-bottom:20px;">';
         if(orientData.title) {
             html += '<h2 style="color:var(--primary);margin-bottom:4px;">' + orientData.title + '</h2>';
@@ -1920,12 +2186,20 @@ function deletePatient(id) {
         }
         html += '</div>';
 
-        // Text instructions section
-        if(orientData.instructions && orientData.instructions.length > 0) {
+        html += '<div style="background:var(--white);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px;box-shadow:var(--shadow);">';
+        html += '<h3 style="color:var(--primary);margin-bottom:12px;font-size:16px;">📤 Enviar fotos e vídeos</h3>';
+        html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">';
+        html += '<label class="btn btn-primary" style="cursor:pointer;">📷 Adicionar Foto<input type="file" accept="image/*" multiple style="display:none" onchange="handlePatientOrientationMediaSelect(this, \"image\")"></label>';
+        html += '<label class="btn btn-secondary" style="cursor:pointer;">🎥 Adicionar Vídeo<input type="file" accept="video/*" multiple style="display:none" onchange="handlePatientOrientationMediaSelect(this, \"video\")"></label>';
+        html += '</div>';
+        html += '<div class="form-hint">Envie fotos ou vídeos para complementar as orientações recebidas. Eles ficarão visíveis para você e para o médico responsável.</div>';
+        html += '</div>';
+
+        if(instructions.length > 0) {
             html += '<div style="background:var(--white);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px;border-left:4px solid var(--primary);box-shadow:var(--shadow);">';
             html += '<h3 style="color:var(--primary);margin-bottom:12px;font-size:16px;">📝 Instruções</h3>';
             html += '<div style="display:flex;flex-direction:column;gap:8px;">';
-            orientData.instructions.forEach((inst, i) => {
+            instructions.forEach((inst, i) => {
                 html += '<div style="display:flex;gap:10px;align-items:flex-start;">';
                 html += '<span style="background:var(--primary);color:white;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;flex-shrink:0;">' + (i+1) + '</span>';
                 html += '<span style="font-size:14px;color:var(--dark);line-height:1.6;">' + inst + '</span>';
@@ -1934,36 +2208,98 @@ function deletePatient(id) {
             html += '</div></div>';
         }
 
-        // Photos and videos grid
-        const mediaItems = items.filter(item => item.type === 'photo' || item.type === 'video');
-        if(mediaItems.length > 0) {
+        if(items.length > 0) {
             html += '<div style="background:var(--white);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px;box-shadow:var(--shadow);">';
-            html += '<h3 style="color:var(--primary);margin-bottom:12px;font-size:16px;">📷 Fotos e Vídeos</h3>';
+            html += '<h3 style="color:var(--primary);margin-bottom:12px;font-size:16px;">📷 Fotos e Vídeos enviados</h3>';
             html += '<div class="orientacoes-grid">';
-            mediaItems.forEach((item, idx) => {
+            items.forEach((item, idx) => {
                 if(item.type === 'video') {
                     html += '<div class="orientacao-item" onclick="openPatientOrientacaoLightbox(' + idx + ')">';
                     html += '<video src="' + item.url + '" muted></video>';
                     html += '<div class="play-overlay"><span>&#9658;</span></div>';
                     html += '<span class="orientacao-type-badge">Vídeo</span>';
+                    html += '<button class="orientacao-remove" onclick="event.stopPropagation();removePatientOrientationMedia(' + idx + ')">&#10005;</button>';
                     html += '</div>';
                 } else {
                     html += '<div class="orientacao-item" onclick="openPatientOrientacaoLightbox(' + idx + ')">';
                     html += '<img src="' + item.url + '" alt="Orientação">';
                     html += '<span class="orientacao-type-badge">Foto</span>';
+                    html += '<button class="orientacao-remove" onclick="event.stopPropagation();removePatientOrientationMedia(' + idx + ')">&#10005;</button>';
                     html += '</div>';
                 }
             });
             html += '</div></div>';
         }
 
-        // Last updated info
         if(orientData.updatedAt) {
             const date = new Date(orientData.updatedAt);
             html += '<p style="font-size:11px;color:var(--gray-light);text-align:right;">Última atualização: ' + date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR') + '</p>';
         }
 
         container.innerHTML = html;
+    }
+
+    function handlePatientOrientationMediaSelect(input, mediaType) {
+        const files = Array.from(input.files || []);
+        if(files.length === 0) return;
+        const current = patientOrientationsCache[currentUser.uid] || {};
+        const existingItems = Array.isArray(current.items) ? current.items : [];
+        let loaded = 0;
+        const newItems = [];
+        files.forEach(file => {
+            if(file.size > 50 * 1024 * 1024) { showToast('Arquivo muito grande. Máximo 50MB.', 'error'); return; }
+            const reader = new FileReader();
+            reader.onload = e => {
+                newItems.push({ type: mediaType === 'video' ? 'video' : 'photo', url: e.target.result, addedAt: Date.now() });
+                loaded += 1;
+                if(loaded === files.length) {
+                    const data = {
+                        title: current.title || '',
+                        description: current.description || '',
+                        instructions: Array.isArray(current.instructions) ? current.instructions : [],
+                        items: [...existingItems, ...newItems],
+                        updatedAt: Date.now(),
+                        updatedBy: currentUser.uid
+                    };
+                    db.ref('patientOrientations/' + currentUser.uid).set(data, err => {
+                        if(err) { showToast('Erro ao salvar mídia.', 'error'); }
+                        else {
+                            patientOrientationsCache[currentUser.uid] = data;
+                            renderPatientOrientationsView();
+                            showToast('Mídia enviada com sucesso!', 'success');
+                        }
+                    });
+                }
+            };
+            reader.onerror = () => {
+                showToast('Erro ao ler o arquivo.', 'error');
+            };
+            reader.readAsDataURL(file);
+        });
+        input.value = '';
+    }
+
+    function removePatientOrientationMedia(idx) {
+        const current = patientOrientationsCache[currentUser.uid] || {};
+        const items = Array.isArray(current.items) ? current.items : [];
+        if(idx < 0 || idx >= items.length) return;
+        items.splice(idx, 1);
+        const data = {
+            title: current.title || '',
+            description: current.description || '',
+            instructions: Array.isArray(current.instructions) ? current.instructions : [],
+            items,
+            updatedAt: Date.now(),
+            updatedBy: currentUser.uid
+        };
+        db.ref('patientOrientations/' + currentUser.uid).set(data, err => {
+            if(err) { showToast('Erro ao remover mídia.', 'error'); }
+            else {
+                patientOrientationsCache[currentUser.uid] = data;
+                renderPatientOrientationsView();
+                showToast('Mídia removida.', 'success');
+            }
+        });
     }
 
     // Lightbox for patient orientation media
@@ -2031,16 +2367,13 @@ function deletePatient(id) {
             document.getElementById('orientEditTitle').value = existing.title || '';
             document.getElementById('orientEditDesc').value = existing.description || '';
             document.getElementById('orientEditInstructions').value = (existing.instructions || []).join('\n');
-            orientEditItems = existing.items ? existing.items.map(item => ({ ...item, data: item.url })) : [];
         } else {
             document.getElementById('orientEditTitle').value = '';
             document.getElementById('orientEditDesc').value = '';
             document.getElementById('orientEditInstructions').value = '';
-            orientEditItems = [];
         }
         
         document.getElementById('orientEditPatientName').innerText = patientName || '';
-        renderOrientEditPreview();
         openModal('modalOrientEdit');
     }
 
@@ -2087,17 +2420,11 @@ function deletePatient(id) {
         const instructionsText = document.getElementById('orientEditInstructions').value.trim();
         const instructions = instructionsText ? instructionsText.split('\n').filter(l => l.trim()) : [];
         
-        const items = orientEditItems.map(item => ({
-            type: item.type,
-            url: item.url,
-            addedAt: item.addedAt || Date.now()
-        }));
-
         const data = {
             title,
             description,
             instructions,
-            items,
+            items: [],
             updatedAt: Date.now(),
             updatedBy: currentUser.uid
         };
