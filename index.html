@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>STEPS2WALK Curitiba 2026 - Neoortho</title>
-    <link rel="icon" href="https://steps2walk-5d8b0.web.app/favicon.ico" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23004d40'/%3E%3Ctext x='8' y='12' font-size='10' fill='%23fff' text-anchor='middle' font-family='Arial'%3ES%3C/text%3E%3C/svg%3E">
     
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
@@ -267,7 +267,7 @@
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
     <button class="lightbox-close" onclick="closeLightbox()">&#10005;</button>
     <button class="lightbox-nav lightbox-prev" onclick="event.stopPropagation();navLightbox(-1)">&#8249;</button>
-    <img id="lightboxImg" src="" alt="Foto">
+    <img id="lightboxImg" alt="Foto">
     <button class="lightbox-nav lightbox-next" onclick="event.stopPropagation();navLightbox(1)">&#8250;</button>
     <div class="lightbox-counter" id="lightboxCounter"></div>
 </div>
@@ -279,7 +279,7 @@
 <nav class="navbar" id="navbar">
     <div class="navbar-inner">
         <div class="navbar-brand" onclick="goHome()">
-            <img src="https://steps2walk-5d8b0.web.app/logo-s2w.png" alt="Logo" onerror="this.style.display='none'">
+            <img alt="Logo">
             <div><h1>STEPS2WALK&reg;</h1><small>Curitiba 2026</small></div>
         </div>
         <div class="navbar-actions" id="navbarAuthSection">
@@ -297,7 +297,7 @@
     <section class="hero">
         <div class="hero-bg"></div><div class="hero-particles" id="heroParticles"></div><div class="hero-overlay"></div>
         <div class="hero-content">
-            <img src="https://steps2walk-5d8b0.web.app/logo-s2w.png" alt="Logo" class="hero-logo" onerror="this.style.display='none'">
+            <img alt="Logo" class="hero-logo">
             <div class="hero-badge" data-i18n="hero_badge">05 a 09 de Outubro de 2026</div>
             <h1>STEPS2WALK&reg;</h1><h2>CURITIBA 2026</h2>
             <p class="subtitle">Foot and Ankle Training &amp; Surgery</p>
@@ -2178,191 +2178,13 @@ function deletePatient(id) {
 
     // ==================== SURGEON ORIENTATION MANAGEMENT ====================
 
-        let html = '<div style="margin-bottom:20px;">';
-        if(orientData.title) {
-            html += '<h2 style="color:var(--primary);margin-bottom:4px;">' + orientData.title + '</h2>';
-        }
-        if(orientData.description) {
-            html += '<p style="color:var(--gray);font-size:14px;margin-bottom:16px;">' + orientData.description + '</p>';
-        }
-        html += '</div>';
-
-        html += '<div style="background:var(--white);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px;box-shadow:var(--shadow);">';
-        html += '<h3 style="color:var(--primary);margin-bottom:12px;font-size:16px;">📤 Enviar fotos e vídeos</h3>';
-        html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">';
-        html += '<label class="btn btn-primary" style="cursor:pointer;">📷 Adicionar Foto<input type="file" accept="image/*" multiple style="display:none" onchange="handlePatientOrientationMediaSelect(this, \"image\")"></label>';
-        html += '<label class="btn btn-secondary" style="cursor:pointer;">🎥 Adicionar Vídeo<input type="file" accept="video/*" multiple style="display:none" onchange="handlePatientOrientationMediaSelect(this, \"video\")"></label>';
-        html += '</div>';
-        html += '<div class="form-hint">Envie fotos ou vídeos para complementar as orientações recebidas. Eles ficarão visíveis para você e para o médico responsável.</div>';
-        html += '</div>';
-
-        if(instructions.length > 0) {
-            html += '<div style="background:var(--white);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px;border-left:4px solid var(--primary);box-shadow:var(--shadow);">';
-            html += '<h3 style="color:var(--primary);margin-bottom:12px;font-size:16px;">📝 Instruções</h3>';
-            html += '<div style="display:flex;flex-direction:column;gap:8px;">';
-            instructions.forEach((inst, i) => {
-                html += '<div style="display:flex;gap:10px;align-items:flex-start;">';
-                html += '<span style="background:var(--primary);color:white;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;flex-shrink:0;">' + (i+1) + '</span>';
-                html += '<span style="font-size:14px;color:var(--dark);line-height:1.6;">' + inst + '</span>';
-                html += '</div>';
-            });
-            html += '</div></div>';
-        }
-
-        if(items.length > 0) {
-            html += '<div style="background:var(--white);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px;box-shadow:var(--shadow);">';
-            html += '<h3 style="color:var(--primary);margin-bottom:12px;font-size:16px;">📷 Fotos e Vídeos enviados</h3>';
-            html += '<div class="orientacoes-grid">';
-            items.forEach((item, idx) => {
-                if(item.type === 'video') {
-                    html += '<div class="orientacao-item" onclick="openPatientOrientacaoLightbox(' + idx + ')">';
-                    html += '<video src="' + item.url + '" muted></video>';
-                    html += '<div class="play-overlay"><span>&#9658;</span></div>';
-                    html += '<span class="orientacao-type-badge">Vídeo</span>';
-                    html += '<button class="orientacao-remove" onclick="event.stopPropagation();removePatientOrientationMedia(' + idx + ')">&#10005;</button>';
-                    html += '</div>';
-                } else {
-                    html += '<div class="orientacao-item" onclick="openPatientOrientacaoLightbox(' + idx + ')">';
-                    html += '<img src="' + item.url + '" alt="Orientação">';
-                    html += '<span class="orientacao-type-badge">Foto</span>';
-                    html += '<button class="orientacao-remove" onclick="event.stopPropagation();removePatientOrientationMedia(' + idx + ')">&#10005;</button>';
-                    html += '</div>';
-                }
-            });
-            html += '</div></div>';
-        }
-
-        if(orientData.updatedAt) {
-            const date = new Date(orientData.updatedAt);
-            html += '<p style="font-size:11px;color:var(--gray-light);text-align:right;">Última atualização: ' + date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR') + '</p>';
-        }
-
-        container.innerHTML = html;
-    }
-
-    function handlePatientOrientationMediaSelect(input, mediaType) {
-        const files = Array.from(input.files || []);
-        if(files.length === 0) return;
-        const current = patientOrientationsCache[currentUser.uid] || {};
-        const existingItems = Array.isArray(current.items) ? current.items : [];
-        let loaded = 0;
-        const newItems = [];
-        files.forEach(file => {
-            if(file.size > 50 * 1024 * 1024) { showToast('Arquivo muito grande. Máximo 50MB.', 'error'); return; }
-            const reader = new FileReader();
-            reader.onload = e => {
-                newItems.push({ type: mediaType === 'video' ? 'video' : 'photo', url: e.target.result, addedAt: Date.now() });
-                loaded += 1;
-                if(loaded === files.length) {
-                    const data = {
-                        title: current.title || '',
-                        description: current.description || '',
-                        instructions: Array.isArray(current.instructions) ? current.instructions : [],
-                        items: [...existingItems, ...newItems],
-                        updatedAt: Date.now(),
-                        updatedBy: currentUser.uid
-                    };
-                    db.ref('patientOrientations/' + currentUser.uid).set(data, err => {
-                        if(err) { showToast('Erro ao salvar mídia.', 'error'); }
-                        else {
-                            patientOrientationsCache[currentUser.uid] = data;
-                            renderPatientOrientationsView();
-                            showToast('Mídia enviada com sucesso!', 'success');
-                        }
-                    });
-                }
-            };
-            reader.onerror = () => {
-                showToast('Erro ao ler o arquivo.', 'error');
-            };
-            reader.readAsDataURL(file);
-        });
-        input.value = '';
-    }
-
-    function removePatientOrientationMedia(idx) {
-        const current = patientOrientationsCache[currentUser.uid] || {};
-        const items = Array.isArray(current.items) ? current.items : [];
-        if(idx < 0 || idx >= items.length) return;
-        items.splice(idx, 1);
-        const data = {
-            title: current.title || '',
-            description: current.description || '',
-            instructions: Array.isArray(current.instructions) ? current.instructions : [],
-            items,
-            updatedAt: Date.now(),
-            updatedBy: currentUser.uid
-        };
-        db.ref('patientOrientations/' + currentUser.uid).set(data, err => {
-            if(err) { showToast('Erro ao remover mídia.', 'error'); }
-            else {
-                patientOrientationsCache[currentUser.uid] = data;
-                renderPatientOrientationsView();
-                showToast('Mídia removida.', 'success');
-            }
-        });
-    }
-
-    // Lightbox for patient orientation media
-    let patientOrientMediaItems = [];
-    let patientOrientMediaIndex = 0;
-
-    function openPatientOrientacaoLightbox(idx) {
-        const orientData = patientOrientationsCache[currentUser.uid];
-        if(!orientData || !orientData.items) return;
-        patientOrientMediaItems = orientData.items.filter(item => item.type === 'photo' || item.type === 'video');
-        patientOrientMediaIndex = idx;
-        showPatientOrientMedia(patientOrientMediaItems[idx]);
-    }
-
-    function showPatientOrientMedia(item) {
-        const lb = document.getElementById('lightbox');
-        const imgEl = document.getElementById('lightboxImg');
-        const counterEl = document.getElementById('lightboxCounter');
-        const oldVid = lb.querySelector('video');
-        if(oldVid) oldVid.remove();
-        if(item.type === 'video') {
-            imgEl.style.display = 'none';
-            const vid = document.createElement('video');
-            vid.id = 'lightboxVideo';
-            vid.src = item.url;
-            vid.controls = true;
-            vid.style.maxWidth = '92%';
-            vid.style.maxHeight = '92vh';
-            vid.style.borderRadius = '8px';
-            imgEl.parentNode.insertBefore(vid, imgEl);
-        } else {
-            imgEl.style.display = 'block';
-            const oldV = document.getElementById('lightboxVideo');
-            if(oldV) oldV.remove();
-            imgEl.src = item.url;
-        }
-        counterEl.innerText = (patientOrientMediaIndex + 1) + ' / ' + patientOrientMediaItems.length;
-        lb.classList.add('active');
-    }
-
-    // Override showView to load orientations when patient opens the view
-    const _originalShowView = showView;
-    showView = function(viewId) {
-        _originalShowView(viewId);
-        if(viewId === 'viewOrientacoes' && currentUser && currentUser.role === 'patient') {
-            renderPatientOrientationsView();
-        }
-    };
-
-    // ==================== SURGEON ORIENTATION MANAGEMENT ====================
-    // Add orientation management to the patient detail modal
-    // This allows surgeons to set orientations for patient users
-
     let orientEditItems = [];
     let orientEditPatientUid = null;
 
-    // Open orientation management modal for a specific patient user
     function openOrientPatientUserModal(patientUid, patientName) {
         orientEditPatientUid = patientUid;
         orientEditItems = [];
         
-        // Load existing orientations for this patient
         const existing = patientOrientationsCache[patientUid];
         if(existing) {
             document.getElementById('orientEditTitle').value = existing.title || '';
@@ -2379,7 +2201,7 @@ function deletePatient(id) {
     }
 
     function handleOrientEditFileSelect(input, mediaType) {
-        const files = Array.from(input.files);
+        const files = Array.from(input.files || []);
         files.forEach(file => {
             if(file.size > 50 * 1024 * 1024) { showToast('Arquivo muito grande. Máximo 50MB.', 'error'); return; }
             const reader = new FileReader();
@@ -2391,6 +2213,10 @@ function deletePatient(id) {
         });
         input.value = '';
     }
+
+    // ==================== SURGEON ORIENTATION MANAGEMENT ====================
+    // Add orientation management to the patient detail modal
+    // This allows surgeons to set orientations for patient users
 
     function renderOrientEditPreview() {
         const area = document.getElementById('orientEditPreview');
