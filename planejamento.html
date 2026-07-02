@@ -1017,6 +1017,39 @@
         container.innerHTML = html;
     }
 
+    function showTab(tabKey) {
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('onclick')?.includes(`'${tabKey}'`));
+        });
+
+        if (tabKey === 'REPORT') {
+            renderReport();
+            return;
+        }
+
+        if (tabKey === 'AGENDA') {
+            renderAgenda();
+            return;
+        }
+
+        if (tabKey === 'MATRIX_08_09') {
+            renderMatrizCompleta();
+            return;
+        }
+
+        if (tabKey.startsWith('EVENT_')) {
+            renderEvento(tabKey);
+            return;
+        }
+
+        if (tabKey.startsWith('CHC_') || tabKey.startsWith('CHR_')) {
+            renderCirurgias(tabKey);
+            return;
+        }
+
+        document.getElementById('scheduleContainer').innerHTML = '<p style="color:#999;">Aba não reconhecida.</p>';
+    }
+
     function refreshCirurgiasView() {
         const activeTab = document.querySelector('.tab-btn.active');
         if (activeTab) {
