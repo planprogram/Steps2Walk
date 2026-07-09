@@ -112,6 +112,28 @@
         .matrix-cell-empty { background: #f9f9f9; border: 1px dashed #ccc; margin: 5px; border-radius: 4px; }
         .matrix-cell-content { font-size: 10px; line-height: 1.4; }
         .surgery-data { margin-bottom: 3px; display: flex; align-items: flex-start; gap: 4px; }
+        .matrix-view-shell { background: var(--white); border-radius: 8px; padding: 20px; }
+        .matrix-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+        .matrix-toolbar p { margin: 0; color: #666; font-size: 12px; }
+        .matrix-day-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .matrix-surgery-cell { color: #1e1e1e; border-right: 1px solid #bbb; border-bottom: 1px solid #bbb; min-height: 60px; overflow-y: auto; padding: 5px; font-size: 8px; position: relative; }
+        .matrix-surgery-id { display: inline-block; font-size: 7px; font-weight: bold; letter-spacing: 0.3px; background: rgba(255,255,255,0.7); border-radius: 8px; padding: 1px 6px; margin-bottom: 3px; }
+        .matrix-surgery-doctor { font-weight: bold; margin-bottom: 1px; font-size: 9px; }
+        .matrix-surgery-patient { opacity: 0.92; font-size: 8px; }
+
+        @media (max-width: 1100px) {
+            .matrix-day-grid { grid-template-columns: 1fr; gap: 20px; }
+        }
+
+        @media print {
+            body { background: #fff; }
+            .header, .sidebar { display: none !important; }
+            .container { height: auto; display: block; }
+            .main { padding: 0; background: #fff; }
+            .matrix-toolbar .btn { display: none !important; }
+            .matrix-view-shell { box-shadow: none; border-radius: 0; padding: 0; }
+            .matrix-surgery-cell { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
 
         /* New styles for independent rooms */
         .sala-card { background: var(--white); border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 20px; overflow: hidden; border: 1px solid #ddd; }
@@ -294,7 +316,7 @@
       }
     };
 
-    let medicos = [], materiais = {}, instrumentadores = [], neoorthos = [], scheduleData = {}, expandedMaterials = {}, dragState = { tabKey: null, dragIndex: null }, patientsDB = {};
+    let medicos = [], materiais = {}, instrumentadores = [], neoorthos = [], scheduleData = {}, expandedMaterials = {}, dragState = { tabKey: null, dragIndex: null }, patientsDB = {}, currentTab = 'EVENT_05';
     const regrasMedicos = { "Dr. Bruno A. B. Moura": "CHR", "Dr. Luiz Fernando Bonaroski": "CHR", "Dr. João Luiz Vieira da Silva": "CHC" };
     const salas = ["Sala 1", "Sala 2", "Sala 3", "Sala 4", "Sala 5"];
     const maxMotorsPerHospital = 5;
@@ -500,6 +522,7 @@
     function renderReport() {
         const container = document.getElementById('scheduleContainer');
         const kitUsage = { 'CHC_08': {}, 'CHC_09': {}, 'CHR_08': {}, 'CHR_09': {} };
+        const surgeriesByDay = { '08': {}, '09': {} };
         ['CHC_08', 'CHC_09', 'CHR_08', 'CHR_09'].forEach(tab => {
             if (!scheduleData[tab]) return;
             for (let sala in scheduleData[tab]) {
@@ -510,12 +533,18 @@
                     slotMats.forEach(m => {
                         if (m) kitUsage[tab][m] = (kitUsage[tab][m] || 0) + 1;
                     });
+
+                    const dayKey = tab.split('_')[1];
+                    const uniqueMats = [...new Set(slotMats.filter(Boolean))];
+                    uniqueMats.forEach(m => {
+                        surgeriesByDay[dayKey][m] = (surgeriesByDay[dayKey][m] || 0) + 1;
+                    });
                 });
             }
         });
         let html = `<h2 style="color:var(--primary);">📦 Relatório de Materiais</h2>`;
         html += `<p style="color:#666; font-size:12px; margin-bottom:16px;">Quantidade de material por hospital e por dia.</p>`;
-        html += `<table><thead><tr><th>Kit</th><th>CHC 08</th><th>CHC 09</th><th>CHR 08</th><th>CHR 09</th><th>Total</th></tr></thead><tbody>`;
+        html += `<table><thead><tr><th>Kit</th><th>CHC 08</th><th>CHC 09</th><th>CHR 08</th><th>CHR 09</th><th>Total</th><th>Cirurgias por Dia</th></tr></thead><tbody>`;
         const allKits = new Set([
             ...Object.keys(kitUsage['CHC_08']),
             ...Object.keys(kitUsage['CHC_09']),
@@ -523,7 +552,7 @@
             ...Object.keys(kitUsage['CHR_09'])
         ]);
         if (allKits.size === 0) {
-            html += `<tr><td colspan="6">Nenhum material alocado nas cirurgias ainda.</td></tr>`;
+            html += `<tr><td colspan="7">Nenhum material alocado nas cirurgias ainda.</td></tr>`;
         } else {
             Array.from(allKits).sort((a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' })).forEach(kit => {
                 const chc08 = kitUsage['CHC_08'][kit] || 0;
@@ -531,7 +560,9 @@
                 const chr08 = kitUsage['CHR_08'][kit] || 0;
                 const chr09 = kitUsage['CHR_09'][kit] || 0;
                 const total = chc08 + chc09 + chr08 + chr09;
-                html += `<tr><td class="left-text"><strong>${kit}</strong></td><td>${chc08}</td><td>${chc09}</td><td>${chr08}</td><td>${chr09}</td><td><strong>${total}</strong></td></tr>`;
+                const cir08 = surgeriesByDay['08'][kit] || 0;
+                const cir09 = surgeriesByDay['09'][kit] || 0;
+                html += `<tr><td class="left-text"><strong>${kit}</strong></td><td>${chc08}</td><td>${chc09}</td><td>${chr08}</td><td>${chr09}</td><td><strong>${total}</strong></td><td><strong>D8:</strong> ${cir08} | <strong>D9:</strong> ${cir09}</td></tr>`;
             });
         }
         html += `</tbody></table>`;
@@ -619,12 +650,14 @@
     function updateSurgeryField(tabKey, sala, surgeryIndex, field, value) {
         scheduleData[tabKey][sala].surgeries[surgeryIndex][field] = value;
         triggerAutoSave();
+        if (currentTab === 'MATRIX_08_09') renderMatrizCompleta();
     }
 
     function addSurgery(tabKey, sala) {
         if (!scheduleData[tabKey][sala].surgeries) scheduleData[tabKey][sala].surgeries = [];
         scheduleData[tabKey][sala].surgeries.push(makeEmptySurgery());
         triggerAutoSave();
+        if (currentTab === 'MATRIX_08_09') renderMatrizCompleta();
         renderCirurgias(tabKey);
     }
 
@@ -632,6 +665,7 @@
         if (confirm('Excluir cirurgia?')) {
             scheduleData[tabKey][sala].surgeries.splice(surgeryIndex, 1);
             triggerAutoSave();
+            if (currentTab === 'MATRIX_08_09') renderMatrizCompleta();
             renderCirurgias(tabKey);
         }
     }
@@ -644,6 +678,7 @@
         surgeries[surgeryIndex] = surgeries[newIndex];
         surgeries[newIndex] = temp;
         triggerAutoSave();
+        if (currentTab === 'MATRIX_08_09') renderMatrizCompleta();
         renderCirurgias(tabKey);
     }
 
@@ -654,18 +689,21 @@
         if (!surgery.materiais) surgery.materiais = [];
         surgery.materiais.push(matName);
         triggerAutoSave();
+        if (currentTab === 'MATRIX_08_09') renderMatrizCompleta();
         renderCirurgias(tabKey);
     }
 
     function removeMaterialFromSurgery(tabKey, sala, surgeryIndex, matIndex) {
         scheduleData[tabKey][sala].surgeries[surgeryIndex].materiais.splice(matIndex, 1);
         triggerAutoSave();
+        if (currentTab === 'MATRIX_08_09') renderMatrizCompleta();
         renderCirurgias(tabKey);
     }
 
     function updateRoomDate(tabKey, sala, newDate) {
         scheduleData[tabKey][sala].date = newDate;
         triggerAutoSave();
+        if (currentTab === 'MATRIX_08_09') renderMatrizCompleta();
         renderCirurgias(tabKey);
     }
 
@@ -767,10 +805,12 @@
 
     function renderMatrizCompleta() {
         const container = document.getElementById('scheduleContainer');
-        let html = '<div style="background:var(--white); border-radius:8px; padding:20px;">';
-        html += '<h2 style="color:var(--primary); margin-bottom:10px;">📊 Matriz de Cirurgias - Dias 8 e 9</h2>';
-        html += '<p style="color:#666; font-size:12px; margin-bottom:20px;">Visualização com horas no eixo Y e salas no eixo X. Cores douradas indicam cirurgias agendadas.</p>';
-        html += '<div style="display:grid; grid-template-columns:1fr 1fr; gap:30px;">';
+        let html = '<div class="matrix-view-shell">';
+        html += '<div class="matrix-toolbar">';
+        html += '<div><h2 style="color:var(--primary); margin:0 0 6px 0;">Matriz de Cirurgias - Dias 8 e 9</h2><p>Blocos da mesma cirurgia recebem a mesma cor e identificador.</p></div>';
+        html += '<button class="btn btn-add" style="height:32px;" onclick="printMatrizView()">Imprimir Matriz</button>';
+        html += '</div>';
+        html += '<div class="matrix-day-grid">';
         
         // Dia 8
         html += '<div><h3 style="color:var(--primary); margin-bottom:15px;">🗓️ Dia 8 de Outubro</h3>';
@@ -788,102 +828,139 @@
         container.innerHTML = html;
     }
 
+    function printMatrizView() {
+        if (currentTab !== 'MATRIX_08_09') {
+            alert('Abra a aba Matriz para imprimir esta visualizacao.');
+            return;
+        }
+        window.print();
+    }
+
     function renderMatrixHTML(tabKey) {
         const [hospital, day] = tabKey.split('_');
-        
-        // Parse all surgeries and create time slots
         const surgeryMap = {};
         const allTimes = [];
-        
+
         salas.forEach(sala => {
             surgeryMap[sala] = [];
             const room = scheduleData[tabKey]?.[sala];
-            if (room?.surgeries) {
-                room.surgeries.forEach(surgery => {
-                    if (surgery.time) {
-                        const times = surgery.time.split(' - ');
-                        const startTime = parseTimeToMinutes(times[0]);
-                        const endTime = times[1] ? parseTimeToMinutes(times[1]) : startTime + 180; // 3 horas default
-                        
-                        surgeryMap[sala].push({
-                            ...surgery,
-                            startTime: startTime,
-                            endTime: endTime,
-                            displayTime: surgery.time
-                        });
-                        allTimes.push(startTime);
-                        allTimes.push(endTime);
-                    }
+            if (!room?.surgeries) return;
+
+            room.surgeries.forEach((surgery, index) => {
+                const range = parseSurgeryTimeRange(surgery.time);
+                if (!range) return;
+
+                const signature = [
+                    hospital,
+                    day,
+                    sala,
+                    surgery.time || '',
+                    surgery.medico || '',
+                    surgery.paciente || '',
+                    String(index)
+                ].join('|');
+
+                surgeryMap[sala].push({
+                    ...surgery,
+                    startTime: range.start,
+                    endTime: range.end,
+                    displayTime: surgery.time,
+                    signature,
+                    surgeryId: 'C' + String(index + 1)
                 });
-            }
+
+                allTimes.push(range.start, range.end);
+            });
         });
-        
-        // Generate time scale
+
         const uniqueTimes = [...new Set(allTimes)].sort((a, b) => a - b);
-        if (uniqueTimes.length === 0) {
+        if (uniqueTimes.length < 2) {
             let html = '<div style="margin-bottom:20px; background:#f5f5f5; border-radius:6px; padding:10px; border-left:4px solid var(--accent);">';
-            html += '<h4 style="color:var(--accent); margin:0 0 10px 0; font-size:13px;">🏥 ' + hospital + ' - 0' + day + ' de Outubro</h4>';
+            html += '<h4 style="color:var(--accent); margin:0 0 10px 0; font-size:13px;">' + hospital + ' - 0' + day + ' de Outubro</h4>';
             html += '<div style="padding:20px; text-align:center; color:#999;">Sem cirurgias agendadas</div>';
             html += '</div>';
             return html;
         }
-        
+
         let html = '<div style="margin-bottom:20px; background:#f5f5f5; border-radius:6px; padding:10px; border-left:4px solid var(--accent);">';
-        html += '<h4 style="color:var(--accent); margin:0 0 10px 0; font-size:13px;">🏥 ' + hospital + ' - 0' + day + ' de Outubro</h4>';
+        html += '<h4 style="color:var(--accent); margin:0 0 10px 0; font-size:13px;">' + hospital + ' - 0' + day + ' de Outubro</h4>';
         html += '<div style="background:white; border-radius:4px; overflow-x:auto; border:1px solid #ddd;">';
         html += '<div style="display:grid; grid-template-columns:70px repeat(5, 1fr); gap:0; background:white; min-width:800px;">';
-        
-        // Room headers
-        html += '<div style="background:var(--primary); color:white; padding:10px 5px; font-weight:bold; font-size:11px; text-align:center; border-right:1px solid #bbb; border-bottom:1px solid #bbb; position:sticky; left:0; z-index:2;">Horário</div>';
+
+        html += '<div style="background:var(--primary); color:white; padding:10px 5px; font-weight:bold; font-size:11px; text-align:center; border-right:1px solid #bbb; border-bottom:1px solid #bbb; position:sticky; left:0; z-index:2;">Horario</div>';
         salas.forEach(sala => {
-            html += '<div style="background:var(--primary); color:white; padding:10px 5px; font-weight:bold; font-size:11px; text-align:center; border-right:1px solid #bbb; border-bottom:1px solid #bbb;">'+sala.replace('Sala ','S')+' </div>';
+            html += '<div style="background:var(--primary); color:white; padding:10px 5px; font-weight:bold; font-size:11px; text-align:center; border-right:1px solid #bbb; border-bottom:1px solid #bbb;">' + sala.replace('Sala ', 'S') + '</div>';
         });
-        
-        // Time slots - show transitions
+
         for (let i = 0; i < uniqueTimes.length - 1; i++) {
             const timeStart = uniqueTimes[i];
-            const timeEnd = uniqueTimes[i + 1];
             const timeLabel = minutesToTime(timeStart);
-            
-            html += '<div style="background:var(--primary-light); padding:8px 5px; font-weight:bold; font-size:10px; text-align:center; border-right:1px solid #bbb; border-bottom:1px solid #bbb; min-height:60px; display:flex; align-items:center; justify-content:center; position:sticky; left:0; z-index:1;">'+timeLabel+'</div>';
-            
+            html += '<div style="background:var(--primary-light); padding:8px 5px; font-weight:bold; font-size:10px; text-align:center; border-right:1px solid #bbb; border-bottom:1px solid #bbb; min-height:60px; display:flex; align-items:center; justify-content:center; position:sticky; left:0; z-index:1;">' + timeLabel + '</div>';
+
             salas.forEach(sala => {
                 const surgeriesInSlot = surgeryMap[sala].filter(s => s.startTime <= timeStart && s.endTime > timeStart);
-                
+
                 if (surgeriesInSlot.length === 0) {
                     html += '<div style="background:white; border-right:1px solid #ddd; border-bottom:1px solid #ddd; min-height:60px;"></div>';
-                } else if (surgeriesInSlot.length === 1) {
-                    const surgery = surgeriesInSlot[0];
-                    const medico = escapeHtml((surgery.medico || '-').split(' ').slice(0,2).join(' '));
-                    const paciente = escapeHtml((surgery.paciente || '-').substring(0, 15));
-                    const motor = surgery.motor ? '⚡' : '';
-                    const materiais = (surgery.materiais || []).slice(0, 2).join(', ');
-                    const patologia = surgery.patologia ? escapeHtml(surgery.patologia.substring(0, 12)) : '';
-                    
-                    let tooltipText = '👨‍⚕️ '+escapeHtml(surgery.medico || 'N/A')+'\n🏥 '+paciente+'\n⏱️ '+surgery.displayTime;
-                    if (patologia) tooltipText += '\n🔬 '+patologia;
-                    if (materiais) tooltipText += '\n📦 '+materiais;
-                    
-                    html += '<div style="background:var(--accent); padding:5px; font-size:8px; border-right:1px solid #bbb; border-bottom:1px solid #bbb; min-height:60px; overflow-y:auto; border-left:2px solid #c5a003;" title="'+tooltipText+'"><div style="font-weight:bold; margin-bottom:2px; font-size:9px;">'+medico+' '+motor+'</div><div style="opacity:0.9;">'+paciente+'</div>' + (patologia ? '<div style="opacity:0.85; font-size:7px; color:#8B6914; margin-top:1px;">🔬 '+patologia+'</div>' : '') + (materiais ? '<div style="opacity:0.75; font-size:7px; margin-top:1px;">📦 '+materiais+'</div>' : '') + '<div style="opacity:0.7; font-size:7px; margin-top:2px;">'+(surgery.instrumentador ? escapeHtml(surgery.instrumentador.substring(0,10)) : '')+'</div></div>';
-                } else {
-                    // Overlapping surgeries - show conflict
-                    html += '<div style="background:#ffcccc; border:2px solid var(--danger); padding:5px; font-size:8px; border-right:1px solid #bbb; border-bottom:1px solid #bbb; min-height:60px; overflow-y:auto; color:var(--danger); font-weight:bold;"><span title="CONFLITO: '+surgeriesInSlot.length+' cirurgias sobrepostas">⚠️ '+surgeriesInSlot.length+'x CONFLITO</span><div style="font-size:7px; margin-top:3px;">';
-                    surgeriesInSlot.forEach(s => {
-                        html += escapeHtml((s.medico || '-').substring(0,12))+' / ';
-                    });
-                    html += '</div></div>';
+                    return;
                 }
+
+                if (surgeriesInSlot.length > 1) {
+                    html += '<div class="matrix-surgery-cell" style="background:#ffd9d9; color:var(--danger); font-weight:bold;">Conflito: ' + surgeriesInSlot.length + ' cirurgias</div>';
+                    return;
+                }
+
+                const surgery = surgeriesInSlot[0];
+                const style = getSurgeryHighlightStyle(surgery.signature);
+                const topRound = surgery.startTime === timeStart ? '8px' : '0';
+                const bottomRound = surgery.endTime === uniqueTimes[i + 1] ? '8px' : '0';
+                const medico = escapeHtml(surgery.medico || '-');
+                const paciente = escapeHtml(surgery.paciente || '-');
+                const tooltip = escapeHtml((surgery.displayTime || '-') + ' | Medico: ' + (surgery.medico || '-') + ' | Paciente: ' + (surgery.paciente || '-'));
+
+                html += '<div class="matrix-surgery-cell" style="background:' + style.bg + '; border-left:4px solid ' + style.border + '; border-top-left-radius:' + topRound + '; border-top-right-radius:' + topRound + '; border-bottom-left-radius:' + bottomRound + '; border-bottom-right-radius:' + bottomRound + ';" title="' + tooltip + '">';
+                html += '<div class="matrix-surgery-id">' + surgery.surgeryId + '</div>';
+                html += '<div class="matrix-surgery-doctor">' + medico + '</div>';
+                html += '<div class="matrix-surgery-patient">' + paciente + '</div>';
+                html += '</div>';
             });
         }
-        
+
         html += '</div></div></div>';
         return html;
     }
 
+    function parseSurgeryTimeRange(timeStr) {
+        if (!timeStr) return null;
+        const normalized = String(timeStr).replace(/\s*[–-]\s*/g, ' - ').trim();
+        const parts = normalized.split(' - ');
+        const start = parseTimeToMinutes(parts[0]);
+        if (!Number.isFinite(start)) return null;
+        const end = parts[1] ? parseTimeToMinutes(parts[1]) : (start + 180);
+        if (!Number.isFinite(end) || end <= start) return { start, end: start + 180 };
+        return { start, end };
+    }
+
+    function getSurgeryHighlightStyle(signature) {
+        let hash = 0;
+        for (let i = 0; i < signature.length; i++) {
+            hash = ((hash << 5) - hash) + signature.charCodeAt(i);
+            hash |= 0;
+        }
+        const hue = Math.abs(hash) % 360;
+        return {
+            bg: 'hsl(' + hue + ', 70%, 88%)',
+            border: 'hsl(' + hue + ', 70%, 42%)'
+        };
+    }
+
     function parseTimeToMinutes(timeStr) {
-        const parts = timeStr.trim().split(':');
-        if (parts.length < 2) return 0;
-        return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+        const match = String(timeStr || '').trim().match(/^(\d{1,2})[:hH](\d{2})$/);
+        if (!match) return Number.NaN;
+        const hours = parseInt(match[1], 10);
+        const mins = parseInt(match[2], 10);
+        if (hours < 0 || hours > 23 || mins < 0 || mins > 59) return Number.NaN;
+        return (hours * 60) + mins;
     }
 
     function minutesToTime(minutes) {
@@ -1018,6 +1095,7 @@
     }
 
     function showTab(tabKey) {
+        currentTab = tabKey;
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.classList.toggle('active', btn.getAttribute('onclick')?.includes(`'${tabKey}'`));
         });
