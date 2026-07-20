@@ -914,14 +914,20 @@
                 const style = getSurgeryHighlightStyle(surgery.signature);
                 const topRound = surgery.startTime === timeStart ? '8px' : '0';
                 const bottomRound = surgery.endTime === uniqueTimes[i + 1] ? '8px' : '0';
+                const isStartCell = surgery.startTime === timeStart;
                 const medico = escapeHtml(surgery.medico || '-');
                 const paciente = escapeHtml(surgery.paciente || '-');
-                const tooltip = escapeHtml((surgery.displayTime || '-') + ' | Medico: ' + (surgery.medico || '-') + ' | Paciente: ' + (surgery.paciente || '-'));
+                const materiais = (surgery.materiais || []).filter(Boolean).map(m => escapeHtml(m));
+                const materiaisText = materiais.length > 0 ? materiais.join(', ') : '-';
+                const tooltip = escapeHtml((surgery.displayTime || '-') + ' | Medico: ' + (surgery.medico || '-') + ' | Paciente: ' + (surgery.paciente || '-') + ' | Materiais: ' + materiaisText);
 
                 html += '<div class="matrix-surgery-cell" style="background:' + style.bg + '; border-left:4px solid ' + style.border + '; border-top-left-radius:' + topRound + '; border-top-right-radius:' + topRound + '; border-bottom-left-radius:' + bottomRound + '; border-bottom-right-radius:' + bottomRound + ';" title="' + tooltip + '">';
-                html += '<div class="matrix-surgery-id">' + surgery.surgeryId + '</div>';
-                html += '<div class="matrix-surgery-doctor">' + medico + '</div>';
-                html += '<div class="matrix-surgery-patient">' + paciente + '</div>';
+                if (isStartCell) {
+                    html += '<div class="matrix-surgery-id">' + surgery.surgeryId + '</div>';
+                    html += '<div class="matrix-surgery-doctor">' + medico + '</div>';
+                    html += '<div class="matrix-surgery-patient">' + paciente + '</div>';
+                    if (materiais.length > 0) html += '<div class="matrix-surgery-patient" style="margin-top:2px; font-size:7px; opacity:0.85;"><strong>Materiais:</strong> ' + materiais.join(', ') + '</div>';
+                }
                 html += '</div>';
             });
         }
