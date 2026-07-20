@@ -311,7 +311,17 @@
         "CHR_08": { "Sala 1": { "date": "2026-10-08", "surgeries": [] }, "Sala 2": { "date": "2026-10-08", "surgeries": [] }, "Sala 3": { "date": "2026-10-08", "surgeries": [] }, "Sala 4": { "date": "2026-10-08", "surgeries": [] }, "Sala 5": { "date": "2026-10-08", "surgeries": [] } },
         "CHR_09": { "Sala 1": { "date": "2026-10-09", "surgeries": [] }, "Sala 2": { "date": "2026-10-09", "surgeries": [] }, "Sala 3": { "date": "2026-10-09", "surgeries": [] }, "Sala 4": { "date": "2026-10-09", "surgeries": [] }, "Sala 5": { "date": "2026-10-09", "surgeries": [] } },
         "EVENT_05": [ { "time": "7:00", "title": "Fotografos e Equipe", "desc": "", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 10000, "comments": "" }, { "time": "7:00", "title": "Entrega dos Crachás", "desc": "", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 2000, "comments": "Crachás divididos em cores diferentes:\nProfessores (25 Unid.);\nStaffs (25 Unid.);\nInscritos (40 Unid.);\nObservadores (40 Unid.):" } ],
-        "EVENT_06": [ { "time": "07:30 - 08:00", "title": "Entrega de Scrubs", "desc": "", "resp": "Heloise", "sponsor": "NeoOrtho", "price": 141000, "comments": "" } ],
+        "EVENT_06": [
+          { "time": "07:30 - 08:00", "title": "Entrega de Scrubs e paramentação", "desc": "Heloise/Felipe", "resp": "Heloise/Felipe", "sponsor": "NeoOrtho", "price": 141000, "comments": "Supervisão do Cadaver Lab: Dr. Luis Fernando\nOrganização dos intervalos (Coffee Breaks e Brunch): Pamela\nCustos cobertos pela Neoortho: Aluguel da sala, Arco em C, Motores, Implantes e Instrumentais, Instrumentadores e Toucas Cirúrgicas\nInvestimento do Backdrop (cenário): R$ 280.000,00 (Marc)" },
+          { "time": "08:00 - 08:15", "title": "Abertura e Boas-vindas", "desc": "", "resp": "", "sponsor": "NeoOrtho", "price": 0, "comments": "Local: Neoortho (Curitiba) | Carga Horária: 08:00 - 18:00\nCapacidade: 10 estações de cadáveres\nProporção: 1 estação para 3 participantes e 1 Faculty\n4 grupos (A, B, C e D)\nDinâmica: 3 blocos de treinamento com 3 exercícios práticos cada\nKits de Instrumentais por bloco (4 de cada):\n1. Parafusos Canulados (2,4 / 3,5 / 4,5 / 7,0mm)\n2. Placas Mini e Micro\n3. Placas de Tíbia e Fíbula" },
+          { "time": "08:15 - 10:30", "title": "Bloco 1 - Cadaver Lab", "desc": "Ex.1: Fixação de Lisfranc | Ex.2: Artrodese TMT (Lapidus) | Ex.3: Fratura do Navicular", "resp": "Dr. Luis Fernando", "sponsor": "NeoOrtho", "price": 0, "comments": "" },
+          { "time": "10:30 - 10:50", "title": "Coffee Break", "desc": "", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 0, "comments": "" },
+          { "time": "10:50 - 13:05", "title": "Bloco 2 - Cadaver Lab", "desc": "Ex.1: Placa Lateral ou Medial | Ex.2: Anterolateral | Ex.3: Medial", "resp": "Dr. Luis Fernando", "sponsor": "NeoOrtho", "price": 0, "comments": "" },
+          { "time": "13:05 - 14:05", "title": "Almoço / Brunch - Lunch Box", "desc": "", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 0, "comments": "" },
+          { "time": "14:05 - 16:20", "title": "Bloco 3 - Cadaver Lab", "desc": "Ex.1: Opcional - Artrodesis | Ex.2 e 3: Rotação de materiais (grupos)", "resp": "Dr. Luis Fernando", "sponsor": "NeoOrtho", "price": 0, "comments": "" },
+          { "time": "16:20 - 16:40", "title": "Coffee Break da Tarde", "desc": "", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 0, "comments": "" },
+          { "time": "16:40 - 18:00", "title": "Discussão de Casos, Debriefing e Q&A", "desc": "Todos os grupos apresentam os resultados", "resp": "", "sponsor": "NeoOrtho", "price": 0, "comments": "" }
+        ],
         "EVENT_07": [ { "time": "08:00 - 09:20", "title": "Aula", "desc": "", "resp": "Pamela", "sponsor": "NeoOrtho", "price": 3000, "comments": "" } ]
       }
     };
@@ -398,6 +408,23 @@
                     }
                 });
             });
+
+            // Migração: Popular EVENT_06 com cronograma completo do Cadaver Lab
+            const event06Default = [
+              { time: "07:30 - 08:00", title: "Entrega de Scrubs e paramentação", desc: "Heloise/Felipe", resp: "Heloise/Felipe", sponsor: "NeoOrtho", price: 141000, status: "", comments: "Supervisão do Cadaver Lab: Dr. Luis Fernando\nOrganização dos intervalos (Coffee Breaks e Brunch): Pamela\nCustos cobertos pela Neoortho: Aluguel da sala, Arco em C, Motores, Implantes e Instrumentais, Instrumentadores e Toucas Cirúrgicas\nInvestimento do Backdrop (cenário): R$ 280.000,00 (Marc)" },
+              { time: "08:00 - 08:15", title: "Abertura e Boas-vindas", desc: "", resp: "", sponsor: "NeoOrtho", price: 0, status: "", comments: "Local: Neoortho (Curitiba) | Carga Horária: 08:00 - 18:00\nCapacidade: 10 estações de cadáveres\nProporção: 1 estação para 3 participantes e 1 Faculty\n4 grupos (A, B, C e D)\nDinâmica: 3 blocos de treinamento com 3 exercícios práticos cada\nKits de Instrumentais por bloco (4 de cada):\n1. Parafusos Canulados (2,4 / 3,5 / 4,5 / 7,0mm)\n2. Placas Mini e Micro\n3. Placas de Tíbia e Fíbula" },
+              { time: "08:15 - 10:30", title: "Bloco 1 - Cadaver Lab", desc: "Ex.1: Fixação de Lisfranc | Ex.2: Artrodese TMT (Lapidus) | Ex.3: Fratura do Navicular", resp: "Dr. Luis Fernando", sponsor: "NeoOrtho", price: 0, status: "", comments: "" },
+              { time: "10:30 - 10:50", title: "Coffee Break", desc: "", resp: "Pamela", sponsor: "NeoOrtho", price: 0, status: "", comments: "" },
+              { time: "10:50 - 13:05", title: "Bloco 2 - Cadaver Lab", desc: "Ex.1: Placa Lateral ou Medial | Ex.2: Anterolateral | Ex.3: Medial", resp: "Dr. Luis Fernando", sponsor: "NeoOrtho", price: 0, status: "", comments: "" },
+              { time: "13:05 - 14:05", title: "Almoço / Brunch - Lunch Box", desc: "", resp: "Pamela", sponsor: "NeoOrtho", price: 0, status: "", comments: "" },
+              { time: "14:05 - 16:20", title: "Bloco 3 - Cadaver Lab", desc: "Ex.1: Opcional - Artrodesis | Ex.2 e 3: Rotação de materiais (grupos)", resp: "Dr. Luis Fernando", sponsor: "NeoOrtho", price: 0, status: "", comments: "" },
+              { time: "16:20 - 16:40", title: "Coffee Break da Tarde", desc: "", resp: "Pamela", sponsor: "NeoOrtho", price: 0, status: "", comments: "" },
+              { time: "16:40 - 18:00", title: "Discussão de Casos, Debriefing e Q&A", desc: "Todos os grupos apresentam os resultados", resp: "", sponsor: "NeoOrtho", price: 0, status: "", comments: "" }
+            ];
+            if (!scheduleData.EVENT_06 || (scheduleData.EVENT_06.length === 1 && scheduleData.EVENT_06[0].title === 'Entrega de Scrubs')) {
+                scheduleData.EVENT_06 = event06Default;
+                triggerAutoSave();
+            }
 
             document.getElementById('loadingScreen').style.display = 'none';
             updateSaveStatus('salvo'); 
